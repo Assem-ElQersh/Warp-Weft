@@ -4,6 +4,8 @@
 
 # Python Bytecode, Caches & Environments
 __pycache__/
+*/__pycache__/
+tests/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -123,3 +125,5 @@ data/fabricnet/*.zip
 !data/fabricnet/FabricNet_parameters.xlsx
 data/samples/*
 !data/samples/.gitkeep
+tests/__pycache__/
+*.pyc

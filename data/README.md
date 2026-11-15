@@ -66,12 +66,20 @@ The dataset comprises **130 photographic samples** (`W001.jpg` to `W130.jpg`) pa
    * **Satin Weave (`satin`):** 41 samples (extended surface floats with minimized interlacing points).
 
 #### Warp & Weft Algorithmic Usability
-FabricNET serves as the comprehensive physical optical benchmark across all 130 samples. Because individual yarn crowns and inter-yarn shadows are distinctly imaged at $\sim 8\,\mu\text{m/pixel}$, it satisfies the Nyquist-Shannon criterion ($> 15\text{ pixels per yarn period}$ for densities up to $60\text{ threads/cm}$). Evaluated across all 130 images using exact anisotropic calibration ($S_x=1280.0, S_y=1200.0\text{ px/cm}$), the engine achieves:
-* **Plain Weave ($N=50$):** Warp $\text{MAE} = 7.68\text{ ends/cm}$, Weft $\text{MAE} = 4.96\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $44.0\%$ (Warp), $46.0\%$ (Weft).
-* **Twill Weave ($N=39$):** Warp $\text{MAE} = 15.05\text{ ends/cm}$, Weft $\text{MAE} = 6.59\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $12.8\%$ (Warp), $35.9\%$ (Weft).
-* **Satin Weave ($N=41$):** Warp $\text{MAE} = 13.54\text{ ends/cm}$, Weft $\text{MAE} = 20.34\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $24.4\%$ (Warp), $14.6\%$ (Weft).
-* **Overall Direct Axis:** Warp $\text{MAE} = 11.74\text{ ends/cm}$, Weft $\text{MAE} = 10.30\text{ picks/cm}$.
-* **Orientation-Invariant Paired:** Warp $\text{MAE} = 10.42\text{ ends/cm}$, Weft $\text{MAE} = 8.94\text{ picks/cm}$.
+FabricNET serves as the comprehensive physical optical benchmark across all 130 samples. Because individual yarn crowns and inter-yarn shadows are distinctly imaged at $\sim 8\,\mu\text{m/pixel}$, it satisfies the Nyquist-Shannon criterion ($> 15\text{ pixels per yarn period}$ for densities up to $60\text{ threads/cm}$). Evaluated across all 130 images using exact anisotropic calibration ($S_x=1280.0, S_y=1200.0\text{ px/cm}$) under aperture-constrained fusion ($\Delta \le \max(2.0, 1.0/L)$):
+* **Plain Weave ($N=50$):** Warp $\text{MAE} = 7.73\text{ ends/cm}$, Weft $\text{MAE} = 4.93\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $42.0\%$ (Warp), $40.0\%$ (Weft).
+* **Twill Weave ($N=39$):** Warp $\text{MAE} = 22.05\text{ ends/cm}$, Weft $\text{MAE} = 8.12\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $2.6\%$ (Warp), $28.2\%$ (Weft).
+* **Satin Weave ($N=41$):** Warp $\text{MAE} = 12.18\text{ ends/cm}$, Weft $\text{MAE} = 21.93\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $31.7\%$ (Warp), $12.2\%$ (Weft).
+* **Overall Direct Axis:** Warp $\text{MAE} = 13.43\text{ ends/cm}$, Weft $\text{MAE} = 11.25\text{ picks/cm}$.
+* **Orientation-Invariant Paired:** Warp $\text{MAE} = 12.39\text{ ends/cm}$, Weft $\text{MAE} = 11.78\text{ picks/cm}$.
+* **Decision Status Transparency:** $88\text{ samples}$ ($67.7\%$) flagged as `NEEDS_REVIEW`, $42\text{ samples}$ ($32.3\%$) as `CONSISTENT_WITH_WARNING`, and $0\text{ samples}$ as false `VALIDATED`.
+
+> [!WARNING]
+> **Optical Calibration Verification Status:** The scales $S_x=1280.0\text{ px/cm}$ and $S_y=1200.0\text{ px/cm}$ are calculated from author FOV claims ($5 \times 4\text{ mm}$), but have not been physically verified against an external stage micrometer. An unverified $\pm 3\text{--}5\%$ magnification error directly introduces a systematic baseline offset of $\pm 1.5\text{--}3.0\text{ ends/cm}$.
+>
+> **Strict Offline Scope for Orientation Pairing:** Orientation-invariant paired error calculation is strictly an offline diagnostic method for un-oriented swatch mounting in this dataset. The production web application and core pipeline NEVER perform ground-truth-dependent pairing.
+>
+> **Honest Limitation on Float Weaves:** The objective of universal autonomous thread counting across arbitrary float architectures is NOT validated under single-side optical surface capture. Float weaves (twill and satin) exhibit severe harmonic ambiguity where surface reflection obscures interior interlacing nodes.
 
 ---
 

@@ -1,48 +1,66 @@
 {
-  "calibration": {
-    "pixels_per_cm": 400,
-    "pixel_pitch_um": 25.0,
-    "roi_field_of_view_cm": [
-      1.0,
-      1.0
-    ],
-    "roi_pixel_dimensions": [
-      400,
-      400
-    ]
-  },
+  "schema_version": "2.0.0",
+  "timestamp_iso": "2026-11-15T23:29:17.062214+00:00",
+  "pipeline": "src.fabric_analysis.pipeline.analyze_fabric",
+  "sample_type": "synthetic_verification_swatch_12deg_skew",
   "ground_truth": {
     "warp_ends_per_cm": 36,
     "weft_picks_per_cm": 30,
-    "skew_angle_deg": 12.0
+    "skew_deg": 12.0
   },
-  "orientation_engine": {
-    "detected_skew_deg": 11.5,
-    "skew_error_deg": 0.5,
-    "rectification_status": "orthogonal_aligned"
-  },
-  "spectral_fft_engine": {
-    "warp_ends_per_cm": 35.79999923706055,
-    "weft_picks_per_cm": 30.0,
-    "warp_spnr": 150.49,
-    "weft_spnr": 265.09,
-    "delta_warp": 0.2,
-    "delta_weft": 0.0
-  },
-  "spatial_projection_engine": {
+  "results": {
+    "accepted_warp_density_ends_per_cm": 36,
+    "accepted_weft_density_picks_per_cm": 30,
+    "is_validated": true,
+    "candidate_measurements": {
+      "warp_fft": 35.94,
+      "warp_proj": 36.36,
+      "weft_fft": 30.0,
+      "weft_proj": 30.77,
+      "delta_warp": 0.42,
+      "delta_weft": 0.77,
+      "warp_concordant": true,
+      "weft_concordant": true,
+      "tolerance_warp": 2.0,
+      "tolerance_weft": 2.0
+    },
     "warp_ends_per_cm": 36,
     "weft_picks_per_cm": 30,
-    "mean_warp_pitch_um": 277.08,
-    "mean_weft_pitch_um": 332.5,
-    "delta_warp": 0,
-    "delta_weft": 0
+    "warp_density_continuous": 36.2,
+    "weft_density_continuous": 30.4,
+    "total_thread_density": 66,
+    "linear_density_sum_per_cm": 66.6,
+    "areal_intersection_density_per_cm2": 1080.0,
+    "pitch_warp_um": 276.24,
+    "pitch_weft_um": 328.95,
+    "detected_skew_deg": 11.5,
+    "decision_status": "VALIDATED",
+    "engine_mode": "Dual-Engine Consensus (Verified)",
+    "signal_quality_index": 75.7,
+    "confidence_score": 75.7,
+    "decision_rationale": "Both engines concordant within physical aperture quantization limit (\u0394_warp=0.4 <= 2.0, \u0394_weft=0.8 <= 2.0 ends/cm)."
   },
-  "consensus_validation": {
-    "validated_warp_ends_per_cm": 36,
-    "validated_weft_picks_per_cm": 30,
-    "warp_discrepancy": 0.2,
-    "weft_discrepancy": 0.0,
-    "is_consistent": true,
-    "confidence_quality_score_pct": 98.5
-  }
+  "calibration": {
+    "pixels_per_cm_x": 400.0,
+    "pixels_per_cm_y": 400.0,
+    "pixel_pitch_um_x": 25.0,
+    "pixel_pitch_um_y": 25.0,
+    "calibration_source": "synthetic_camera_calibration",
+    "is_verified": true,
+    "uncertainty_pct": 5.0,
+    "is_isotropic": true,
+    "aspect_ratio": 1.0
+  },
+  "audit": {
+    "fft_warp": 35.94,
+    "fft_weft": 30.0,
+    "proj_warp": 36.36,
+    "proj_weft": 30.77,
+    "delta_warp": 0.42,
+    "delta_weft": 0.77,
+    "spnr_warp": 4974.7,
+    "spnr_weft": 5530.7,
+    "rect_variance": 0.03423
+  },
+  "latency_ms": 41.45
 }

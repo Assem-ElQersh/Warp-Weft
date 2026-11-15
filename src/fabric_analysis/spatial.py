@@ -26,24 +26,49 @@ def median_filter_1d(signal: np.ndarray, kernel_size: int = 3) -> np.ndarray:
     return filtered
 
 
+def detrend_projection_1d(signal: np.ndarray, window_size: int = 51) -> np.ndarray:
+    """
+    The mechanistic justification for this step is: remove broad, low-frequency
+    illumination baseline gradients (vignetting, central glare) across the 1D projection
+    profile using a moving-average baseline estimator, preventing asymmetric baseline tilt
+    from suppressing true peak-to-trough prominence.
+    """
+    n = len(signal)
+    if n < window_size:
+        return signal - np.mean(signal)
+    pad = window_size // 2
+    padded = np.pad(signal, pad, mode="reflect")
+    kernel = np.ones(window_size, dtype=np.float32) / float(window_size)
+    baseline = np.convolve(padded, kernel, mode="valid")
+    detrended = signal - baseline[:n]
+    return detrended
+
+
 def find_prominent_peaks_adaptive(signal: np.ndarray,
                                   min_dist: int = 3,
+                                  trough_window: int = 18,
                                   prominence: float = 0.012) -> List[int]:
     """
     The mechanistic justification for this step is: identify structural yarn crowns
-    by verifying that candidate local maxima exceed both an adaptive spatial distance
-    constraint and optical contrast prominence relative to neighboring troughs.
+    by verifying that candidate local maxima exceed an adaptive minimum separation distance
+    and optical contrast prominence evaluated across a physically scaled trough window
+    spanning the expected inter-yarn half-period, rather than truncating the trough search
+    to min_dist.
     """
     n = len(signal)
     peaks = []
+    # Dynamic prominence bounded by signal dispersion to prevent rejection on low-contrast fabrics
+    sig_std = float(np.std(signal))
+    eff_prom = min(prominence, max(0.003, 0.25 * sig_std))
+
     for i in range(1, n - 1):
         if signal[i] > signal[i - 1] and signal[i] >= signal[i + 1]:
-            left_w = max(0, i - min_dist)
-            right_w = min(n, i + min_dist + 1)
+            left_w = max(0, i - trough_window)
+            right_w = min(n, i + trough_window + 1)
             left_min = np.min(signal[left_w:i]) if i > left_w else signal[i]
             right_min = np.min(signal[i + 1 : right_w]) if right_w > i + 1 else signal[i]
             prom = signal[i] - max(left_min, right_min)
-            if prom >= prominence:
+            if prom >= eff_prom:
                 if not peaks or (i - peaks[-1]) >= min_dist:
                     peaks.append(i)
                 elif signal[i] > signal[peaks[-1]]:
@@ -71,20 +96,30 @@ def compute_spatial_projection_density(
     p_warp_raw = np.mean(crop_arr, axis=0)  # Down columns -> Warp waveform
     p_weft_raw = np.mean(crop_arr, axis=1)  # Across rows -> Weft waveform
 
-    # 2. 1D Median Filtering
-    p_warp = median_filter_1d(p_warp_raw, kernel_size=3)
-    p_weft = median_filter_1d(p_weft_raw, kernel_size=3)
+    # 2. 1D Median Filtering & Baseline Detrending
+    p_warp_med = median_filter_1d(p_warp_raw, kernel_size=3)
+    p_weft_med = median_filter_1d(p_weft_raw, kernel_size=3)
 
-    # 3. Adaptive Minimum Peak Separation
+    # Detrend using window scaled to expected fabric periodicity to remove lighting bow
+    win_detrend_x = max(21, int(round(sx / 25.0)))
+    win_detrend_y = max(21, int(round(sy / 25.0)))
+    p_warp = detrend_projection_1d(p_warp_med, window_size=win_detrend_x)
+    p_weft = detrend_projection_1d(p_weft_med, window_size=win_detrend_y)
+
+    # 3. Adaptive Minimum Peak Separation & Physical Trough Windows
     min_dist_x = max(3, int(round(0.40 * sx / max_density_bound)))
     min_dist_y = max(3, int(round(0.40 * sy / max_density_bound)))
 
+    # Trough window covers physical half-period at nominal 35 threads/cm
+    trough_win_x = max(min_dist_x * 2, int(round(0.50 * sx / 35.0)))
+    trough_win_y = max(min_dist_y * 2, int(round(0.50 * sy / 35.0)))
+
     # 4. Prominence Peak Detection
-    warp_peaks = find_prominent_peaks_adaptive(p_warp, min_dist=min_dist_x, prominence=prominence)
-    weft_peaks = find_prominent_peaks_adaptive(p_weft, min_dist=min_dist_y, prominence=prominence)
+    warp_peaks = find_prominent_peaks_adaptive(p_warp, min_dist=min_dist_x, trough_window=trough_win_x, prominence=prominence)
+    weft_peaks = find_prominent_peaks_adaptive(p_weft, min_dist=min_dist_y, trough_window=trough_win_y, prominence=prominence)
 
     def analyze_intervals(peaks, scale_px_cm, crop_span_cm):
-        if len(peaks) < 2:
+        if len(peaks) < 3:
             return 0.0, 0.0, 0.0, 0.0, "insufficient_peaks"
 
         intervals = np.diff(peaks).astype(np.float32)
@@ -112,13 +147,21 @@ def compute_spatial_projection_density(
     (weft_pitch_density, weft_span_density, pitch_weft_um,
      weft_dispersion, status_wf) = analyze_intervals(weft_peaks, sy, crop_h_cm)
 
-    # Traditional raw peak count / crop_span for legacy audit comparison
-    raw_warp_count = len(warp_peaks) / max(crop_w_cm, 1e-5)
-    raw_weft_count = len(weft_peaks) / max(crop_h_cm, 1e-5)
+    raw_warp_count = len(warp_peaks) / max(crop_w_cm, 1e-4)
+    raw_weft_count = len(weft_peaks) / max(crop_h_cm, 1e-4)
 
-    # Use pitch-based density as authoritative spatial estimate when dispersion is low (< 0.25)
-    final_warp_spatial = warp_pitch_density if warp_dispersion <= 0.25 and warp_pitch_density > 0 else raw_warp_count
-    final_weft_spatial = weft_pitch_density if weft_dispersion <= 0.25 and weft_pitch_density > 0 else raw_weft_count
+    # Authoritative spatial density assignment:
+    # Requires at least 3 peaks; if interval dispersion is low (<= 0.35), use median pitch;
+    # otherwise fallback to active span density if >= 3 peaks, else 0.0
+    if len(warp_peaks) >= 3:
+        final_warp_spatial = warp_pitch_density if warp_dispersion <= 0.35 else warp_span_density
+    else:
+        final_warp_spatial = 0.0
+
+    if len(weft_peaks) >= 3:
+        final_weft_spatial = weft_pitch_density if weft_dispersion <= 0.35 else weft_span_density
+    else:
+        final_weft_spatial = 0.0
 
     var_warp = float(np.var(p_warp))
     var_weft = float(np.var(p_weft))

@@ -1401,14 +1401,23 @@
             const a = data.audit;
             const v = data.visuals;
 
-            // KPIs
-            document.getElementById('kpi-warp').innerText = r.warp_ends_per_cm;
-            document.getElementById('kpi-warp-pitch').innerText = `Pitch: ${r.pitch_warp_um} µm`;
+            // Separate accepted measurements from unvalidated candidate measurements
+            const warpAccepted = (r.accepted_warp_density_ends_per_cm != null) ? r.accepted_warp_density_ends_per_cm : (r.warp_ends_per_cm != null ? r.warp_ends_per_cm : null);
+            const weftAccepted = (r.accepted_weft_density_picks_per_cm != null) ? r.accepted_weft_density_picks_per_cm : (r.weft_picks_per_cm != null ? r.weft_picks_per_cm : null);
 
-            document.getElementById('kpi-weft').innerText = r.weft_picks_per_cm;
-            document.getElementById('kpi-weft-pitch').innerText = `Pitch: ${r.pitch_weft_um} µm`;
+            // KPIs: Never expose unvalidated guesses as verified primary density
+            document.getElementById('kpi-warp').innerText = warpAccepted != null ? warpAccepted : '--';
+            document.getElementById('kpi-warp-pitch').innerText = r.pitch_warp_um != null 
+                ? `Pitch: ${r.pitch_warp_um} µm` 
+                : `Unvalidated (FFT: ${a.fft_warp} | Proj: ${a.proj_warp})`;
 
-            document.getElementById('kpi-total').innerText = r.linear_density_sum_per_cm || r.total_thread_density;
+            document.getElementById('kpi-weft').innerText = weftAccepted != null ? weftAccepted : '--';
+            document.getElementById('kpi-weft-pitch').innerText = r.pitch_weft_um != null 
+                ? `Pitch: ${r.pitch_weft_um} µm` 
+                : `Unvalidated (FFT: ${a.fft_weft} | Proj: ${a.proj_weft})`;
+
+            const totVal = r.linear_density_sum_per_cm != null ? r.linear_density_sum_per_cm : (r.total_thread_density != null ? r.total_thread_density : '--');
+            document.getElementById('kpi-total').innerText = totVal;
             const arealStr = r.areal_intersection_density_per_cm2 ? ` | Areal: ${r.areal_intersection_density_per_cm2} cr/cm²` : '';
             document.getElementById('kpi-skew').innerText = `Skew: ${r.detected_skew_deg > 0 ? '+' : ''}${r.detected_skew_deg}°${arealStr}`;
 
@@ -1458,15 +1467,21 @@
             document.getElementById('audit-fft-warp').innerText = `${a.fft_warp} ends/cm`;
             document.getElementById('audit-proj-warp').innerText = `${a.proj_warp} ends/cm (${a.warp_peaks_count} peaks)`;
             document.getElementById('audit-delta-warp').innerText = `Δ = ${a.delta_warp}`;
-            document.getElementById('audit-final-warp').innerText = `${r.warp_ends_per_cm} Ends/cm`;
+            document.getElementById('audit-final-warp').innerText = warpAccepted != null 
+                ? `${warpAccepted} Ends/cm (Verified)` 
+                : `UNVALIDATED (Candidate FFT: ${a.fft_warp}, Proj: ${a.proj_warp})`;
 
             document.getElementById('audit-fft-weft').innerText = `${a.fft_weft} picks/cm`;
             document.getElementById('audit-proj-weft').innerText = `${a.proj_weft} picks/cm (${a.weft_peaks_count} peaks)`;
             document.getElementById('audit-delta-weft').innerText = `Δ = ${a.delta_weft}`;
-            document.getElementById('audit-final-weft').innerText = `${r.weft_picks_per_cm} Picks/cm`;
+            document.getElementById('audit-final-weft').innerText = weftAccepted != null 
+                ? `${weftAccepted} Picks/cm (Verified)` 
+                : `UNVALIDATED (Candidate FFT: ${a.fft_weft}, Proj: ${a.proj_weft})`;
 
             document.getElementById('audit-mode').innerText = r.engine_mode;
-            document.getElementById('audit-final-decision').innerText = `${r.warp_ends_per_cm} Ends / ${r.weft_picks_per_cm} Picks`;
+            document.getElementById('audit-final-decision').innerText = (warpAccepted != null && weftAccepted != null)
+                ? `${warpAccepted} Ends / ${weftAccepted} Picks`
+                : `NEEDS REVIEW (Warp: ${warpAccepted != null ? warpAccepted : 'Unvalidated'}, Weft: ${weftAccepted != null ? weftAccepted : 'Unvalidated'})`;
 
             document.getElementById('audit-detected-skew').innerText = `${r.detected_skew_deg}°`;
             document.getElementById('audit-variance').innerText = `Var = ${a.rect_variance}`;

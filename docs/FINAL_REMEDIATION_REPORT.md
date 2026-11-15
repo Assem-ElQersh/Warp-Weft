@@ -70,21 +70,21 @@ The complete FabricNET dataset ($N=130$) was evaluated using the exact physical 
 
 ### 4.1. Comparative Performance Ledger
 
-| Evaluation Metric | Historical Baseline (Uncorrected Engine) | Remediated Authoritative Engine (`src.fabric_analysis`) | Analytical Impact / Mechanical Justification |
+| Evaluation Metric | Historical Baseline (Uncorrected Engine) | Remediated Authoritative Engine (`src.fabric_analysis` v2.0) | Analytical Impact / Mechanical Justification |
 | :--- | :--- | :--- | :--- |
 | **Total Samples Evaluated** | 4 cherry-picked ($3.1\%$) | **130 samples ($100\%$)** | Eliminates selection bias; covers all weave variations. |
-| **Overall Direct Warp MAE** | 12.75 ends/cm | **11.74 ends/cm** | Anisotropic scale correction reduces horizontal frequency errors. |
-| **Overall Direct Weft MAE** | 10.84 picks/cm | **10.30 picks/cm** | $S_y=1200.0$ calibration eliminates $6.67\%$ vertical over-scaling. |
-| **Paired (Orientation-Invariant) Warp MAE**| N/A (Manual swap on W017) | **10.42 ends/cm** | Robust against physical $90^\circ$ swatch mounting. |
-| **Paired (Orientation-Invariant) Weft MAE**| N/A | **8.94 picks/cm** | Resolves camera-to-fabric axis misalignment objectively. |
-| **Plain Weave Warp MAE (N=50)** | 5.56 ends/cm | **7.68 ends/cm** | Honest calculation without hardcoded W012 substitutions. |
-| **Plain Weave Weft MAE (N=50)** | 3.78 picks/cm | **4.96 picks/cm** | Reflects true optical projection performance on real yarns. |
-| **Plain Weave Accuracy ($\le \pm 2$)** | 46.2% | **46.0% (Weft) / 44.0% (Warp)** | Verified baseline for orthogonal simple weaves. |
-| **Twill Weave Warp MAE (N=39)** | 22.85 ends/cm | **15.05 ends/cm** | Harmonic family filtering reduces twill float overcounting. |
-| **Twill Weave Weft MAE (N=39)** | 5.90 picks/cm | **6.59 picks/cm** | Consistent projection tracking along straight weft picks. |
-| **Satin Weave Warp MAE (N=41)** | 11.90 ends/cm | **13.54 ends/cm** | Identifies fundamental domain boundary where floats hide interlaces. |
-| **Satin Weave Weft MAE (N=41)** | 24.15 picks/cm | **20.34 picks/cm** | 2D FFT multi-candidate suppression reduces float harmonic error. |
-| **Decision Status Transparency** | 100% false "VALIDATED" | **NEEDS_REVIEW: 63.8%<br>CONSISTENT_WITH_WARNING: 27.7%<br>VALIDATED: 8.5%** | Eliminates false certainty; flags ambiguous float textures. |
+| **Overall Direct Warp MAE** | 12.75 ends/cm | **13.43 ends/cm** | Replaces arbitrary 6% tolerance with aperture limits; isolates unvalidated predictions. |
+| **Overall Direct Weft MAE** | 10.84 picks/cm | **11.25 picks/cm** | $S_y=1200.0$ calibration eliminates vertical over-scaling on physical yarns. |
+| **Paired (Orientation-Invariant) Warp MAE**| N/A (Manual swap on W017) | **12.39 ends/cm** | Offline benchmark evaluation metric for un-oriented swatch mounting. |
+| **Paired (Orientation-Invariant) Weft MAE**| N/A | **11.78 picks/cm** | Evaluates frequency recovery invariance without ground-truth leaking to production. |
+| **Plain Weave Warp MAE (N=50)** | 5.56 ends/cm | **7.73 ends/cm** | Honest calculation across all 50 plain weaves without hardcoded substitutions. |
+| **Plain Weave Weft MAE (N=50)** | 3.78 picks/cm | **4.93 picks/cm** | Consistent optical projection tracking along clean orthogonal weft picks. |
+| **Plain Weave Accuracy ($\le \pm 2$)** | 46.2% | **40.0% (Weft) / 42.0% (Warp)** | Empirical baseline for orthogonal simple weaves. |
+| **Twill Weave Warp MAE (N=39)** | 22.85 ends/cm | **22.05 ends/cm** | Float sub-harmonics and diagonal ridges introduce severe frequency ambiguities. |
+| **Twill Weave Weft MAE (N=39)** | 5.90 picks/cm | **8.12 picks/cm** | Projection profiling tracks interlacing steps across diagonal ridges. |
+| **Satin Weave Warp MAE (N=41)** | 11.90 ends/cm | **12.18 ends/cm** | Long warp floats obscure interlacing nodes, lowering optical prominence. |
+| **Satin Weave Weft MAE (N=41)** | 24.15 picks/cm | **21.93 picks/cm** | Severe float harmonic error; identifies physical limit of surface reflection. |
+| **Decision Status Transparency** | 100% false "VALIDATED" | **NEEDS_REVIEW: 67.7% (88)<br>CONSISTENT_WITH_WARNING: 32.3% (42)<br>VALIDATED: 0.0% (0)** | Rejects false certainty; flags ambiguous float weaves for manual audit. |
 
 ---
 
@@ -93,61 +93,82 @@ The complete FabricNET dataset ($N=130$) was evaluated using the exact physical 
 The empirical findings across 130 samples isolate distinct physical failure modes and explain why weave-aware fusion is mandatory:
 
 1. **Plain Weave ($1/1$ Interlacing, $N=50$):**
-   * Highest accuracy ($\text{MAE} \approx 4.96\text{ picks/cm}$).
+   * Highest accuracy ($\text{MAE} \approx 4.93\text{ picks/cm}$).
    * Every warp yarn alternates over and under each weft yarn, creating symmetric, high-contrast optical crowns and orthogonal Fourier harmonics.
-   * Dual-engine consensus functions optimally with minimal discrepancy.
+   * Dual-engine consensus functions with highest consistency on plain fabrics.
 2. **Twill Weave (Diagonal Floats, $N=39$):**
-   * Warp yarns float over two or more weft yarns (e.g. $2/1$ or $2/2$ twill), creating diagonal ridges.
+   * Warp yarns float over two or more weft yarns (e.g. $2/1$ or $2/2$ twill), creating diagonal ridges ($\text{Warp MAE} = 22.05$).
    * Spatial projection profiling along columns often detects both the yarn boundary and the float step, leading to sub-harmonic overcounting.
-   * Spectral 2D FFT successfully isolates the fundamental spacing ($f_0$) by suppressing diagonal float harmonics.
+   * Spectral 2D FFT isolates dominant directional energy, but harmonic families (fundamental vs repeat pattern period) remain ambiguous without structural float phase modeling.
 3. **Satin / Sateen Weave (Long Floats, $N=41$):**
-   * Warp threads float over 4 to 7 weft threads with minimal interlacing nodes visible from one side.
+   * Warp threads float over 4 to 7 weft threads with minimal interlacing nodes visible from one side ($\text{Weft MAE} = 21.93$).
    * The surface reflects light uniformly, severely diminishing projection contrast ($\text{contrast variance} < 0.05$).
    * Constitutes the physical domain limit of purely optical surface counting; dense satins require transmitted back-illumination or infrared penetration to resolve interior yarn paths.
 
 ---
 
-## 6. Smartphone Failure Mode & Robustness Verification
+## 6. Physical Calibration Status & Accuracy Impact
 
-To address the documented smartphone failure mode ($1200 \times 1600$ px capture with non-uniform illumination and heavy yarn fuzz):
-* We implemented `tests/test_smartphone_regression.py` simulating heavy lens vignetting, directional flash flare, and high-frequency surface fuzz.
-* Under this fixture, the remediated engine:
-  1. Detects low projection contrast and high interval dispersion.
-  2. Flags estimator divergence between FFT and projection.
-  3. Sets `decision_status` to `CONSISTENT_WITH_WARNING` or `NEEDS_REVIEW`.
-  4. Produces an honest `signal_quality_index` ($< 70\%$) rather than claiming false certainty.
+* **Nominal Calibration Parameters:** The spatial scales $S_x = 1280.0\text{ px/cm}$ and $S_y = 1200.0\text{ px/cm}$ are calculated from the author-reported optical field of view ($5.0 \times 4.0\text{ mm}$ across $640 \times 480\text{ px}$).
+* **Unverified Status:** This nominal calibration has NOT been physically verified against an external stage micrometer or NIST-traceable optical graticule.
+* **Uncertainty Propagation:** A nominal error of merely $\pm 3\text{--}5\%$ in focal distance, sensor tilt, or optical magnification translates directly to an irreducible systematic offset of $\pm 1.5\text{--}3.0\text{ ends/cm}$ on dense fabrics ($50\text{--}80\text{ ends/cm}$).
+* **Architectural Invariant:** In `src/fabric_analysis/calibration.py`, `is_verified` is explicitly flagged as `False` for FabricNET inputs, exposing `uncertainty_pct = 5.0` to prevent over-confident assertions.
 
 ---
 
-## 7. Automated Regression Test Suite Verification
+## 7. Audit of Orientation-Invariant Pairing Policy
 
-The automated regression test suite (`tests/`) contains 20 comprehensive unit tests covering all components:
+* **Dataset Anomaly:** In the FabricNET dataset, physical fabric swatches were mounted arbitrarily under the microscope without a standardized warp-parallel orientation protocol (e.g., sample W017 mounted rotated $90^\circ$ relative to the camera sensor).
+* **Strict Evaluation Boundary:** Orientation-invariant paired error calculation ($\min(\text{direct}, \text{swapped})$) is strictly and exclusively an offline benchmark evaluation diagnostic to assess frequency recovery invariance against un-oriented dataset labels.
+* **Production Integrity Guarantee:** The production web application (`web_app/`), REST API, and core pipeline (`src.fabric_analysis.pipeline`) NEVER perform ground-truth-dependent pairing. The production system strictly maps the image horizontal axis to vertical warp threads and the vertical axis to horizontal weft picks based on user-supplied calibration parameters and detected skew angles.
+
+---
+
+## 8. Synthetic Smartphone Failure-Mode Fixture Verification
+
+To rigorously evaluate phone-based capture robustness without fabricating validation claims on uncalibrated photographs:
+* We implemented `tests/test_smartphone_regression.py` using an engineered synthetic failure-mode fixture modeling smartphone optical degradations: out-of-focus blur, non-uniform lens vignetting, flash flare gradient, and high-frequency surface yarn fuzz.
+* Under this fixture, the engine:
+  1. Detects low projection contrast and high interval dispersion.
+  2. Flags estimator divergence between FFT and projection ($35.0$ vs $0.0\text{ ends/cm}$).
+  3. Correctly sets `decision_status` to `NEEDS_REVIEW` and `is_validated = False`.
+  4. Returns `None` for primary accepted density metrics, completely preventing unvalidated guesses from being presented as verified truth.
+  5. Preserves unvalidated candidate measurements explicitly under `candidate_measurements` for user inspection.
+* **Important Caveat:** This test validates synthetic failure-mode bounds; it does NOT claim that real-world uncalibrated smartphone photographs are validated.
+
+---
+
+## 9. Automated Regression Test Suite Verification
+
+The automated regression test suite (`tests/`) contains 22 comprehensive unit tests covering all components:
 
 ```
-Ran 20 tests in 1.092s
+Ran 22 tests in 1.018s
 OK
 ```
 
-1. `test_anisotropic_fabricnet_calibration`: Validates independent $S_x, S_y$ scale calculation.
-2. `test_isotropic_calibration`: Verifies backward compatibility for single-scale inputs.
-3. `test_dpi_calibration`: Validates metric DPI conversion.
-4. `test_invalid_scales_raise_value_error`: Ensures negative or zero scales raise exceptions.
-5. `test_full_roi_available_on_large_image`: Validates 1.0 cm² crop on large images.
-6. `test_undersized_image_reports_actual_coverage`: Validates honest coverage disclosure on FabricNET images.
-7. `test_custom_roi_bounds`: Validates custom bounding box cropping.
-8. `test_skew_detection_synthetic_12deg`: Validates Polar Radon recovery of $+12^\circ$ tilt within $0.5^\circ$.
-9. `test_rectification_improves_contrast_variance`: Validates that rotation sharpens projection profiles.
-10. `test_synthetic_2d_sinusoid_frequency_recovery`: Validates exact frequency extraction from 2D FFT.
-11. `test_parabolic_sub_bin_interpolation`: Validates quadratic peak refinement to sub-pixel accuracy.
-12. `test_high_density_peaks_not_suppressed`: Validates yarn separation up to $120\text{ threads/cm}$.
-13. `test_median_filter_removes_single_pixel_spikes`: Validates noise suppression without peak shifting.
-14. `test_concordant_estimators_yield_validated_status`: Validates dual-engine agreement logic.
-15. `test_divergent_estimators_yield_needs_review_status`: Validates uncertainty flagging on discrepancy.
-16. `test_density_semantics_dimensional_correctness`: Validates threads/cm sum vs crossings/cm² product.
-17. `test_production_engine_and_src_package_equivalence`: Validates zero divergence between web app and core package.
-18. `test_calculated_errors_match_arithmetic_truth`: Validates absence of hardcoded benchmark errors.
-19. `test_fabricnet_w012_end_to_end_execution`: Validates complete pipeline on real physical swatch.
-20. `test_noisy_smartphone_yields_warning_or_review_status`: Validates robust handling of uncalibrated phone images.
+1. `test_benchmark_report_serialization_pipeline`: Validates end-to-end JSON, CSV, and TXT report generation from injected engine predictions, verifying round-trip schema and arithmetic consistency.
+2. `test_calculated_errors_match_arithmetic_truth`: Validates absence of hardcoded benchmark error constants.
+3. `test_fabricnet_w012_end_to_end_execution`: Validates complete pipeline on real physical swatch.
+4. `test_production_engine_and_src_package_equivalence`: Validates zero divergence between web app engine and core package.
+5. `test_anisotropic_fabricnet_calibration`: Validates independent $S_x, S_y$ scale calculation.
+6. `test_isotropic_calibration`: Verifies backward compatibility for single-scale inputs.
+7. `test_dpi_calibration`: Validates metric DPI conversion.
+8. `test_invalid_scales_raise_value_error`: Ensures negative or zero scales raise exceptions.
+9. `test_concordant_estimators_yield_validated_status`: Validates dual-engine agreement logic under physical aperture quantization limits.
+10. `test_density_semantics_dimensional_correctness`: Validates threads/cm sum vs crossings/cm² product.
+11. `test_divergent_estimators_yield_needs_review_and_none_accepted_density`: Validates that accepted measurements are None on discrepancy and candidates are isolated.
+12. `test_partial_concordance_yields_consistent_with_warning`: Validates partial axis agreement.
+13. `test_rectification_improves_contrast_variance`: Validates that rotation sharpens projection profiles.
+14. `test_skew_detection_synthetic_12deg`: Validates Polar Radon recovery of $+12^\circ$ tilt within $0.5^\circ$.
+15. `test_custom_roi_bounds`: Validates custom bounding box cropping.
+16. `test_full_roi_available_on_large_image`: Validates 1.0 cm² crop on large images.
+17. `test_undersized_image_reports_actual_coverage`: Validates honest coverage disclosure on FabricNET images.
+18. `test_degraded_synthetic_fixture_yields_needs_review_and_isolates_candidates`: Validates handling of degraded phone capture fixtures.
+19. `test_high_density_peaks_not_suppressed`: Validates yarn separation up to $120\text{ threads/cm}$.
+20. `test_median_filter_removes_single_pixel_spikes`: Validates noise suppression without peak shifting.
+21. `test_parabolic_sub_bin_interpolation`: Validates quadratic peak refinement to sub-pixel accuracy.
+22. `test_synthetic_2d_sinusoid_frequency_recovery`: Validates exact frequency extraction from 2D FFT.
 
 ---
 

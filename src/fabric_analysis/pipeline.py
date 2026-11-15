@@ -220,7 +220,9 @@ def analyze_fabric(
         rect_variance=rect_var,
         warp_dispersion=spatial_meta["warp_interval_dispersion"],
         weft_dispersion=spatial_meta["weft_interval_dispersion"],
-        weave_hint=weave_hint
+        weave_hint=weave_hint,
+        crop_w_cm=crop_w_cm,
+        crop_h_cm=crop_h_cm
     )
 
     latency_ms = (time.perf_counter() - t_start) * 1000.0
@@ -237,17 +239,27 @@ def analyze_fabric(
     plot_weft_b64 = render_waveform_plot_pillow(p_weft, weft_peaks, "Weft Projection Profile (Horizontal Threads)")
     plot_fft_b64 = render_fft_spectrum_image_pillow(fft_mag)
 
+    total_thread_density = (
+        int(fusion_res["accepted_warp_density_ends_per_cm"] + fusion_res["accepted_weft_density_picks_per_cm"])
+        if (fusion_res["accepted_warp_density_ends_per_cm"] is not None and fusion_res["accepted_weft_density_picks_per_cm"] is not None)
+        else None
+    )
+
     return {
         "status": "success",
         "latency_ms": round(float(latency_ms), 2),
         "calibration": calibration.to_dict(),
         "roi_metadata": roi_meta,
         "results": {
+            "accepted_warp_density_ends_per_cm": fusion_res["accepted_warp_density_ends_per_cm"],
+            "accepted_weft_density_picks_per_cm": fusion_res["accepted_weft_density_picks_per_cm"],
+            "is_validated": fusion_res["is_validated"],
+            "candidate_measurements": fusion_res["candidate_measurements"],
             "warp_ends_per_cm": fusion_res["warp_density_ends_per_cm"],
             "weft_picks_per_cm": fusion_res["weft_density_picks_per_cm"],
             "warp_density_continuous": fusion_res["warp_density_continuous"],
             "weft_density_continuous": fusion_res["weft_density_continuous"],
-            "total_thread_density": int(fusion_res["warp_density_ends_per_cm"] + fusion_res["weft_density_picks_per_cm"]),
+            "total_thread_density": total_thread_density,
             "linear_density_sum_per_cm": fusion_res["linear_density_sum_per_cm"],
             "areal_intersection_density_per_cm2": fusion_res["areal_intersection_density_per_cm2"],
             "pitch_warp_um": fusion_res["pitch_warp_um"],

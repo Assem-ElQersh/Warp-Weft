@@ -109,42 +109,55 @@ def compute_spectral_density_multicandidate(
     warp_candidates = extract_candidates(slice_x, cccol, min_k_x, max_k_x, crop_w_cm)
     weft_candidates = extract_candidates(slice_y, ccrow, min_k_y, max_k_y, crop_h_cm)
 
-    # 4. Harmonic Family Disambiguation
-    # In float weaves (twill, satin), float pattern repeats create sub-harmonics at f0 / k
-    # (e.g. 2/2 twill has repeat at f0/2, 5-end satin at f0/5).
-    # If a weave hint is twill or satin, check if candidate peaks have a 2x or 3x or 4x relationship.
-    def select_best_fundamental(candidates, weave):
+    # 4. Harmonic Family Analysis & Ambiguity Exposure
+    # Float patterns (twills, satins) create sub-harmonics at f_repeat = f0 / R,
+    # while yarn cross-sectional shapes create higher harmonics at 2*f0, 3*f0.
+    # Without spatial or structural corroboration, selecting an arbitrary multiple
+    # is mathematically unverified. We expose candidate ambiguity explicitly.
+    def select_best_fundamental(candidates: List[Dict[str, Any]], weave: str):
         if not candidates:
-            return 0.0, 0.0, "no_candidates"
-
-        if len(candidates) == 1:
-            return candidates[0]["density"], candidates[0]["spnr"], "single_candidate"
+            return 0.0, 0.0, "no_candidates_in_passband", False, []
 
         top_cand = candidates[0]
-        second_cand = candidates[1]
+        if len(candidates) == 1:
+            return top_cand["density"], top_cand["spnr"], "single_dominant_candidate", False, []
 
-        # Check for sub-harmonic float repeat:
-        # If top candidate is around 15-28 and second candidate is ~2x or ~3x of it with high SPNR,
-        # in twill/satin weaves the higher frequency represents individual yarn spacing,
-        # while the lower frequency represents the weave float pattern repeat.
-        if weave in ("twill", "satin"):
-            for cand in candidates[1:4]:
+        # Analyze potential harmonic/sub-harmonic ambiguity among top candidates
+        ambiguous_candidates = []
+        for cand in candidates[1:4]:
+            if cand["spnr"] >= 2.5:
                 ratio = cand["density"] / max(top_cand["density"], 1e-4)
-                if abs(ratio - 2.0) < 0.25 or abs(ratio - 3.0) < 0.35 or abs(ratio - 4.0) < 0.45:
-                    if cand["spnr"] >= 3.0 and cand["symmetry"] >= 0.70:
-                        return cand["density"], cand["spnr"], f"float_repeat_resolved (ratio {ratio:.1f})"
+                inv_ratio = top_cand["density"] / max(cand["density"], 1e-4)
+                is_harmonic = any(abs(ratio - k) < 0.20 for k in [2.0, 3.0, 4.0])
+                is_subharmonic = any(abs(inv_ratio - k) < 0.20 for k in [2.0, 3.0, 4.0])
+                if is_harmonic or is_subharmonic:
+                    ambiguous_candidates.append({
+                        "density": cand["density"],
+                        "spnr": cand["spnr"],
+                        "ratio_to_dominant": round(float(ratio), 2),
+                        "type": "harmonic_multiple" if is_harmonic else "subharmonic_float_repeat"
+                    })
 
-        # Otherwise, the top candidate by SPNR * symmetry is the fundamental
-        return top_cand["density"], top_cand["spnr"], "dominant_harmonic"
+        has_ambiguity = len(ambiguous_candidates) > 0
+        reason = "dominant_harmonic_with_ambiguity" if has_ambiguity else "dominant_harmonic"
 
-    warp_density, spnr_x, warp_reason = select_best_fundamental(warp_candidates, weave_hint)
-    weft_density, spnr_y, weft_reason = select_best_fundamental(weft_candidates, weave_hint)
+        return top_cand["density"], top_cand["spnr"], reason, has_ambiguity, ambiguous_candidates
+
+    (warp_density, spnr_x, warp_reason,
+     warp_ambiguity, warp_ambiguous_cands) = select_best_fundamental(warp_candidates, weave_hint)
+
+    (weft_density, spnr_y, weft_reason,
+     weft_ambiguity, weft_ambiguous_cands) = select_best_fundamental(weft_candidates, weave_hint)
 
     diagnostic_metadata = {
         "warp_candidates": warp_candidates[:4],
         "weft_candidates": weft_candidates[:4],
         "warp_selection_reason": warp_reason,
         "weft_selection_reason": weft_reason,
+        "warp_harmonic_ambiguity": bool(warp_ambiguity),
+        "weft_harmonic_ambiguity": bool(weft_ambiguity),
+        "warp_ambiguous_candidates": warp_ambiguous_cands,
+        "weft_ambiguous_candidates": weft_ambiguous_cands,
         "min_density_bound": min_density,
         "max_density_bound": max_density
     }

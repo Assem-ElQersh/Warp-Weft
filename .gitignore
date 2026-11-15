@@ -2,7 +2,7 @@
 # Central .gitignore: Automated Fabric Warp & Weft Thread Density Analysis
 # ==============================================================================
 
-# Python Bytecode & Environments
+# Python Bytecode, Caches & Environments
 __pycache__/
 *.py[cod]
 *$py.class
@@ -28,6 +28,20 @@ wheels/
 .installed.cfg
 *.egg
 
+# Secrets, Environment Variables & API Keys
+.env
+.env.*
+*.env
+secrets/
+
+# Model Context Protocol (MCP) & Local IDE Agent Configurations
+.mcp.json
+.agents/mcp_config.json
+*mcp_config.json
+.antigravity/
+.claude/
+.cursor/
+
 # Jupyter Notebook Caches
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
@@ -42,11 +56,50 @@ wheels/
 .DS_Store
 Thumbs.db
 
-# Temporary Scratch Scripts
+# Temporary Scratch Scripts & Working Directories
 scratch/
+tmp/
+temp/
+*.tmp
 test_*.py
 temp_*.py
 build_and_run_*.py
+
+# LaTeX & Typesetting Compilation Artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+reports/*.aux
+reports/*.log
+reports/*.out
+reports/*.toc
+reports/*.html
+
+# LibreOffice & Document Locks
+.~lock.*#
+
+# Deep Learning Model Checkpoints & Heavy Weights (> 50 MB)
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.bin
+*.weights
+*.h5
+
+# Large Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
 
 # Large Datasets (> 10 MB raw captures)
 # Only lightweight metadata, synthetic ground truths, and parameters are tracked

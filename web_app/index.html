@@ -2,7 +2,10 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f2b48">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Warp & Weft AI Analyzer — Automated Thread Density Quantification</title>
     <style>
         :root {
@@ -29,18 +32,47 @@
             padding: 0;
         }
 
+        html {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            overscroll-behavior-y: contain;
+        }
+
         body {
             font-family: var(--font-en);
             background-color: var(--bg-light);
             color: var(--text-main);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            min-height: 100dvh;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            overflow-x: clip;
         }
 
         body.lang-ar {
             font-family: var(--font-ar);
             direction: rtl;
             text-align: right;
+        }
+
+        /* Prevent iOS auto-zoom on input focus */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+
+        /* Kill sticky hover on touch devices & add active press states */
+        button, .btn-analyze, .lang-btn, .preset-item, .upload-zone, .tab-btn, .btn-report {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        button:active, .btn-analyze:active, .lang-btn:active, .preset-item:active, .tab-btn:active, .btn-report:active {
+            transform: scale(0.97);
+            transition: transform 0.05s ease;
         }
 
         /* Top Navigation Header */
@@ -79,15 +111,20 @@
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 6px;
-            padding: 6px 14px;
+            padding: 8px 16px;
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s ease;
             font-weight: 600;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
         }
 
-        .lang-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
+        @media (hover: hover) and (pointer: fine) {
+            .lang-btn:hover {
+                background: rgba(255, 255, 255, 0.25);
+            }
         }
 
         /* Container & Layout */
@@ -103,6 +140,72 @@
         @media (max-width: 1080px) {
             .container {
                 grid-template-columns: 1fr;
+                margin: 20px auto;
+                padding: 0 16px;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 16px;
+            }
+            .header-brand h1 {
+                font-size: 1.18rem;
+            }
+            .header-brand p {
+                font-size: 0.76rem;
+            }
+            .container {
+                padding: 0 12px;
+                margin: 12px auto;
+                gap: 14px;
+            }
+            .card {
+                padding: 14px;
+                margin-bottom: 14px;
+                border-radius: 8px;
+            }
+            /* 2x2 compact KPI dashboard on phones */
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .kpi-card {
+                padding: 10px;
+            }
+            .kpi-value {
+                font-size: 1.45rem;
+            }
+            .kpi-title {
+                font-size: 0.72rem;
+            }
+            .kpi-unit, .kpi-sub {
+                font-size: 0.7rem;
+            }
+            .tabs {
+                gap: 2px;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 0.78rem;
+            }
+            .reports-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .reports-links {
+                width: 100%;
+                flex-direction: column;
+            }
+            .btn-report {
+                text-align: center;
+                width: 100%;
             }
         }
 
@@ -673,50 +776,52 @@
 
                 <!-- Tab 5: Mathematical Audit Table -->
                 <div class="tab-content" id="tab-audit">
-                    <table class="audit-table">
-                        <thead>
-                            <tr>
-                                <th id="th-pipeline-stage">Pipeline Stage</th>
-                                <th id="th-engine1">Engine 1 (2D FFT)</th>
-                                <th id="th-engine2">Engine 2 (1D Projection)</th>
-                                <th id="th-delta">Discrepancy (Δ)</th>
-                                <th id="th-status">Validated Decision</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="row-warp-label"><strong>Warp Yarn Density</strong></td>
-                                <td id="audit-fft-warp">-- ends/cm</td>
-                                <td id="audit-proj-warp">-- ends/cm</td>
-                                <td id="audit-delta-warp">Δ = --</td>
-                                <td id="audit-final-warp" style="font-weight: 700; color: #1e3a8a;">-- Ends/cm</td>
-                            </tr>
-                            <tr>
-                                <td id="row-weft-label"><strong>Weft Yarn Density</strong></td>
-                                <td id="audit-fft-weft">-- picks/cm</td>
-                                <td id="audit-proj-weft">-- picks/cm</td>
-                                <td id="audit-delta-weft">Δ = --</td>
-                                <td id="audit-final-weft" style="font-weight: 700; color: #047857;">-- Picks/cm</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td id="row-consensus-label"><strong>Validated Thread Density</strong></td>
-                                <td colspan="3" id="audit-mode">Dual-Engine Consensus</td>
-                                <td id="audit-final-decision" style="font-size: 1rem;">-- Ends / -- Picks</td>
-                            </tr>
-                            <tr>
-                                <td id="row-skew-label"><strong>Angular Skew (θ)</strong></td>
-                                <td id="audit-detected-skew">--°</td>
-                                <td id="audit-variance">Var = --</td>
-                                <td id="audit-spnr">SPNR = --</td>
-                                <td id="audit-rect-status">Rectified</td>
-                            </tr>
-                            <tr>
-                                <td id="row-quality-label"><strong>Quality Score (Q)</strong></td>
-                                <td colspan="3" id="audit-quality-breakdown">SPNR (35%) + Variance (35%) + Delta (30%)</td>
-                                <td id="audit-final-quality" style="font-weight: 700;">--%</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+                        <table class="audit-table">
+                            <thead>
+                                <tr>
+                                    <th id="th-pipeline-stage">Pipeline Stage</th>
+                                    <th id="th-engine1">Engine 1 (2D FFT)</th>
+                                    <th id="th-engine2">Engine 2 (1D Projection)</th>
+                                    <th id="th-delta">Discrepancy (Δ)</th>
+                                    <th id="th-status">Validated Decision</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="row-warp-label"><strong>Warp Yarn Density</strong></td>
+                                    <td id="audit-fft-warp">-- ends/cm</td>
+                                    <td id="audit-proj-warp">-- ends/cm</td>
+                                    <td id="audit-delta-warp">Δ = --</td>
+                                    <td id="audit-final-warp" style="font-weight: 700; color: #1e3a8a;">-- Ends/cm</td>
+                                </tr>
+                                <tr>
+                                    <td id="row-weft-label"><strong>Weft Yarn Density</strong></td>
+                                    <td id="audit-fft-weft">-- picks/cm</td>
+                                    <td id="audit-proj-weft">-- picks/cm</td>
+                                    <td id="audit-delta-weft">Δ = --</td>
+                                    <td id="audit-final-weft" style="font-weight: 700; color: #047857;">-- Picks/cm</td>
+                                </tr>
+                                <tr class="highlight">
+                                    <td id="row-consensus-label"><strong>Validated Thread Density</strong></td>
+                                    <td colspan="3" id="audit-mode">Dual-Engine Consensus</td>
+                                    <td id="audit-final-decision" style="font-size: 1rem;">-- Ends / -- Picks</td>
+                                </tr>
+                                <tr>
+                                    <td id="row-skew-label"><strong>Angular Skew (θ)</strong></td>
+                                    <td id="audit-detected-skew">--°</td>
+                                    <td id="audit-variance">Var = --</td>
+                                    <td id="audit-spnr">SPNR = --</td>
+                                    <td id="audit-rect-status">Rectified</td>
+                                </tr>
+                                <tr>
+                                    <td id="row-quality-label"><strong>Quality Score (Q)</strong></td>
+                                    <td colspan="3" id="audit-quality-breakdown">SPNR (35%) + Variance (35%) + Delta (30%)</td>
+                                    <td id="audit-final-quality" style="font-weight: 700;">--%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>

@@ -1,0 +1,31 @@
+{
+  "calibration": {
+    "pixels_per_cm": 400,
+    "pixel_size_um": 25.0,
+    "roi_dimensions": [
+      400,
+      400
+    ]
+  },
+  "ground_truth": {
+    "warp_ends_per_cm": 32,
+    "weft_picks_per_cm": 28
+  },
+  "spectral_fft_engine": {
+    "warp_ends_per_cm": 32,
+    "weft_picks_per_cm": 28,
+    "error_warp": 0,
+    "error_weft": 0
+  },
+  "spatial_projection_engine": {
+    "warp_ends_per_cm": 31,
+    "weft_picks_per_cm": 27,
+    "mean_warp_spacing_um": 313.33,
+    "mean_weft_spacing_um": 357.69
+  },
+  "consensus_output": {
+    "validated_warp_ends_per_cm": 32,
+    "validated_weft_picks_per_cm": 28,
+    "status_consistent": true
+  }
+}

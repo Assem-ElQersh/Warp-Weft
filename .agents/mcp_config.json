@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "roboflow": {
+      "type": "http",
+      "url": "https://mcp.roboflow.com/mcp",
+      "serverUrl": "https://mcp.roboflow.com/mcp",
+      "note": "Official Roboflow MCP server. Auth defaults to OAuth via Dynamic Client Registration: sign in to Roboflow on first use, no key required. For clients that cannot complete OAuth, explicitly configure an x-api-key header from a secret or environment variable; setting ROBOFLOW_API_KEY alone is not enough."
+    }
+  }
+}

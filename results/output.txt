@@ -1,0 +1,6 @@
+=== FABRIC THREAD DENSITY ANALYSIS REPORT ===
+Scale: 400 px/cm | Resolution: 25.0 um/px
+True Warp: 32 | Pred Warp (FFT): 32 | Pred Warp (Proj): 31
+True Weft: 28 | Pred Weft (FFT): 28 | Pred Weft (Proj): 27
+Validated Result: 32 Ends/cm (Warp) | 28 Picks/cm (Weft)
+Consistency Check: True

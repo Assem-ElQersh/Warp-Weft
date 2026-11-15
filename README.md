@@ -37,6 +37,7 @@ The system is architected to operate under resource constraints (standard laptop
 | FabricNET (`acseckn/fabricnet`) provides 130 microscopic woven fabric images (640×480 px, 5×4 mm FOV, $S_x=1280$, $S_y=1200\text{ px/cm}$) labeled with exact Warp (20–62), Weft (15–93), and weave pattern | `data/fabricnet` | Provides physical optical microscopy benchmark with ground truth thread density; establishes exact scale calibration: $\Delta x = 7.81\,\mu\text{m/px}$, $\Delta y = 8.33\,\mu\text{m/px}$. |
 | Physical Validation on `W012.jpg` (Plain Weave, GT: Warp=38, Weft=33): 1D Projection extracts Warp = 38.0 ends/cm ($\Delta=0.0$) and Weft = 32.5 picks/cm ($\Delta=0.5$, exact integer 33) | `notebooks/04_real_fabric_benchmark.ipynb` | Empirically proves dual-engine pipeline accuracy on physical handheld microscopy without requiring pre-trained deep learning weights or external cloud inference. |
 | Orthogonal Frequency Swap on `W017.jpg` (Plain Weave, GT: Warp=32, Weft=23): 2D FFT detects $N_1 = 22.0\text{ threads/cm}$ ($\Delta=1.0$) and $N_2 = 30.0\text{ threads/cm}$ ($\Delta=2.0$) | `notebooks/04_real_fabric_benchmark.ipynb` | Unveils that physical $90^\circ$ textile rotation relative to the camera sensor inverts horizontal/vertical frequency axes; necessitates un-oriented orthogonal density pairing $(N_1, N_2)$. |
+| Automated Dual-Language Executive Demo Reports compiled to PDF (English: 7 pages via pdfTeX; Arabic: 8 pages via HarfBuzz/Amiri) with embedded diagnostic matrices and empirical tables | `reports/warp_weft_report_en.tex` & `reports/warp_weft_report_ar.tex` | Provides reproducible, client-ready technical deliverables in both English and Arabic demonstrating the dual-engine computer vision architecture, benchmark verifications, and physical deployment specs. |
 
 ---
 
@@ -233,5 +234,50 @@ Warp Weft Project/
 4. **Panel (1, 0) — W001 Twill Weave Real Microscopic Capture:** Displays a heavier $140\text{ g/m}^2$ twill fabric with characteristic diagonal floating ridges ($\sim 45^\circ$ float angle).
 5. **Panel (1, 1) — W001 Warp Projection Profile (Diagonal Float Sub-Peaks):** Demonstrates the mathematical failure mode of 1D spatial projection on twill weaves: diagonal float interlacing causes multiple intra-period peaks to project onto the orthogonal axis, producing an apparent count of 42 peaks/cm.
 6. **Panel (1, 2) — W001 2D FFT Spectrum (Diagonal Float Harmonics):** Illustrates how the 2D Fourier transform cleanly separates diagonal float harmonics from the fundamental spatial yarn frequencies ($25.8$ and $27.9\text{ cycles/cm}$), proving that 2D FFT must dominate when twill or satin weaves are inspected.
+
+---
+
+## 9. Executive Project Demo Reports (PDF & LaTeX)
+
+For formal client presentations, technical audits, and industrial proposals, complete self-contained demo reports have been authored and compiled in both **English** and **Arabic**:
+
+### 9.1. English Technical Report
+* **Compiled PDF:** [`reports/warp_weft_report_en.pdf`](reports/warp_weft_report_en.pdf) (7 pages, 20 MB with high-resolution diagnostic matrices)
+* **LaTeX Source:** [`reports/warp_weft_report_en.tex`](reports/warp_weft_report_en.tex)
+* **Compilation Command:**
+  ```bash
+  cd reports && pdflatex -interaction=nonstopmode warp_weft_report_en.tex
+  ```
+* **Contents:**
+  1. Abstract & Executive Problem Definition
+  2. Optical Physics & Spatial Resolution Invariants (Nyquist-Shannon theorem, DPI calibration)
+  3. System Architecture & Dual-Engine Formulation (CLAHE, Polar Radon Skew Rectification, 2D FFT, 1D Projection, Quality Score $Q$)
+  4. Empirical Production Pipeline Benchmark (swatch with $+12.0^\circ$ skew, $36\text{ ends/cm} \times 30\text{ picks/cm}$, $98.5\%$ confidence)
+  5. Real Physical FabricNET Microscopic Benchmark (W012 Plain, W017 Plain, W001 Twill, W067 Satin)
+  6. Hardware Utilization & Resource Bounds ($< 100\text{ MB}$ RAM, $0.00\text{ MB}$ persistent GPU VRAM, $< 10\text{ ms}$ latency)
+  7. Client Deployment Recommendations (USB microscope hardware lock, LED illumination, fixed stand)
+
+### 9.2. Arabic Technical Demo Report (تقرير العرض الفني والتجريبي باللغة العربية)
+* **Compiled PDF:** [`reports/warp_weft_report_ar.pdf`](reports/warp_weft_report_ar.pdf) (8 pages, 1.86 MB, formatted with authentic Amiri typography, RTL alignment, and embedded diagnostic matrices)
+* **LaTeX Source (XeLaTeX/LuaLaTeX):** [`reports/warp_weft_report_ar.tex`](reports/warp_weft_report_ar.tex)
+* **OpenDocument Source (LibreOffice):** [`reports/warp_weft_report_ar.fodt`](reports/warp_weft_report_ar.fodt)
+* **Compilation Command:**
+  ```bash
+  # Via LibreOffice Headless (Native Arabic Text Shaping):
+  libreoffice --headless --convert-to pdf reports/warp_weft_report_ar.fodt
+  
+  # Via XeLaTeX (for standard TeXLive with polyglossia):
+  xelatex -interaction=nonstopmode reports/warp_weft_report_ar.tex
+  ```
+* **Arabic Report Sections (الأقسام الموثقة باللغة العربية):**
+  1. ملخص تنفيذي (Executive Abstract)
+  2. المقدمة والمشكلة التشغيلية (Introduction & Operational Problem: خيوط السداء واللحمة وعدسة الفحص)
+  3. فيزياء البصريات ومعايير الاستبانة المكانية (Optical Physics: معيار نايكست-شانون، طرق المعايرة المترية)
+  4. البنية المعمارية للنظام وصياغة المحرك المزدوج (شكل 1: مصفوفة تصحيح الانحراف الزاوي، محرك فورييه 2D ومحرك الإسقاط 1D)
+  5. التقييم التجريبي وخط الإنتاج المتكامل (شكل 2: تقرير خط الإنتاج، جدول 1: ملخص الأداء القياسي)
+  6. التحقق المجهري الفيزيائي على قاعدة بيانات FabricNET (شكل 3: مصفوفة التحقق، جدول 2: النتائج المقاسة للعينات الحقيقية)
+  7. كفاءة استهلاك الموارد وحسابات العتاد (استهلاك الذاكرة، بطاقة الرسوميات، زمن الاستجابة، التشغيل الذاتي دون إنترنت)
+  8. الخاتمة والتوصيات التشغيلية للمصنع والعميل (مواصفات الميكروسكوب وحلقة الإضاءة LED وتثبيت الارتفاع للتشغيل الفوري)
+
 
 

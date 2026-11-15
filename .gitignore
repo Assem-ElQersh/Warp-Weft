@@ -93,13 +93,18 @@ reports/*.html
 *.weights
 *.h5
 
-# Large Archives
+# Large Archives & Package Installers
 *.zip
 *.tar
 *.tar.gz
 *.tgz
 *.rar
 *.7z
+cloudflared.deb
+*.deb
+*.rpm
+*.AppImage
+
 
 # Large Datasets (> 10 MB raw captures)
 # Only lightweight metadata, synthetic ground truths, and parameters are tracked

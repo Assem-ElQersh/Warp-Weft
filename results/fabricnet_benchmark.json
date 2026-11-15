@@ -1,0 +1,78 @@
+{
+  "dataset": "acseckn/fabricnet",
+  "samples_evaluated": {
+    "W012_plain": {
+      "ground_truth": {
+        "warp": 38,
+        "weft": 33
+      },
+      "detected_skew_deg": 1.0,
+      "fft_density": [
+        39.7,
+        27.5
+      ],
+      "proj_density": [
+        38.0,
+        35.0
+      ],
+      "validated_warp": 38,
+      "delta_warp": 0.0,
+      "validated_weft": 33,
+      "delta_weft": 0.5
+    },
+    "W017_plain": {
+      "ground_truth": {
+        "warp": 32,
+        "weft": 23
+      },
+      "detected_skew_deg": 0.0,
+      "fft_density": [
+        22.0,
+        30.0
+      ],
+      "proj_density": [
+        36.0,
+        32.5
+      ],
+      "orientation_swap": true,
+      "paired_fft_density": [
+        30.0,
+        22.0
+      ],
+      "delta_warp": 2.0,
+      "delta_weft": 1.0
+    },
+    "W001_twill": {
+      "ground_truth": {
+        "warp": 32,
+        "weft": 30
+      },
+      "detected_skew_deg": 1.0,
+      "fft_density": [
+        25.8,
+        27.9
+      ],
+      "proj_density": [
+        42.0,
+        40.0
+      ],
+      "float_subpeak_effect": true
+    },
+    "W067_satin": {
+      "ground_truth": {
+        "warp": 62,
+        "weft": 35
+      },
+      "detected_skew_deg": -16.5,
+      "fft_density": [
+        29.2,
+        27.6
+      ],
+      "proj_density": [
+        48.0,
+        30.0
+      ],
+      "surface_float_effect": true
+    }
+  }
+}

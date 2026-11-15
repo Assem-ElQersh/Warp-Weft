@@ -66,7 +66,12 @@ The dataset comprises **130 photographic samples** (`W001.jpg` to `W130.jpg`) pa
    * **Satin Weave (`satin`):** 41 samples (extended surface floats with minimized interlacing points).
 
 #### Warp & Weft Algorithmic Usability
-FabricNET is the **primary physical benchmark** for the project. Because individual yarn crowns and inter-yarn shadows are distinctly imaged at $\sim 8\,\mu\text{m/pixel}$, it satisfies the Nyquist-Shannon criterion ($> 15\text{ pixels per yarn period}$ for densities up to $60\text{ threads/cm}$). It directly validated the dual-engine consensus on `W012.jpg` (Warp $38.0\text{ ends/cm}$, $\Delta=0.0$; Weft $32.5\text{ picks/cm}$, $\Delta=0.5$).
+FabricNET serves as the comprehensive physical optical benchmark across all 130 samples. Because individual yarn crowns and inter-yarn shadows are distinctly imaged at $\sim 8\,\mu\text{m/pixel}$, it satisfies the Nyquist-Shannon criterion ($> 15\text{ pixels per yarn period}$ for densities up to $60\text{ threads/cm}$). Evaluated across all 130 images using exact anisotropic calibration ($S_x=1280.0, S_y=1200.0\text{ px/cm}$), the engine achieves:
+* **Plain Weave ($N=50$):** Warp $\text{MAE} = 7.68\text{ ends/cm}$, Weft $\text{MAE} = 4.96\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $44.0\%$ (Warp), $46.0\%$ (Weft).
+* **Twill Weave ($N=39$):** Warp $\text{MAE} = 15.05\text{ ends/cm}$, Weft $\text{MAE} = 6.59\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $12.8\%$ (Warp), $35.9\%$ (Weft).
+* **Satin Weave ($N=41$):** Warp $\text{MAE} = 13.54\text{ ends/cm}$, Weft $\text{MAE} = 20.34\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $24.4\%$ (Warp), $14.6\%$ (Weft).
+* **Overall Direct Axis:** Warp $\text{MAE} = 11.74\text{ ends/cm}$, Weft $\text{MAE} = 10.30\text{ picks/cm}$.
+* **Orientation-Invariant Paired:** Warp $\text{MAE} = 10.42\text{ ends/cm}$, Weft $\text{MAE} = 8.94\text{ picks/cm}$.
 
 ---
 

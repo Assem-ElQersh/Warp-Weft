@@ -1038,6 +1038,7 @@
         let currentLanguage = 'en';
         let currentImageBase64 = '';
         let activePresetId = '';
+        let activePreset = null;
 
         const i18n = {
             en: {
@@ -1059,8 +1060,8 @@
                 kpiWeft: "Weft Density (Horizontal)",
                 kpiWeftUnit: "Picks / 1.0 cm",
                 kpiTotal: "Total Fabric Density",
-                kpiTotalUnit: "Threads / cm²",
-                kpiQuality: "Quality Score (Q)",
+                kpiTotalUnit: "Threads / cm (Linear Sum)",
+                kpiQuality: "Signal Quality Index (Q)",
                 tabOverview: "Visual Overview & ROI",
                 tabSkew: "Skew Rectification",
                 tabProj: "1D Projection Profiles",
@@ -1097,8 +1098,8 @@
                 kpiWeft: "كثافة اللحمة (أفقي)",
                 kpiWeftUnit: "خيط لحمة / 1.0 سم",
                 kpiTotal: "إجمالي كثافة النسيج",
-                kpiTotalUnit: "خيط / سم²",
-                kpiQuality: "مؤشر الثقة والجودة (Q)",
+                kpiTotalUnit: "خيط / سم (المجموع الخطي)",
+                kpiQuality: "مؤشر جودة الإشارة (Q)",
                 tabOverview: "نافذة الفحص والمعايرة",
                 tabSkew: "تصحيح الميل الزاوي",
                 tabProj: "منحنيات الإسقاط الخطي",
@@ -1223,6 +1224,7 @@
             if (el) el.classList.add('active');
 
             activePresetId = preset.id;
+            activePreset = preset;
             currentImageBase64 = ''; // Cleared so backend loads preset file directly
 
             // Update inputs
@@ -1301,6 +1303,7 @@
                     // Re-compress to optimized JPEG (reduces 15 MB mobile payloads to ~250 KB)
                     currentImageBase64 = canvas.toDataURL('image/jpeg', 0.88);
                     activePresetId = '';
+                    activePreset = null;
                     document.querySelectorAll('.preset-item').forEach(e => e.classList.remove('active'));
                     document.getElementById('txt-drop-text').innerText = `${file.name} (${dWidth}×${dHeight} px)`;
                     executeAnalysis();
@@ -1354,6 +1357,8 @@
                 preset_id: activePresetId,
                 image: currentImageBase64,
                 pixels_per_cm: pixelsPerCm,
+                pixels_per_cm_x: (activePreset && activePreset.pixels_per_cm_x) ? activePreset.pixels_per_cm_x : pixelsPerCm,
+                pixels_per_cm_y: (activePreset && activePreset.pixels_per_cm_y) ? activePreset.pixels_per_cm_y : pixelsPerCm,
                 auto_skew: autoSkew,
                 prominence: prominence,
                 weave_hint: weaveHint
@@ -1403,12 +1408,13 @@
             document.getElementById('kpi-weft').innerText = r.weft_picks_per_cm;
             document.getElementById('kpi-weft-pitch').innerText = `Pitch: ${r.pitch_weft_um} µm`;
 
-            document.getElementById('kpi-total').innerText = r.total_thread_density;
-            document.getElementById('kpi-skew').innerText = `Skew: ${r.detected_skew_deg > 0 ? '+' : ''}${r.detected_skew_deg}°`;
+            document.getElementById('kpi-total').innerText = r.linear_density_sum_per_cm || r.total_thread_density;
+            const arealStr = r.areal_intersection_density_per_cm2 ? ` | Areal: ${r.areal_intersection_density_per_cm2} cr/cm²` : '';
+            document.getElementById('kpi-skew').innerText = `Skew: ${r.detected_skew_deg > 0 ? '+' : ''}${r.detected_skew_deg}°${arealStr}`;
 
-            document.getElementById('kpi-quality').innerText = `${r.confidence_score}%`;
+            document.getElementById('kpi-quality').innerText = `${r.signal_quality_index || r.confidence_score}%`;
             document.getElementById('kpi-mode').innerText = r.engine_mode;
-            document.getElementById('kpi-latency').innerText = `Latency: ${data.latency_ms} ms`;
+            document.getElementById('kpi-latency').innerText = `Latency: ${data.latency_ms} ms (${r.decision_status || 'OK'})`;
 
             // Visuals
             if (v.roi_preview) {

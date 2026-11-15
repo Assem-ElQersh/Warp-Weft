@@ -10,3 +10,12 @@ Confidence Quality Score: 98.5% | Consensus Verified: True
 Sample W012 (Plain): GT Warp=38, Weft=33 | Measured Warp=38.0, Weft=32.5 | Exact Delta=0.0 ends/cm
 Sample W017 (Plain): GT Warp=32, Weft=23 | Measured Paired FFT=(30.0, 22.0) | Max Delta=2.0
 Weave Boundary: Plain Weave reaches exact consensus; Twill/Satin float structures require 2D FFT dominance.
+
+=== FABRICNET PHYSICAL MICROSCOPY 130-SAMPLE BENCHMARK ===
+Evaluated Samples: 130 | Calibration: Sx=1280.0 px/cm, Sy=1200.0 px/cm
+Direct Overall MAE: Warp=11.74 ends/cm, Weft=10.30 picks/cm
+Direct Acc (<= 2 ends/cm): Warp=28.5%, Weft=33.1%
+Plain Weave (N=50): Warp MAE=7.68, Weft MAE=4.96 | Acc<=2: Warp=44.0%, Weft=46.0%
+Twill Weave (N=39): Warp MAE=15.05, Weft MAE=6.59 | Acc<=2: Warp=12.8%, Weft=35.9%
+Satin Weave (N=41): Warp MAE=13.54, Weft MAE=20.34 | Acc<=2: Warp=24.4%, Weft=14.6%
+Orientation Invariant MAE: Warp=10.42, Weft=8.94 | Joint Acc<=2: 10.8%

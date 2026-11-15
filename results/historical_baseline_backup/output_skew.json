@@ -1,0 +1,14 @@
+{
+  "true_skew_degrees": 15.0,
+  "detected_skew_degrees": 15.0,
+  "skew_estimation_error_degrees": 0.0,
+  "skewed_projection_variance": 0.005678019020706415,
+  "rectified_projection_variance": 0.16333185136318207,
+  "contrast_recovery_ratio": 28.765589391591664,
+  "rectified_warp_fft": 31.700000762939453,
+  "rectified_weft_fft": 28.299999237060547,
+  "ground_truth_warp": 32,
+  "ground_truth_weft": 28,
+  "delta_warp": 0.2999992370605469,
+  "delta_weft": 0.2999992370605469
+}

@@ -94,6 +94,8 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     "category": "Synthetic Benchmark",
                     "ground_truth": "36 Warp / 30 Weft (Tilt: +12°)",
                     "pixels_per_cm": 400.0,
+                    "pixels_per_cm_x": 400.0,
+                    "pixels_per_cm_y": 400.0,
                     "auto_skew": True,
                     "prominence": 0.012,
                     "weave_hint": "plain",
@@ -104,8 +106,10 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     "name_en": "FabricNET W012 (Plain Weave 105 g/m²)",
                     "name_ar": "قماش فابريك نت W012 (نسيج سادة)",
                     "category": "Real Optical Microscopy",
-                    "ground_truth": "38 Warp / 33 Weft (Exact Match)",
+                    "ground_truth": "38 Warp / 33 Weft (Plain Benchmark)",
                     "pixels_per_cm": 1280.0,
+                    "pixels_per_cm_x": 1280.0,
+                    "pixels_per_cm_y": 1200.0,
                     "auto_skew": False,
                     "prominence": 0.010,
                     "weave_hint": "plain",
@@ -118,6 +122,8 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     "category": "Real Optical Microscopy",
                     "ground_truth": "32 Warp / 30 Weft (Float Ridges)",
                     "pixels_per_cm": 1280.0,
+                    "pixels_per_cm_x": 1280.0,
+                    "pixels_per_cm_y": 1200.0,
                     "auto_skew": False,
                     "prominence": 0.012,
                     "weave_hint": "twill",
@@ -130,6 +136,8 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     "category": "Synthetic Benchmark",
                     "ground_truth": "32 Warp / 28 Weft (Tilt: +15°)",
                     "pixels_per_cm": 400.0,
+                    "pixels_per_cm_x": 400.0,
+                    "pixels_per_cm_y": 400.0,
                     "auto_skew": True,
                     "prominence": 0.012,
                     "weave_hint": "plain",
@@ -205,7 +213,9 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     pil_img = Image.open(io.BytesIO(img_bytes))
 
                 # 2. Extract Calibration & Algorithmic Parameters
-                pixels_per_cm = float(payload.get("pixels_per_cm", 400.0))
+                raw_scale = payload.get("pixels_per_cm", 400.0)
+                pixels_per_cm_x = float(payload.get("pixels_per_cm_x", raw_scale))
+                pixels_per_cm_y = float(payload.get("pixels_per_cm_y", pixels_per_cm_x))
                 auto_skew = bool(payload.get("auto_skew", True))
                 prominence = float(payload.get("prominence", 0.012))
                 weave_hint = str(payload.get("weave_hint", "auto")).lower()
@@ -214,7 +224,8 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 # 3. Run Dual-Engine Analysis
                 result = run_complete_fabric_analysis(
                     img_pil=pil_img,
-                    pixels_per_cm=pixels_per_cm,
+                    pixels_per_cm=pixels_per_cm_x,
+                    pixels_per_cm_y=pixels_per_cm_y,
                     auto_skew=auto_skew,
                     prominence=prominence,
                     weave_hint=weave_hint,

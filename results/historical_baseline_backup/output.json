@@ -1,0 +1,48 @@
+{
+  "calibration": {
+    "pixels_per_cm": 400,
+    "pixel_pitch_um": 25.0,
+    "roi_field_of_view_cm": [
+      1.0,
+      1.0
+    ],
+    "roi_pixel_dimensions": [
+      400,
+      400
+    ]
+  },
+  "ground_truth": {
+    "warp_ends_per_cm": 36,
+    "weft_picks_per_cm": 30,
+    "skew_angle_deg": 12.0
+  },
+  "orientation_engine": {
+    "detected_skew_deg": 11.5,
+    "skew_error_deg": 0.5,
+    "rectification_status": "orthogonal_aligned"
+  },
+  "spectral_fft_engine": {
+    "warp_ends_per_cm": 35.79999923706055,
+    "weft_picks_per_cm": 30.0,
+    "warp_spnr": 150.49,
+    "weft_spnr": 265.09,
+    "delta_warp": 0.2,
+    "delta_weft": 0.0
+  },
+  "spatial_projection_engine": {
+    "warp_ends_per_cm": 36,
+    "weft_picks_per_cm": 30,
+    "mean_warp_pitch_um": 277.08,
+    "mean_weft_pitch_um": 332.5,
+    "delta_warp": 0,
+    "delta_weft": 0
+  },
+  "consensus_validation": {
+    "validated_warp_ends_per_cm": 36,
+    "validated_weft_picks_per_cm": 30,
+    "warp_discrepancy": 0.2,
+    "weft_discrepancy": 0.0,
+    "is_consistent": true,
+    "confidence_quality_score_pct": 98.5
+  }
+}

@@ -61,9 +61,11 @@ scratch/
 tmp/
 temp/
 *.tmp
-test_*.py
+/test_*.py
 temp_*.py
 build_and_run_*.py
+!tests/
+!tests/**
 
 # LaTeX & Typesetting Compilation Artifacts
 *.aux
@@ -114,7 +116,8 @@ data/multiclass_defects/
 data/ten_fabrics/
 data/textile_weaving_tabular/
 data/textile_knitting_tabular/
-data/fabricnet/*.jpg
+# data/fabricnet/*.jpg (Tracked: 130 reference images, ~13.3 MB total)
+!data/fabricnet/*.jpg
 data/fabricnet/*.png
 data/fabricnet/*.zip
 !data/fabricnet/FabricNet_parameters.xlsx

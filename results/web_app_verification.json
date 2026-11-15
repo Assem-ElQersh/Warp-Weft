@@ -89,5 +89,102 @@
   "en_report_bytes": 20118458,
   "en_report_mime": "application/pdf",
   "ar_report_bytes": 1864848,
-  "ar_report_mime": "application/pdf"
+  "ar_report_mime": "application/pdf",
+  "mobile_responsive_audit": {
+    "css_cascade_reordered": true,
+    "container_collapse_breakpoint_px": 1080,
+    "preset_grid_spec": "repeat(auto-fit, minmax(min(100%, 150px), 1fr))",
+    "viewports_tested": [
+      {
+        "width_px": 320,
+        "sidebar_w": 304,
+        "card_inner_w": 284,
+        "cols": 1,
+        "col_w": 284.0,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 360,
+        "sidebar_w": 344,
+        "card_inner_w": 324,
+        "cols": 1,
+        "col_w": 324.0,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 375,
+        "sidebar_w": 359,
+        "card_inner_w": 339,
+        "cols": 2,
+        "col_w": 165.5,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 390,
+        "sidebar_w": 366,
+        "card_inner_w": 338,
+        "cols": 2,
+        "col_w": 165.0,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 414,
+        "sidebar_w": 390,
+        "card_inner_w": 362,
+        "cols": 2,
+        "col_w": 177.0,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 543,
+        "sidebar_w": 519,
+        "card_inner_w": 491,
+        "cols": 2,
+        "col_w": 241.5,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 768,
+        "sidebar_w": 736,
+        "card_inner_w": 692,
+        "cols": 4,
+        "col_w": 165.5,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 1024,
+        "sidebar_w": 992,
+        "card_inner_w": 948,
+        "cols": 5,
+        "col_w": 181.6,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 1280,
+        "sidebar_w": 420,
+        "card_inner_w": 376,
+        "cols": 2,
+        "col_w": 183.0,
+        "overflow_px": 0,
+        "status": "valid"
+      },
+      {
+        "width_px": 1440,
+        "sidebar_w": 420,
+        "card_inner_w": 376,
+        "cols": 2,
+        "col_w": 183.0,
+        "overflow_px": 0,
+        "status": "valid"
+      }
+    ]
+  }
 }

@@ -1,0 +1,4 @@
+=== SKEW RECTIFICATION & RESTORATION REPORT ===
+True Skew: 15.0 deg | Detected Skew: 15.0 deg | Error: 0.0 deg
+Projection Contrast Gain: 28.77x
+Rectified Pred Warp: 31.700000762939453 (True: 32) | Pred Weft: 28.299999237060547 (True: 28)

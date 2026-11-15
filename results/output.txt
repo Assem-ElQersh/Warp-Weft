@@ -1,6 +1,7 @@
-=== FABRIC THREAD DENSITY ANALYSIS REPORT ===
-Scale: 400 px/cm | Resolution: 25.0 um/px
-True Warp: 32 | Pred Warp (FFT): 32 | Pred Warp (Proj): 31
-True Weft: 28 | Pred Weft (FFT): 28 | Pred Weft (Proj): 27
-Validated Result: 32 Ends/cm (Warp) | 28 Picks/cm (Weft)
-Consistency Check: True
+=== PRODUCTION FABRIC ANALYSIS REPORT (1.0 CM) ===
+Spatial Calibration: 400 px/cm | Pitch: 25.00 um/px
+Orientation Rectification: Detected 11.5 deg (True 12.0 deg) | Error: 0.50 deg
+Validated Thread Density: 36 Ends/cm (Warp) | 30 Picks/cm (Weft)
+Physical Pitch: Warp = 277.1 um | Weft = 332.5 um
+Dual-Engine Discrepancy: Warp Delta = 0.20 | Weft Delta = 0.00
+Confidence Quality Score: 98.5% | Consensus Verified: True

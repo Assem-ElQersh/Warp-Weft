@@ -301,12 +301,86 @@ $$\Delta x \le \frac{10,000\,\mu\text{m}}{N_{\text{threads/cm}} \times K}$$
 
 ---
 
-## 5. Storage Policy, Bandwidth Management & Git Invariants
+## 5. Analysis Parameters, Theoretical Foundations & Measurement Semantics
+
+The computer vision pipeline translates optical photography into calibrated metric thread densities through four foundational control parameters and produces seven synchronized diagnostic outputs.
+
+### 5.1. The Four Operational Parameters
+
+#### 1. Spatial Calibration Scale ($S = \text{pixels/cm}$)
+* **Physical Definition:** The linear spatial magnification factor relating digital image coordinates to physical metric space:
+  $$S = \frac{\text{Pixel Count}}{\text{Physical Distance in Centimeters}} \quad [\text{px/cm}]$$
+  Equivalently, the optical pixel pitch $\Delta x$ represents the physical dimension spanned by a single sensor pixel:
+  $$\Delta x = \frac{10,000\,\mu\text{m}}{S} \quad [\mu\text{m/pixel}]$$
+* **Mechanistic Role in Pipeline:** Digital images possess no intrinsic metric dimensions—only pixel matrices $(W \times H)$. Without spatial calibration, Fourier spectral analysis yields dimensionless normalized frequency cycles per image width ($f_{\text{norm}}$), and spatial projection yields pixel pitch ($P_{\text{pixels}}$). The scale factor $S$ acts as the linear conversion operator mapping spatial frequencies and crown distances directly to physical fabric specifications:
+  $$N_{\text{threads/cm}} = f_{\text{cycles/image}} \times \frac{S}{\text{Image Width}_{\text{pixels}}}$$
+* **Failure Mode if Misconfigured:** An incorrect scale factor introduces an exact proportional scaling error across all outputs. If an image captured at $1280\text{ px/cm}$ is analyzed using $400\text{ px/cm}$, thread density will be undercounted by a factor of $1280 / 400 = 3.2\times$.
+
+#### 2. Weave Architecture Hint
+* **Physical Definition:** Structural categorization of the interlacing pattern formed between orthogonal warp and weft yarns. Four operational modes are supported:
+  1. `Auto-Detect / Balanced`: Default mode applying symmetric weighting between 2D FFT and 1D Projection engines.
+  2. `Plain Weave (Consensus Dominant)`: 1/1 balanced alternating interlacement where every warp thread alternates over and under successive weft threads.
+  3. `Twill Weave (2D FFT Dominant)`: Diagonal floating ridges (e.g., 2/1, 2/2, 3/1 construction) where yarns float over multiple perpendicular threads before interlacing.
+  4. `Satin Weave (2D FFT Dominant)`: Extended surface floats with isolated, non-adjacent interlacing points producing a smooth, lustrous face.
+* **Mechanistic Role in Pipeline:** In Plain Weave (1/1), every intersection produces a physical crown and shadow trough, creating pronounced, periodic marginal projection peaks. However, in Twill and Satin weaves, elongated surface floats smooth out marginal spatial projection profiles, causing 1D projection peaks to attenuate and drop below detection thresholds. Conversely, the continuous periodic translational symmetry of twill ridges and satin lattices produces intense, razor-sharp harmonic impulses in the 2D Fourier spectrum. The hint instructs the discrepancy arbiter to prioritize 2D FFT harmonic peaks (70% FFT / 30% Projection) when evaluating complex weave geometries.
+
+#### 3. Peak Prominence Sensitivity
+* **Physical Definition:** The minimum relative vertical descent $\Delta y_{\text{prom}}$ (normalized between 0.005 and 0.040) that a projection peak must exhibit relative to its surrounding local valleys to qualify as an authentic yarn crown:
+  $$\text{Prominence}(p) = y(p) - \max\Big(\min_{x \in [a, p]} y(x),\, \min_{x \in [p, b]} y(x)\Big)$$
+* **Mechanistic Role in Pipeline:** Raw textile surfaces are non-ideal optical targets characterized by spun fiber fuzz, yarn hairiness, lint, and micro-shadows. Without prominence thresholding, high-frequency surface noise is misidentified as additional yarn crowns (overcounting).
+* **Tuning Dynamics:**
+  * *High Sensitivity (Low values, 0.005–0.010):* Captures subtle, low-contrast yarn crowns in dense, fine fabrics (e.g., poplin, satin, microfibers); susceptible to false positives from yarn hairiness.
+  * *Standard / Balanced (Default 0.012):* Optimal operating point for medium woven goods (plain shirting, denim, twill), reliably rejecting intra-yarn fiber striations while isolating true thread boundaries.
+  * *High Specificity (High values, 0.020–0.040):* Recommended for high-contrast, coarse fabrics (canvas, burlap) or fuzzy woolen textures where yarn crowns are prominent and surface hairiness is severe.
+
+#### 4. Auto Skew Detection & Rectification
+* **Physical Definition:** Automated detection of non-orthogonal angular rotation $\theta \in [-45^\circ, +45^\circ]$ using frequency-domain Polar Radon integration, followed by inverse affine bicubic rotation and center-cropping.
+* **Mechanistic Role in Pipeline:** Fabric samples are frequently placed with a non-zero angular misalignment relative to the camera sensor. If a fabric tilted by $\theta \ne 0^\circ$ is projected along Cartesian axes $(x, y)$, columns integrate across both yarn crowns and interlacing valleys simultaneously. This mathematical phase cancellation completely flattens the projection profile (reducing profile variance by up to $28.77\times$). Auto Skew deterministically extracts the skew angle via:
+  $$R(\theta) = \int_{r_{\min}}^{r_{\max}} |F(r \cos\theta, -r \sin\theta)|\,dr \quad \implies \quad \theta_{\text{skew}} = \arg\max_\theta R(\theta)$$
+  and restores orthogonal alignment before spatial projection is performed.
+
+---
+
+### 5.2. Analytical Meaning of All Pipeline Results
+
+| Output Parameter | Metric Unit | Mathematical Derivation | Physical & Quality Meaning |
+| :--- | :---: | :--- | :--- |
+| **Warp Yarn Density** | Ends / 1.0 cm | $N_{\text{warp}} = \frac{u_0 \cdot S}{W_{\text{ROI}}}$ or peak count | Number of lengthwise vertical threads spanning exactly 1.0 physical centimeter ($10,000\,\mu\text{m}$). Determines longitudinal tensile strength. |
+| **Weft Yarn Density** | Picks / 1.0 cm | $N_{\text{weft}} = \frac{v_0 \cdot S}{H_{\text{ROI}}}$ or peak count | Number of crosswise horizontal threads spanning exactly 1.0 physical centimeter ($10,000\,\mu\text{m}$). Determines crosswise elasticity and filling density. |
+| **Total Fabric Density** | Threads / cm² | $N_{\text{total}} = N_{\text{warp}} \times N_{\text{weft}}$ | Combined areal yarn density per square centimeter. Quantifies fabric compactness, porosity, and mass classification. |
+| **Physical Yarn Pitch** | Micrometers ($\mu\text{m}$) | $P = \frac{10,000\,\mu\text{m}}{N}$ | Average center-to-center linear distance between consecutive parallel threads. Dictates yarn diameter clearance and cover factor. |
+| **Angular Skew Angle** | Degrees ($^\circ$) | $\theta_{\text{skew}} = \arg\max_\theta R(\theta)$ | Rotational misalignment of the sample relative to the optical sensor. High skew ($> 5^\circ$) indicates mounting tilt or factory bow/skew defects. |
+| **Confidence Quality Score ($Q$)** | Percentage (%) | $Q = 0.35 \cdot \text{SPNR}_{\text{norm}} + 0.35 \cdot \sigma_{\text{norm}} + 0.30 \cdot (1 - \Delta_{\text{rel}})$ | Composite validation metric. Reflects spectral peak sharpness (SPNR), spatial contrast ($\sigma$), and cross-engine consensus ($\Delta = |N_{\text{FFT}} - N_{\text{Proj}}|$). |
+| **Decision Status / Engine Mode** | Categorical | Tri-state algorithmic arbiter | **Dual-Engine Consensus:** Both independent engines agree within $\le 2\text{ threads/cm}$ (highest rigor).<br>**2D FFT Primary:** Selected when spatial contrast is degraded but frequency harmonics remain distinct.<br>**2D FFT Dominant (Float Structure):** Enforced via Twill/Satin hint to counteract float attenuation.<br>**1D Projection Primary:** Selected when spatial peaks exhibit high prominence under optical illumination. |
+
+---
+
+## 6. Comprehensive Dataset Selection Guide: Options & Rationale Matrix
+
+When testing imagery from any subdirectory within the `data/` repository, configure the analysis parameters according to the following matrix to ensure valid mathematical quantification:
+
+| Target Dataset Path | Image Category & Format | Recommended Spatial Calibration Scale | Recommended Weave Hint | Optimal Peak Prominence | Auto Skew Status | Mechanistic Rationale |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`data/fabricnet/`**<br>(`W001.jpg`–`W050.jpg`) | Plain Weave Microscopy ($640 \times 480\text{ px}$) | **`1280.0 px/cm`**<br>(USB Digital Microscope — FabricNET Scale) | `Plain Weave (Consensus Dominant)` | `0.012` | **Checked (ON)** | Handheld microscope field of view covers exactly $5.0\text{ mm} \times 4.0\text{ mm}$ ($640\text{ px} / 0.5\text{ cm} = 1280\text{ px/cm}$). 1/1 interlacement produces balanced projection peaks. |
+| **`data/fabricnet/`**<br>(`W051.jpg`–`W089.jpg`) | Twill Weave Microscopy ($640 \times 480\text{ px}$) | **`1280.0 px/cm`**<br>(USB Digital Microscope — FabricNET Scale) | `Twill Weave (2D FFT Dominant)` | `0.010`–`0.012` | **Checked (ON)** | Floating diagonal twill ridges attenuate 1D spatial profile contrast; 2D FFT dominance extracts the fundamental spatial frequency without float disruption. |
+| **`data/fabricnet/`**<br>(`W090.jpg`–`W130.jpg`) | Satin Weave Microscopy ($640 \times 480\text{ px}$) | **`1280.0 px/cm`**<br>(USB Digital Microscope — FabricNET Scale) | `Satin Weave (2D FFT Dominant)` | `0.008`–`0.010` | **Checked (ON)** | Extended satin floats minimize surface interlacing points; lower prominence sensitivity captures fine interlacements, while 2D FFT isolates lattice harmonics. |
+| **`data/ten_fabrics/`**<br>(e.g., `fabric1_001.png`) | Flatbed Scanner Crops ($256 \times 256\text{ px}$) | **`Custom: 118.11 px/cm`**<br>($300\text{ DPI} / 2.54$) | `Plain Weave` or `Auto-Detect` | `0.016`–`0.020` | **Checked (ON)** | Flatbed scans captured at fixed $300\text{ DPI}$ yield $\Delta x = 84.67\,\mu\text{m/px}$. Coarse pixel resolution requires higher prominence to avoid scan noise artifacts. |
+| **`data/synthetic/`**<br>(`macro_swatch_skewed_12deg.png`) | Synthetic Benchmark ($800 \times 800\text{ px}$) | **`400.0 px/cm`**<br>(Smartphone / Macro Camera) | `Auto-Detect` or `Plain Weave` | `0.012` | **Checked (ON)** | Mathematically synthesized with $P_x = 277.8\,\mu\text{m}$ at $\Delta x = 25.0\,\mu\text{m/px}$ ($400\text{ px/cm}$) and $+12.0^\circ$ tilt. Tests Radon orientation recovery. |
+| **`data/synthetic/`**<br>(`sample_plain_32x28.png`) | Orthogonal Plain Weave ($400 \times 400\text{ px}$) | **`400.0 px/cm`**<br>(Smartphone / Macro Camera) | `Plain Weave (Consensus Dominant)` | `0.012` | **Unchecked or Checked** | True zero-tilt orthogonal baseline swatch ($32\text{ ends} \times 28\text{ picks}$). Evaluates perfect dual-engine consensus under zero optical distortion. |
+| **`data/synthetic/`**<br>(`sample_skewed_15deg.png`) | Rotated Plain Weave ($400 \times 400\text{ px}$) | **`400.0 px/cm`**<br>(Smartphone / Macro Camera) | `Plain Weave (Consensus Dominant)` | `0.012` | **Checked (ON)** | Demonstrates Radon spectral peak detection at $+15.0^\circ$ and contrast variance recovery from $\sigma=0.0056$ to $\sigma=0.1633$. |
+| **`data/aitex_database/`**<br>(`2306881-210020u/`) | Industrial Loom Web Scan ($4096 \times 256\text{ px}$) | **`Custom: 35.0`–`45.0 px/cm`**<br>(Unmagnified Web Scan) | `Auto-Detect` | `0.025` | **Checked (ON)** | Wide-web line-scan inspection imaging full $1.5\text{ m}$ fabric rolls. Optical resolution ($\sim 250\,\mu\text{m/px}$) violates Nyquist sampling for fine threads; useful for coarse weave macro inspection. |
+| **`data/multiclass_defects/`** & **`fabric_defects_benchmark/`** | Industrial Defect Macro Frames ($640 \times 360\text{ px}$) | **`Custom: 200.0`–`400.0 px/cm`**<br>(Estimated Macro Frame) | `Auto-Detect` | `0.015` | **Checked (ON)** | Factory camera frames lacking in-frame calibration rulers. User should estimate pixel scale based on known fabric width or ArUco reference. |
+| **User Ingestion (`data/samples/` / Upload)** | Smartphone with 10x Pick-Glass | **`1200.0 px/cm`**<br>(USB Digital Microscope / Pick-Glass) | `Auto-Detect` | `0.012` | **Checked (ON)** | 10x optical pick-glass magnification attached to smartphone camera resolves $\sim 8.3\,\mu\text{m/pixel}$, matching standard digital microscope geometry. |
+| **User Ingestion (`data/samples/` / Upload)** | Direct Smartphone Macro Close-up | **`400.0 px/cm`**<br>(Smartphone / Macro Camera) | `Auto-Detect` | `0.014`–`0.018` | **Checked (ON)** | Unassisted smartphone camera at minimum focal distance ($5\text{--}8\text{ cm}$) yields $\sim 25\,\mu\text{m/pixel}$. Suitable for coarse-to-medium fabrics up to $35\text{ threads/cm}$. |
+
+---
+
+## 7. Storage Policy, Bandwidth Management & Git Invariants
 
 To avoid overloading the Git repository with multi-gigabyte binary assets, strict tracking invariants are enforced via [`.gitignore`](../.gitignore):
 
 * **Tracked Assets (Committed to Repository):**
-  * `data/README.md`: This comprehensive data taxonomy and physical specifications reference.
+  * `data/README.md`: This comprehensive data taxonomy, analysis parameter specifications, and dataset selection guide.
   * `data/fabricnet/FabricNet_parameters.xlsx`: Ground-truth tabular parameters (131 rows, 13.3 KB).
   * `data/synthetic/*`: High-precision synthetic testbed PNGs (696 KB total).
   * `data/samples/.gitkeep`: Empty ingestion buffer anchor.
@@ -318,3 +392,4 @@ To avoid overloading the Git repository with multi-gigabyte binary assets, stric
   * `data/fabric_defects_benchmark/`: 2,739 images (2.15 GB).
   * `data/textile_weaving_tabular/`: Industrial production logs (41 MB).
   * `data/textile_knitting_tabular/`: Knitting production CSV (3.1 MB).
+

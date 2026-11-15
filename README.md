@@ -41,6 +41,7 @@ The system is architected to operate under resource constraints (standard laptop
 | Zero-dependency interactive Web Application & REST API (HTTP 8080/8085) serves dual-engine fabric analysis with user uploads, 4 benchmark presets, and full diagnostics in < 250 ms | `notebooks/05_web_app_interface.ipynb` & `web_app/server.py` | Eliminates external bulky framework dependencies (Flask/FastAPI); enables instant, offline, zero-download local deployment on any workstation with interactive dual-language (EN/AR) controls. |
 | Comprehensive Multi-Modal Data Repository Audit cataloging 12,238 files across 9 subdirectories (~5.07 GB) with sensor resolutions, FOVs, scale calibrations, and schemas | `data/README.md` | Establishes immutable engineering specifications reference across microscopy, line-scans, flatbed captures, and tabular production records; codifies Nyquist resolution invariants and git tracking boundaries. |
 | Mobile Responsive Reflow & CSS Cascade Reordering resolves 345 px viewport overflow on 543 px screens, achieving 0 px horizontal overflow across all widths (320–1440 px) with fluid `minmax(min(100%, 150px), 1fr)` swatch wrapping | `web_app/index.html` | Eliminates CSS Grid `auto` track blowout and static 2-column card truncation; proves mobile-first cascade order and `min-width: 0` constraints guarantee non-clipped rendering on smartphones and tablets. |
+| Comprehensive Control Parameters & Output Semantics Ledger establishing exact analytical equations, failure modes, and per-dataset selection criteria | `README.md` & `data/README.md` | Formalizes physical definitions for Scale, Weave Hint, Prominence, and Skew Rectification; codifies exact optical selection parameters across 6 dataset modalities to prevent scaling and float undercounting errors. |
 
 ---
 
@@ -117,6 +118,39 @@ flowchart TD
 2. **Sub-Second Execution:** Processes a 1 cm² ROI in $< 10\text{ ms}$ on standard laptop CPUs.
 3. **Memory Footprint:** Operates within $< 100\text{ MB}$ of system RAM.
 4. **Environment Portability:** Fully functional offline with zero cloud API dependencies.
+
+### 6.2. Operational Control Parameters & Mechanistic Justifications
+
+The execution of the dual-engine pipeline is parameterized by four core variables:
+
+1. **Spatial Calibration Scale ($S = \text{pixels/cm}$):**
+   * *Mechanism:* The linear conversion operator mapping 2D discrete sensor pixels to continuous metric dimensions: $S = \text{px} / \text{cm}$, with optical pitch $\Delta x = 10,000 / S\,\mu\text{m/pixel}$.
+   * *Justification:* Digital arrays lack metric awareness. The Fourier spectrum yields dimensionless cycles per window ($f_{\text{norm}}$); multiplying by $S / W$ directly yields physical thread density in Ends/cm and Picks/cm.
+2. **Weave Architecture Hint (`auto`, `plain`, `twill`, `satin`):**
+   * *Mechanism:* Guides the decision arbiter's engine weighting based on the physical interlacing topology.
+   * *Justification:* Plain weaves alternate symmetrically at every intersection, producing balanced 1D projection peaks. Twill and satin weaves feature elongated float ridges that smooth out 1D marginal projection troughs; the hint shifts weighting to 2D FFT spectral harmonics (70% FFT / 30% Projection) to eliminate float-induced undercounting.
+3. **Peak Prominence Sensitivity ($\Delta y_{\text{prom}} \in [0.005, 0.040]$):**
+   * *Mechanism:* Specifies the required vertical altitude drop of a projection peak relative to adjacent local troughs.
+   * *Justification:* Spun fibers, yarn fuzz, and micro-shadows introduce high-frequency profile ripple. A prominence threshold (default $0.012$) prevents surface hairiness from triggering false peak detections while preserving genuine inter-yarn crown valleys.
+4. **Auto Skew Detection & Rectification:**
+   * *Mechanism:* Evaluates Polar Radon radial ray integrals across 2D FFT magnitude space: $R(\theta) = \int |F(r \cos\theta, -r \sin\theta)|\,dr$ across $\theta \in [-45^\circ, +45^\circ]$, followed by $-\theta$ inverse affine rotation.
+   * *Justification:* Non-orthogonal sample placement washes out spatial projection contrast via inter-column phase cancellation ($\sigma_{\text{skewed}} = 0.00568$). Rectification restores column alignment and elevates contrast variance by up to $28.77\times$ ($\sigma_{\text{rect}} = 0.16333$).
+
+### 6.3. Physical & Mathematical Semantics of Pipeline Results
+
+* **Warp Yarn Density (Ends / 1.0 cm):** Total vertical lengthwise threads across a calibrated $10,000\,\mu\text{m}$ span. Controls fabric tensile elongation and tear resistance.
+* **Weft Yarn Density (Picks / 1.0 cm):** Total horizontal crosswise filling threads across a calibrated $10,000\,\mu\text{m}$ span. Controls fabric width stability and air permeability.
+* **Total Fabric Density (Threads / cm²):** Areal product $N_{\text{warp}} \times N_{\text{weft}}$. Serves as an index of fabric tightness and basis weight categorization.
+* **Physical Yarn Pitch ($P$ in $\mu\text{m}$):** Mean center-to-center thread spacing calculated as $P = 10,000 / N$. Indicates yarn thickness and inter-thread porosity.
+* **Angular Skew Angle ($\theta$ in $^\circ$):** Rotational angle of deviation from the optical sensor grid. Quantifies sample mounting tilt or structural textile skewing flaws.
+* **Confidence Quality Score ($Q$ in %):** Tri-factor composite metric:
+  $$Q = 0.35 \times \text{SPNR}_{\text{norm}} + 0.35 \times \sigma_{\text{norm}} + 0.30 \times (1 - \Delta_{\text{rel}})$$
+  Combining Spectral Peak-to-Noise Ratio, Spatial Projection Contrast Variance, and Inter-Engine Concordance.
+* **Decision Status / Engine Mode:** Identifies the algorithmic decision branch:
+  * *Dual-Engine Consensus:* Both engines agree within $\Delta \le 2\text{ threads/cm}$ (maximum analytical confidence).
+  * *2D FFT Primary (Discrepancy Arbiter):* Engines diverged ($\Delta > 2$); 2D FFT was selected due to higher spectral peak sharpness.
+  * *2D FFT Dominant (Float Structure):* Enforced by twill/satin hint to bypass float-induced projection attenuation.
+  * *1D Projection Primary:* Selected under high-contrast conditions where spatial crown peaks are unequivocally resolved.
 
 ---
 

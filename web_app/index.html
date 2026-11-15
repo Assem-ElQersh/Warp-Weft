@@ -325,6 +325,74 @@
             cursor: pointer;
         }
 
+        /* Contextual Help & Information Toggle */
+        .field-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .info-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #1e3a8a;
+            border: 1px solid #cbd5e1;
+            font-size: 0.74rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.2s ease;
+            padding: 0;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .info-btn:hover, .info-btn[aria-expanded="true"] {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+            transform: scale(1.12);
+        }
+
+        .help-box {
+            display: none;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 3px solid var(--accent);
+            border-radius: 6px;
+            padding: 9px 12px;
+            font-size: 0.77rem;
+            color: #1e3a8a;
+            line-height: 1.45;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            animation: helpFadeIn 0.2s ease-in-out;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        body.lang-ar .help-box {
+            border-left: 1px solid #bfdbfe;
+            border-right: 3px solid var(--accent);
+        }
+
+        .help-box.show {
+            display: block;
+        }
+
+        @keyframes helpFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* Primary Button */
         .btn-analyze {
             width: 100%;
@@ -735,7 +803,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label id="lbl-calibration">Spatial Calibration Scale</label>
+                    <div class="field-header">
+                        <label id="lbl-calibration" style="margin-bottom: 0;">Spatial Calibration Scale</label>
+                        <button type="button" class="info-btn" id="btn-info-scale" aria-expanded="false" aria-label="More information about Spatial Calibration Scale" onclick="toggleHelp('help-scale', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-scale"></div>
                     <select class="form-control" id="preset-scale-select" onchange="handleScalePresetChange()">
                         <option value="1280.0">USB Digital Microscope (1280 px/cm — FabricNET Scale)</option>
                         <option value="1200.0">USB Digital Microscope (1200 px/cm — Standard Pick-Glass)</option>
@@ -752,7 +824,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label id="lbl-weave-hint">Weave Architecture Hint</label>
+                    <div class="field-header">
+                        <label id="lbl-weave-hint" style="margin-bottom: 0;">Weave Architecture Hint</label>
+                        <button type="button" class="info-btn" id="btn-info-weave" aria-expanded="false" aria-label="More information about Weave Architecture Hint" onclick="toggleHelp('help-weave', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-weave"></div>
                     <select class="form-control" id="select-weave-hint">
                         <option value="auto" selected>Auto-Detect / Balanced</option>
                         <option value="plain">Plain Weave (Consensus Dominant)</option>
@@ -762,7 +838,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label id="lbl-prominence">Peak Prominence Sensitivity</label>
+                    <div class="field-header">
+                        <label id="lbl-prominence" style="margin-bottom: 0;">Peak Prominence Sensitivity</label>
+                        <button type="button" class="info-btn" id="btn-info-prominence" aria-expanded="false" aria-label="More information about Peak Prominence Sensitivity" onclick="toggleHelp('help-prominence', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-prominence"></div>
                     <div class="form-range-container">
                         <input type="range" class="form-range" id="input-prominence" min="0.005" max="0.040" step="0.002" value="0.012" oninput="document.getElementById('val-prominence').innerText = this.value">
                         <span id="val-prominence" style="font-size: 0.8rem; font-weight: 700; width: 45px;">0.012</span>
@@ -770,10 +850,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="chk-auto-skew" checked>
-                        <span id="txt-auto-skew">Auto Skew Detection & Rectification</span>
-                    </label>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="chk-auto-skew" checked>
+                            <span id="txt-auto-skew">Auto Skew Detection & Rectification</span>
+                        </label>
+                        <button type="button" class="info-btn" id="btn-info-skew" aria-expanded="false" aria-label="More information about Auto Skew Detection" onclick="toggleHelp('help-skew', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-skew"></div>
                 </div>
 
                 <button class="btn-analyze" id="btn-run" onclick="executeAnalysis()">
@@ -787,28 +871,44 @@
             <!-- KPI Summary Cards -->
             <div class="kpi-grid">
                 <div class="kpi-card warp">
-                    <div class="kpi-title" id="kpi-title-warp">Warp Density (Vertical)</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="kpi-title" id="kpi-title-warp">Warp Density (Vertical)</div>
+                        <button type="button" class="info-btn" id="btn-info-kpi-warp" aria-expanded="false" aria-label="More information about Warp Density" onclick="toggleHelp('help-kpi-warp', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-kpi-warp"></div>
                     <div class="kpi-value" id="kpi-warp">--</div>
                     <div class="kpi-unit" id="kpi-warp-unit">Ends / 1.0 cm</div>
                     <div class="kpi-sub" id="kpi-warp-pitch">Pitch: -- µm</div>
                 </div>
 
                 <div class="kpi-card weft">
-                    <div class="kpi-title" id="kpi-title-weft">Weft Density (Horizontal)</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="kpi-title" id="kpi-title-weft">Weft Density (Horizontal)</div>
+                        <button type="button" class="info-btn" id="btn-info-kpi-weft" aria-expanded="false" aria-label="More information about Weft Density" onclick="toggleHelp('help-kpi-weft', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-kpi-weft"></div>
                     <div class="kpi-value" id="kpi-weft">--</div>
                     <div class="kpi-unit" id="kpi-weft-unit">Picks / 1.0 cm</div>
                     <div class="kpi-sub" id="kpi-weft-pitch">Pitch: -- µm</div>
                 </div>
 
                 <div class="kpi-card total">
-                    <div class="kpi-title" id="kpi-title-total">Total Fabric Density</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="kpi-title" id="kpi-title-total">Total Fabric Density</div>
+                        <button type="button" class="info-btn" id="btn-info-kpi-total" aria-expanded="false" aria-label="More information about Total Fabric Density" onclick="toggleHelp('help-kpi-total', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-kpi-total"></div>
                     <div class="kpi-value" id="kpi-total">--</div>
                     <div class="kpi-unit" id="kpi-total-unit">Threads / cm²</div>
                     <div class="kpi-sub" id="kpi-skew">Skew Angle: --°</div>
                 </div>
 
                 <div class="kpi-card quality">
-                    <div class="kpi-title" id="kpi-title-quality">Quality Score (Q)</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="kpi-title" id="kpi-title-quality">Quality Score (Q)</div>
+                        <button type="button" class="info-btn" id="btn-info-kpi-quality" aria-expanded="false" aria-label="More information about Quality Score" onclick="toggleHelp('help-kpi-quality', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-kpi-quality"></div>
                     <div class="kpi-value" id="kpi-quality">--%</div>
                     <div class="kpi-unit" id="kpi-mode">Status: Standby</div>
                     <div class="kpi-sub" id="kpi-latency">Latency: -- ms</div>
@@ -968,7 +1068,15 @@
                 tabAudit: "Mathematical Audit",
                 bannerText: "Ready to present to clients or review complete scientific derivations?",
                 btnDlEn: "Download English PDF",
-                btnDlAr: "تحميل التقرير الفني (عربي)"
+                btnDlAr: "تحميل التقرير الفني (عربي)",
+                helpScale: "Relates image pixels to physical metric distance. Optimal choices: 1280 px/cm for USB digital microscopes (FabricNET scale), 1200 px/cm for 10× pick-glass magnifiers, or 400 px/cm for direct smartphone macro close-ups.",
+                helpWeave: "Informs the decision arbiter of the interlacing topology. Plain weave uses balanced 50/50 consensus. Twill and satin weaves feature long float ridges that flatten 1D projection troughs; choosing Twill/Satin weights 2D FFT harmonics dominant (70% FFT / 30% Proj) to prevent float undercounting.",
+                helpProminence: "Minimum altitude drop for a spatial projection peak to qualify as a real yarn crown. Lower values (0.006–0.010) capture subtle fine yarns in poplin/satin; higher values (0.016–0.025) filter out fiber hairiness in fuzzy fabrics. Default 0.012 is balanced for standard weaves.",
+                helpSkew: "Automatically detects fabric placement tilt between -45° and +45° via 2D FFT Polar Radon integration and rotates the swatch before spatial projection, preventing profile contrast collapse.",
+                helpKpiWarp: "Vertical lengthwise threads per 1.0 physical centimeter (10,000 µm). Dictates longitudinal tensile strength.",
+                helpKpiWeft: "Horizontal crosswise filling threads (picks) per 1.0 physical centimeter (10,000 µm). Dictates crosswise elasticity and compactness.",
+                helpKpiTotal: "Combined areal thread count per square centimeter (Threads/cm² = Warp × Weft). Indicates fabric tightness and weight class.",
+                helpKpiQuality: "Multi-factor composite confidence score: Q = 35% Spectral Sharpness (SPNR) + 35% Projection Contrast Variance + 30% Inter-Engine Concordance. Scores > 60% indicate verified analytical certainty."
             },
             ar: {
                 appTitle: "القياس الآلي لكثافة خيوط النسيج (سداء ولحمة)",
@@ -998,9 +1106,36 @@
                 tabAudit: "جدول التدقيق الرياضي",
                 bannerText: "هل ترغب في استعراض التقرير الهندسي الكامل المعتمد للعميل؟",
                 btnDlEn: "English PDF Report",
-                btnDlAr: "تحميل التقرير الفني بالعربية (PDF)"
+                btnDlAr: "تحميل التقرير الفني بالعربية (PDF)",
+                helpScale: "يربط بكسلات الصورة بالقياس المتري الفعلي. الخيارات المثالية: 1280 بكسل/سم للميكروسكوب الرقمي (مقياس FabricNET)، أو 1200 بكسل/سم لعدسة قياس النسيج (Pick-Glass 10x)، أو 400 بكسل/سم لكاميرا الهاتف الماكرو.",
+                helpWeave: "يحدد نوع التركيب النسجي للقماش. النسج السادة يعتمد توافقاً متوازناً بين المحركين. أنسجة المبرد والأطلس تتميز بتراكيب طولية (Floats) تضعف قمم الإسقاط الخطي؛ اختيار المبرد أو الأطلس يوجه المحرك للاعتماد على فورييه 2D لتجنب نقص العد.",
+                helpProminence: "الارتفاع الأدنى لقمة الإسقاط لاعتبارها خيطاً فعلياً. القيم المنخفضة (0.006–0.010) تلتقط الخيوط الدقيقة الناعمة في الأطلس والبوبلين، بينما القيم المرتفعة (0.016–0.025) تتجاهل الشعيرات السطحية والوبر. القيمة الافتراضية 0.012 متوازنة للأقمشة القياسية.",
+                helpSkew: "يكتشف ميلان القماش تلقائياً عبر فحص طاقة الترددات في مجال فورييه بين -45° و+45°، ثم يعدل دوران العينة لحماية تباين الإسقاط الخطي من الانهيار.",
+                helpKpiWarp: "عدد خيوط السداء الرأسية لكل 1.0 سم متري (10,000 ميكرومتر). يحدد مقاومة الشد الطولي للقماش.",
+                helpKpiWeft: "عدد خيوط اللحمة العرضية لكل 1.0 سم متري (10,000 ميكرومتر). يحدد كثافة النسيج العرضي ومرونته.",
+                helpKpiTotal: "الكثافة الإجمالية المحسوبة لمساحة السنتيمتر المربع (خيوط/سم² = السداء × اللحمة). تدل على تماسك القماش ووزنه.",
+                helpKpiQuality: "درجة موثوقية مركبة: 35% وضوح ترددات فورييه + 35% تباين الإسقاط الخطي + 30% نسبة التوافق بين المحركين. نسبة أعلى من 60% تعكس ثقة تحليلية عالية."
             }
         };
+
+        function toggleHelp(helpId, btn) {
+            const panel = document.getElementById(helpId);
+            if (!panel) return;
+            const isShowing = panel.classList.toggle('show');
+            btn.setAttribute('aria-expanded', isShowing ? 'true' : 'false');
+        }
+
+        function updateHelpTexts() {
+            const strings = i18n[currentLanguage];
+            document.getElementById('help-scale').innerText = strings.helpScale;
+            document.getElementById('help-weave').innerText = strings.helpWeave;
+            document.getElementById('help-prominence').innerText = strings.helpProminence;
+            document.getElementById('help-skew').innerText = strings.helpSkew;
+            document.getElementById('help-kpi-warp').innerText = strings.helpKpiWarp;
+            document.getElementById('help-kpi-weft').innerText = strings.helpKpiWeft;
+            document.getElementById('help-kpi-total').innerText = strings.helpKpiTotal;
+            document.getElementById('help-kpi-quality').innerText = strings.helpKpiQuality;
+        }
 
         function toggleLanguage() {
             currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
@@ -1049,6 +1184,8 @@
             document.getElementById('txt-banner-text').innerText = strings.bannerText;
             document.getElementById('btn-dl-en').innerText = strings.btnDlEn;
             document.getElementById('btn-dl-ar').innerText = strings.btnDlAr;
+
+            updateHelpTexts();
         }
 
         // Initialize Presets
@@ -1333,7 +1470,10 @@
         }
 
         // Initialize on load
-        window.onload = loadPresets;
+        window.onload = () => {
+            updateHelpTexts();
+            loadPresets();
+        };
     </script>
 </body>
 </html>

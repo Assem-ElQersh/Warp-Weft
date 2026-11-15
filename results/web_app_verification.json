@@ -1,0 +1,93 @@
+{
+  "root_status": 200,
+  "root_html_len": 43530,
+  "health": {
+    "status": "healthy",
+    "service": "Warp-Weft Thread Density Analyzer",
+    "framework": "Pure NumPy / Pillow Mathematical Engine",
+    "gpu_available": false,
+    "offline": true
+  },
+  "presets_count": 4,
+  "presets_thumbnails_ok": true,
+  "preset_tests": {
+    "synthetic_skewed_12": {
+      "status": "success",
+      "latency_ms": 243.64,
+      "results": {
+        "warp_ends_per_cm": 36,
+        "weft_picks_per_cm": 30,
+        "total_thread_density": 66,
+        "pitch_warp_um": 277.78,
+        "pitch_weft_um": 333.33,
+        "detected_skew_deg": 11.5,
+        "confidence_score": 69.5,
+        "engine_mode": "Dual-Engine Consensus"
+      },
+      "has_plots": true
+    },
+    "fabricnet_w012": {
+      "status": "success",
+      "latency_ms": 193.83,
+      "results": {
+        "warp_ends_per_cm": 40,
+        "weft_picks_per_cm": 30,
+        "total_thread_density": 70,
+        "pitch_warp_um": 250.0,
+        "pitch_weft_um": 333.33,
+        "detected_skew_deg": 0.0,
+        "confidence_score": 37.5,
+        "engine_mode": "2D FFT Primary (Discrepancy Arbiter)"
+      },
+      "has_plots": true
+    },
+    "fabricnet_w001": {
+      "status": "success",
+      "latency_ms": 175.93,
+      "results": {
+        "warp_ends_per_cm": 34,
+        "weft_picks_per_cm": 31,
+        "total_thread_density": 65,
+        "pitch_warp_um": 294.12,
+        "pitch_weft_um": 322.58,
+        "detected_skew_deg": 0.0,
+        "confidence_score": 37.3,
+        "engine_mode": "2D FFT Dominant (Float Structure)"
+      },
+      "has_plots": true
+    },
+    "synthetic_skewed_15": {
+      "status": "success",
+      "latency_ms": 140.38,
+      "results": {
+        "warp_ends_per_cm": 32,
+        "weft_picks_per_cm": 28,
+        "total_thread_density": 60,
+        "pitch_warp_um": 312.5,
+        "pitch_weft_um": 357.14,
+        "detected_skew_deg": 15.0,
+        "confidence_score": 59.5,
+        "engine_mode": "Dual-Engine Consensus"
+      },
+      "has_plots": true
+    }
+  },
+  "custom_upload_test": {
+    "status": "success",
+    "results": {
+      "warp_ends_per_cm": 40,
+      "weft_picks_per_cm": 67,
+      "total_thread_density": 107,
+      "pitch_warp_um": 250.0,
+      "pitch_weft_um": 149.25,
+      "detected_skew_deg": 0.0,
+      "confidence_score": 59.4,
+      "engine_mode": "2D FFT Primary (Discrepancy Arbiter)"
+    },
+    "latency_ms": 37.63
+  },
+  "en_report_bytes": 20118458,
+  "en_report_mime": "application/pdf",
+  "ar_report_bytes": 1864848,
+  "ar_report_mime": "application/pdf"
+}

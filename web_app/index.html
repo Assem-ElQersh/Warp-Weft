@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warp & Weft AI Analyzer — Automated Thread Density Quantification</title>
+    <style>
+        :root {
+            --primary: #0f2b48;
+            --primary-light: #1a446c;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+            --border-focus: #3b82f6;
+            --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-ar: "Amiri", "Noto Naskh Arabic", serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-en);
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.lang-ar {
+            font-family: var(--font-ar);
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background: linear-gradient(135deg, #0f2b48 0%, #1e3a8a 100%);
+            color: #ffffff;
+            padding: 20px 32px;
+            box-shadow: 0 4px 12px rgba(15, 43, 72, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-brand h1 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-brand p {
+            font-size: 0.88rem;
+            color: #93c5fd;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1400px;
+            margin: 28px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 28px;
+        }
+
+        @media (max-width: 1080px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Quick Preset Buttons */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .preset-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .preset-item:hover, .preset-item.active {
+            border-color: var(--accent);
+            background: #eff6ff;
+        }
+
+        .preset-img {
+            width: 100%;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #cbd5e1;
+        }
+
+        .preset-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .preset-meta {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Drag & Drop Upload Zone */
+        .upload-zone {
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 26px 16px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 18px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: #eff6ff;
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .upload-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #ffffff;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--border-focus);
+        }
+
+        .form-range-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-range {
+            flex: 1;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Primary Button */
+        .btn-analyze {
+            width: 100%;
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-analyze:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-analyze:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            border-top: 4px solid var(--accent);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .kpi-card.warp {
+            border-top-color: #2563eb;
+        }
+
+        .kpi-card.weft {
+            border-top-color: #059669;
+        }
+
+        .kpi-card.total {
+            border-top-color: #7c3aed;
+        }
+
+        .kpi-card.quality {
+            border-top-color: #d97706;
+        }
+
+        .kpi-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .kpi-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 4px 0 2px 0;
+            line-height: 1.1;
+        }
+
+        .kpi-unit {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .kpi-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 18px;
+            overflow-x: auto;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 10px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Visualization Views */
+        .vis-container {
+            text-align: center;
+        }
+
+        .vis-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .dual-vis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .dual-vis {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Audit Table */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+            margin-top: 10px;
+        }
+
+        .audit-table th, .audit-table td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        .audit-table th {
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .audit-table tr.highlight {
+            background: #fef3c7;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        /* Footer & Downloads */
+        .reports-banner {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .reports-text {
+            font-size: 0.88rem;
+            color: #166534;
+            font-weight: 600;
+        }
+
+        .reports-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-report {
+            background: #ffffff;
+            color: #166534;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-report:hover {
+            background: #166534;
+            color: #ffffff;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-brand">
+            <h1 id="txt-app-title">Warp & Weft AI Thread Density Analyzer</h1>
+            <p id="txt-app-subtitle">Dual-Engine Computer Vision System (2D FFT & 1D Projection) for Calibrated 1.0 cm Fabric Analysis</p>
+        </div>
+        <div class="header-actions">
+            <button class="lang-btn" id="lang-toggle-btn" onclick="toggleLanguage()">العربية</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar: Upload & Controls -->
+        <div class="sidebar">
+            <!-- Card 1: Sample Presets -->
+            <div class="card">
+                <div class="card-title">
+                    <span id="txt-preset-title">Quick Test Swatches</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);" id="txt-preset-hint">Click to test instantly</span>
+                </div>
+                <div class="preset-grid" id="preset-grid">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Card 2: Upload & Calibration -->
+            <div class="card">
+                <div class="card-title">
+                    <span id="txt-upload-title">Upload Custom Fabric</span>
+                </div>
+
+                <div class="upload-zone" id="upload-dropzone" onclick="document.getElementById('file-input').click()">
+                    <div class="upload-icon">&#8679;</div>
+                    <div class="upload-text" id="txt-drop-text">Drag & Drop Image Here</div>
+                    <div class="upload-hint" id="txt-drop-hint">or click to browse JPG, PNG, WEBP, BMP</div>
+                    <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-calibration">Spatial Calibration Scale</label>
+                    <select class="form-control" id="preset-scale-select" onchange="handleScalePresetChange()">
+                        <option value="1280.0">USB Digital Microscope (1280 px/cm — FabricNET Scale)</option>
+                        <option value="1200.0">USB Digital Microscope (1200 px/cm — Standard Pick-Glass)</option>
+                        <option value="472.44">Flatbed Scanner 1200 DPI (472.4 px/cm)</option>
+                        <option value="236.22">Flatbed Scanner 600 DPI (236.2 px/cm)</option>
+                        <option value="400.0" selected>Smartphone / Macro Camera (400 px/cm)</option>
+                        <option value="custom">Custom (Specify px/cm manually)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="custom-scale-group" style="display: none;">
+                    <label id="lbl-pixels-cm">Pixels per Centimeter (px/cm)</label>
+                    <input type="number" class="form-control" id="input-pixels-cm" value="400.0" step="1.0" min="50" max="10000">
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-weave-hint">Weave Architecture Hint</label>
+                    <select class="form-control" id="select-weave-hint">
+                        <option value="auto" selected>Auto-Detect / Balanced</option>
+                        <option value="plain">Plain Weave (Consensus Dominant)</option>
+                        <option value="twill">Twill Weave (2D FFT Dominant)</option>
+                        <option value="satin">Satin Weave (2D FFT Dominant)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-prominence">Peak Prominence Sensitivity</label>
+                    <div class="form-range-container">
+                        <input type="range" class="form-range" id="input-prominence" min="0.005" max="0.040" step="0.002" value="0.012" oninput="document.getElementById('val-prominence').innerText = this.value">
+                        <span id="val-prominence" style="font-size: 0.8rem; font-weight: 700; width: 45px;">0.012</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="chk-auto-skew" checked>
+                        <span id="txt-auto-skew">Auto Skew Detection & Rectification</span>
+                    </label>
+                </div>
+
+                <button class="btn-analyze" id="btn-run" onclick="executeAnalysis()">
+                    <span id="btn-run-text">Run Thread Analysis</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Workspace: Results & Diagnostics -->
+        <div class="main-content">
+            <!-- KPI Summary Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card warp">
+                    <div class="kpi-title" id="kpi-title-warp">Warp Density (Vertical)</div>
+                    <div class="kpi-value" id="kpi-warp">--</div>
+                    <div class="kpi-unit" id="kpi-warp-unit">Ends / 1.0 cm</div>
+                    <div class="kpi-sub" id="kpi-warp-pitch">Pitch: -- µm</div>
+                </div>
+
+                <div class="kpi-card weft">
+                    <div class="kpi-title" id="kpi-title-weft">Weft Density (Horizontal)</div>
+                    <div class="kpi-value" id="kpi-weft">--</div>
+                    <div class="kpi-unit" id="kpi-weft-unit">Picks / 1.0 cm</div>
+                    <div class="kpi-sub" id="kpi-weft-pitch">Pitch: -- µm</div>
+                </div>
+
+                <div class="kpi-card total">
+                    <div class="kpi-title" id="kpi-title-total">Total Fabric Density</div>
+                    <div class="kpi-value" id="kpi-total">--</div>
+                    <div class="kpi-unit" id="kpi-total-unit">Threads / cm²</div>
+                    <div class="kpi-sub" id="kpi-skew">Skew Angle: --°</div>
+                </div>
+
+                <div class="kpi-card quality">
+                    <div class="kpi-title" id="kpi-title-quality">Quality Score (Q)</div>
+                    <div class="kpi-value" id="kpi-quality">--%</div>
+                    <div class="kpi-unit" id="kpi-mode">Status: Standby</div>
+                    <div class="kpi-sub" id="kpi-latency">Latency: -- ms</div>
+                </div>
+            </div>
+
+            <!-- Diagnostic Visualization Panels -->
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('tab-overview', this)" id="tab-btn-overview">Visual Overview & ROI</button>
+                    <button class="tab-btn" onclick="switchTab('tab-skew', this)" id="tab-btn-skew">Skew Rectification</button>
+                    <button class="tab-btn" onclick="switchTab('tab-proj', this)" id="tab-btn-proj">1D Projection Profiles</button>
+                    <button class="tab-btn" onclick="switchTab('tab-fft', this)" id="tab-btn-fft">2D FFT Spectrum</button>
+                    <button class="tab-btn" onclick="switchTab('tab-audit', this)" id="tab-btn-audit">Mathematical Audit</button>
+                </div>
+
+                <!-- Tab 1: Overview & ROI -->
+                <div class="tab-content active" id="tab-overview">
+                    <div class="vis-container">
+                        <img id="img-roi-preview" class="vis-image" src="" alt="Calibrated ROI Preview" style="display: none; max-height: 480px;">
+                        <p id="placeholder-roi" style="color: var(--text-muted); padding: 40px;">Select a preset or upload an image to view the calibrated 1.0 cm² ROI.</p>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Skew Rectification -->
+                <div class="tab-content" id="tab-skew">
+                    <div class="dual-vis">
+                        <div class="vis-container">
+                            <h4 style="font-size: 0.88rem; margin-bottom: 8px;" id="title-rectified-crop">Rectified Fabric Crop (0.7 cm Span)</h4>
+                            <img id="img-rectified-crop" class="vis-image" src="" alt="Rectified Sample" style="display: none;">
+                        </div>
+                        <div class="vis-container">
+                            <h4 style="font-size: 0.88rem; margin-bottom: 8px;" id="title-radon-sweep">Polar Radon Frequency Energy Sweep</h4>
+                            <img id="img-radon-sweep" class="vis-image" src="" alt="Radon Sweep Curve" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: 1D Projection Profiles -->
+                <div class="tab-content" id="tab-proj">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="vis-container">
+                            <img id="img-warp-profile" class="vis-image" src="" alt="Warp Profile" style="display: none; width: 100%;">
+                        </div>
+                        <div class="vis-container">
+                            <img id="img-weft-profile" class="vis-image" src="" alt="Weft Profile" style="display: none; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: 2D FFT Spectrum -->
+                <div class="tab-content" id="tab-fft">
+                    <div class="vis-container">
+                        <img id="img-fft-spectrum" class="vis-image" src="" alt="2D FFT Spectrum" style="display: none; max-height: 380px;">
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 8px;" id="desc-fft">
+                            Inferno colormapped magnitude spectrum showing orthogonal harmonic impulses corresponding to fundamental yarn repetition frequencies.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tab 5: Mathematical Audit Table -->
+                <div class="tab-content" id="tab-audit">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th id="th-pipeline-stage">Pipeline Stage</th>
+                                <th id="th-engine1">Engine 1 (2D FFT)</th>
+                                <th id="th-engine2">Engine 2 (1D Projection)</th>
+                                <th id="th-delta">Discrepancy (Δ)</th>
+                                <th id="th-status">Validated Decision</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="row-warp-label"><strong>Warp Yarn Density</strong></td>
+                                <td id="audit-fft-warp">-- ends/cm</td>
+                                <td id="audit-proj-warp">-- ends/cm</td>
+                                <td id="audit-delta-warp">Δ = --</td>
+                                <td id="audit-final-warp" style="font-weight: 700; color: #1e3a8a;">-- Ends/cm</td>
+                            </tr>
+                            <tr>
+                                <td id="row-weft-label"><strong>Weft Yarn Density</strong></td>
+                                <td id="audit-fft-weft">-- picks/cm</td>
+                                <td id="audit-proj-weft">-- picks/cm</td>
+                                <td id="audit-delta-weft">Δ = --</td>
+                                <td id="audit-final-weft" style="font-weight: 700; color: #047857;">-- Picks/cm</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td id="row-consensus-label"><strong>Validated Thread Density</strong></td>
+                                <td colspan="3" id="audit-mode">Dual-Engine Consensus</td>
+                                <td id="audit-final-decision" style="font-size: 1rem;">-- Ends / -- Picks</td>
+                            </tr>
+                            <tr>
+                                <td id="row-skew-label"><strong>Angular Skew (θ)</strong></td>
+                                <td id="audit-detected-skew">--°</td>
+                                <td id="audit-variance">Var = --</td>
+                                <td id="audit-spnr">SPNR = --</td>
+                                <td id="audit-rect-status">Rectified</td>
+                            </tr>
+                            <tr>
+                                <td id="row-quality-label"><strong>Quality Score (Q)</strong></td>
+                                <td colspan="3" id="audit-quality-breakdown">SPNR (35%) + Variance (35%) + Delta (30%)</td>
+                                <td id="audit-final-quality" style="font-weight: 700;">--%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Reports Download Banner -->
+            <div class="reports-banner">
+                <div class="reports-text" id="txt-banner-text">
+                    Ready to present to clients or review complete scientific derivations?
+                </div>
+                <div class="reports-links">
+                    <a href="/reports/warp_weft_report_en.pdf" target="_blank" class="btn-report" id="btn-dl-en">Download English PDF</a>
+                    <a href="/reports/warp_weft_report_ar.pdf" target="_blank" class="btn-report" id="btn-dl-ar">تحميل التقرير الفني المعتمد (PDF)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let currentImageBase64 = '';
+        let activePresetId = '';
+
+        const i18n = {
+            en: {
+                appTitle: "Warp & Weft AI Thread Density Analyzer",
+                appSubtitle: "Dual-Engine Computer Vision System (2D FFT & 1D Projection) for Calibrated 1.0 cm Fabric Analysis",
+                presetTitle: "Quick Test Swatches",
+                presetHint: "Click to test instantly",
+                uploadTitle: "Upload Custom Fabric",
+                dropText: "Drag & Drop Image Here",
+                dropHint: "or click to browse JPG, PNG, WEBP, BMP",
+                lblCalibration: "Spatial Calibration Scale",
+                lblPixelsCm: "Pixels per Centimeter (px/cm)",
+                lblWeaveHint: "Weave Architecture Hint",
+                lblProminence: "Peak Prominence Sensitivity",
+                autoSkew: "Auto Skew Detection & Rectification",
+                runText: "Run Thread Analysis",
+                kpiWarp: "Warp Density (Vertical)",
+                kpiWarpUnit: "Ends / 1.0 cm",
+                kpiWeft: "Weft Density (Horizontal)",
+                kpiWeftUnit: "Picks / 1.0 cm",
+                kpiTotal: "Total Fabric Density",
+                kpiTotalUnit: "Threads / cm²",
+                kpiQuality: "Quality Score (Q)",
+                tabOverview: "Visual Overview & ROI",
+                tabSkew: "Skew Rectification",
+                tabProj: "1D Projection Profiles",
+                tabFft: "2D FFT Spectrum",
+                tabAudit: "Mathematical Audit",
+                bannerText: "Ready to present to clients or review complete scientific derivations?",
+                btnDlEn: "Download English PDF",
+                btnDlAr: "تحميل التقرير الفني (عربي)"
+            },
+            ar: {
+                appTitle: "القياس الآلي لكثافة خيوط النسيج (سداء ولحمة)",
+                appSubtitle: "نظام رؤية حاسوبية مزدوج المحرك (تحويل فورييه 2D والإسقاط الخطي 1D) لعينة 1.0 سم",
+                presetTitle: "عينات الاختبار السريع",
+                presetHint: "اضغط لتجربة الفحص الفوري",
+                uploadTitle: "رفع صورة عينة قماش",
+                dropText: "اسحب وأفلت صورة القماش هنا",
+                dropHint: "أو اضغط لاختيار ملف من جهازك (JPG, PNG, WEBP)",
+                lblCalibration: "مقياس المعايرة المكانية",
+                lblPixelsCm: "عدد البكسلات لكل سنتيمتر (بكسل/سم)",
+                lblWeaveHint: "نوع التركيب النسجي",
+                lblProminence: "حساسية بروز قمم الخيوط",
+                autoSkew: "كشف وتصحيح الانحراف الزاوي أوتوماتيكياً",
+                runText: "بدء تحليل كثافة الخيوط",
+                kpiWarp: "كثافة السداء (رأسي)",
+                kpiWarpUnit: "خيط سداء / 1.0 سم",
+                kpiWeft: "كثافة اللحمة (أفقي)",
+                kpiWeftUnit: "خيط لحمة / 1.0 سم",
+                kpiTotal: "إجمالي كثافة النسيج",
+                kpiTotalUnit: "خيط / سم²",
+                kpiQuality: "مؤشر الثقة والجودة (Q)",
+                tabOverview: "نافذة الفحص والمعايرة",
+                tabSkew: "تصحيح الميل الزاوي",
+                tabProj: "منحنيات الإسقاط الخطي",
+                tabFft: "طيف فورييه التوافقي",
+                tabAudit: "جدول التدقيق الرياضي",
+                bannerText: "هل ترغب في استعراض التقرير الهندسي الكامل المعتمد للعميل؟",
+                btnDlEn: "English PDF Report",
+                btnDlAr: "تحميل التقرير الفني بالعربية (PDF)"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            const body = document.body;
+            const langBtn = document.getElementById('lang-toggle-btn');
+
+            if (currentLanguage === 'ar') {
+                body.classList.add('lang-ar');
+                body.dir = 'rtl';
+                langBtn.innerText = 'English';
+            } else {
+                body.classList.remove('lang-ar');
+                body.dir = 'ltr';
+                langBtn.innerText = 'العربية';
+            }
+
+            const strings = i18n[currentLanguage];
+            document.getElementById('txt-app-title').innerText = strings.appTitle;
+            document.getElementById('txt-app-subtitle').innerText = strings.appSubtitle;
+            document.getElementById('txt-preset-title').innerText = strings.presetTitle;
+            document.getElementById('txt-preset-hint').innerText = strings.presetHint;
+            document.getElementById('txt-upload-title').innerText = strings.uploadTitle;
+            document.getElementById('txt-drop-text').innerText = strings.dropText;
+            document.getElementById('txt-drop-hint').innerText = strings.dropHint;
+            document.getElementById('lbl-calibration').innerText = strings.lblCalibration;
+            document.getElementById('lbl-pixels-cm').innerText = strings.lblPixelsCm;
+            document.getElementById('lbl-weave-hint').innerText = strings.lblWeaveHint;
+            document.getElementById('lbl-prominence').innerText = strings.lblProminence;
+            document.getElementById('txt-auto-skew').innerText = strings.autoSkew;
+            document.getElementById('btn-run-text').innerText = strings.runText;
+
+            document.getElementById('kpi-title-warp').innerText = strings.kpiWarp;
+            document.getElementById('kpi-warp-unit').innerText = strings.kpiWarpUnit;
+            document.getElementById('kpi-title-weft').innerText = strings.kpiWeft;
+            document.getElementById('kpi-weft-unit').innerText = strings.kpiWeftUnit;
+            document.getElementById('kpi-title-total').innerText = strings.kpiTotal;
+            document.getElementById('kpi-total-unit').innerText = strings.kpiTotalUnit;
+            document.getElementById('kpi-title-quality').innerText = strings.kpiQuality;
+
+            document.getElementById('tab-btn-overview').innerText = strings.tabOverview;
+            document.getElementById('tab-btn-skew').innerText = strings.tabSkew;
+            document.getElementById('tab-btn-proj').innerText = strings.tabProj;
+            document.getElementById('tab-btn-fft').innerText = strings.tabFft;
+            document.getElementById('tab-btn-audit').innerText = strings.tabAudit;
+
+            document.getElementById('txt-banner-text').innerText = strings.bannerText;
+            document.getElementById('btn-dl-en').innerText = strings.btnDlEn;
+            document.getElementById('btn-dl-ar').innerText = strings.btnDlAr;
+        }
+
+        // Initialize Presets
+        async function loadPresets() {
+            try {
+                const res = await fetch('/api/presets');
+                const data = await res.json();
+                const container = document.getElementById('preset-grid');
+                container.innerHTML = '';
+
+                data.presets.forEach((p, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'preset-item' + (idx === 0 ? ' active' : '');
+                    item.onclick = () => selectPreset(p, item);
+
+                    const name = currentLanguage === 'ar' ? p.name_ar : p.name_en;
+                    item.innerHTML = `
+                        <img class="preset-img" src="${p.thumbnail_b64 || ''}" alt="${name}">
+                        <div class="preset-label">${name}</div>
+                        <div class="preset-meta">${p.ground_truth}</div>
+                    `;
+                    container.appendChild(item);
+
+                    if (idx === 0) {
+                        selectPreset(p, item);
+                    }
+                });
+            } catch (err) {
+                console.error("Failed to load presets", err);
+            }
+        }
+
+        function selectPreset(preset, el) {
+            document.querySelectorAll('.preset-item').forEach(e => e.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            activePresetId = preset.id;
+            currentImageBase64 = ''; // Cleared so backend loads preset file directly
+
+            // Update inputs
+            const scaleSelect = document.getElementById('preset-scale-select');
+            const customScaleInput = document.getElementById('input-pixels-cm');
+
+            if (preset.pixels_per_cm === 1280.0) {
+                scaleSelect.value = "1280.0";
+                document.getElementById('custom-scale-group').style.display = 'none';
+            } else if (preset.pixels_per_cm === 400.0) {
+                scaleSelect.value = "400.0";
+                document.getElementById('custom-scale-group').style.display = 'none';
+            } else {
+                scaleSelect.value = "custom";
+                document.getElementById('custom-scale-group').style.display = 'block';
+                customScaleInput.value = preset.pixels_per_cm;
+            }
+
+            document.getElementById('chk-auto-skew').checked = preset.auto_skew;
+            document.getElementById('input-prominence').value = preset.prominence;
+            document.getElementById('val-prominence').innerText = preset.prominence;
+            document.getElementById('select-weave-hint').value = preset.weave_hint;
+
+            // Trigger immediate analysis
+            executeAnalysis();
+        }
+
+        function handleScalePresetChange() {
+            const val = document.getElementById('preset-scale-select').value;
+            const customGroup = document.getElementById('custom-scale-group');
+            if (val === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+                document.getElementById('input-pixels-cm').value = val;
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            processUploadedFile(file);
+        }
+
+        function processUploadedFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                currentImageBase64 = evt.target.result;
+                activePresetId = '';
+                document.querySelectorAll('.preset-item').forEach(e => e.classList.remove('active'));
+                document.getElementById('txt-drop-text').innerText = file.name;
+                executeAnalysis();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Drag and drop setup
+        const dropzone = document.getElementById('upload-dropzone');
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                processUploadedFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Tabs switcher
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Run Analysis Request
+        async function executeAnalysis() {
+            const btn = document.getElementById('btn-run');
+            const btnText = document.getElementById('btn-run-text');
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+            let pixelsPerCm = parseFloat(document.getElementById('input-pixels-cm').value);
+            const scalePreset = document.getElementById('preset-scale-select').value;
+            if (scalePreset !== 'custom') {
+                pixelsPerCm = parseFloat(scalePreset);
+            }
+
+            const autoSkew = document.getElementById('chk-auto-skew').checked;
+            const prominence = parseFloat(document.getElementById('input-prominence').value);
+            const weaveHint = document.getElementById('select-weave-hint').value;
+
+            const payload = {
+                preset_id: activePresetId,
+                image: currentImageBase64,
+                pixels_per_cm: pixelsPerCm,
+                auto_skew: autoSkew,
+                prominence: prominence,
+                weave_hint: weaveHint
+            };
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const res = await response.json();
+
+                if (res.status === 'success') {
+                    displayResults(res);
+                } else {
+                    alert('Analysis error: ' + (res.error || 'Unknown failure'));
+                }
+            } catch (err) {
+                console.error("API error", err);
+                alert("Failed to communicate with analysis server");
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = i18n[currentLanguage].runText;
+            }
+        }
+
+        function displayResults(data) {
+            const r = data.results;
+            const a = data.audit;
+            const v = data.visuals;
+
+            // KPIs
+            document.getElementById('kpi-warp').innerText = r.warp_ends_per_cm;
+            document.getElementById('kpi-warp-pitch').innerText = `Pitch: ${r.pitch_warp_um} µm`;
+
+            document.getElementById('kpi-weft').innerText = r.weft_picks_per_cm;
+            document.getElementById('kpi-weft-pitch').innerText = `Pitch: ${r.pitch_weft_um} µm`;
+
+            document.getElementById('kpi-total').innerText = r.total_thread_density;
+            document.getElementById('kpi-skew').innerText = `Skew: ${r.detected_skew_deg > 0 ? '+' : ''}${r.detected_skew_deg}°`;
+
+            document.getElementById('kpi-quality').innerText = `${r.confidence_score}%`;
+            document.getElementById('kpi-mode').innerText = r.engine_mode;
+            document.getElementById('kpi-latency').innerText = `Latency: ${data.latency_ms} ms`;
+
+            // Visuals
+            if (v.roi_preview) {
+                const imgRoi = document.getElementById('img-roi-preview');
+                imgRoi.src = v.roi_preview;
+                imgRoi.style.display = 'block';
+                document.getElementById('placeholder-roi').style.display = 'none';
+            }
+
+            if (v.rectified_crop) {
+                const imgRect = document.getElementById('img-rectified-crop');
+                imgRect.src = v.rectified_crop;
+                imgRect.style.display = 'block';
+            }
+
+            if (v.radon_sweep) {
+                const imgRadon = document.getElementById('img-radon-sweep');
+                imgRadon.src = v.radon_sweep;
+                imgRadon.style.display = 'block';
+            }
+
+            if (v.warp_profile) {
+                const imgWarp = document.getElementById('img-warp-profile');
+                imgWarp.src = v.warp_profile;
+                imgWarp.style.display = 'block';
+            }
+
+            if (v.weft_profile) {
+                const imgWeft = document.getElementById('img-weft-profile');
+                imgWeft.src = v.weft_profile;
+                imgWeft.style.display = 'block';
+            }
+
+            if (v.fft_spectrum) {
+                const imgFft = document.getElementById('img-fft-spectrum');
+                imgFft.src = v.fft_spectrum;
+                imgFft.style.display = 'block';
+            }
+
+            // Audit Table
+            document.getElementById('audit-fft-warp').innerText = `${a.fft_warp} ends/cm`;
+            document.getElementById('audit-proj-warp').innerText = `${a.proj_warp} ends/cm (${a.warp_peaks_count} peaks)`;
+            document.getElementById('audit-delta-warp').innerText = `Δ = ${a.delta_warp}`;
+            document.getElementById('audit-final-warp').innerText = `${r.warp_ends_per_cm} Ends/cm`;
+
+            document.getElementById('audit-fft-weft').innerText = `${a.fft_weft} picks/cm`;
+            document.getElementById('audit-proj-weft').innerText = `${a.proj_weft} picks/cm (${a.weft_peaks_count} peaks)`;
+            document.getElementById('audit-delta-weft').innerText = `Δ = ${a.delta_weft}`;
+            document.getElementById('audit-final-weft').innerText = `${r.weft_picks_per_cm} Picks/cm`;
+
+            document.getElementById('audit-mode').innerText = r.engine_mode;
+            document.getElementById('audit-final-decision').innerText = `${r.warp_ends_per_cm} Ends / ${r.weft_picks_per_cm} Picks`;
+
+            document.getElementById('audit-detected-skew').innerText = `${r.detected_skew_deg}°`;
+            document.getElementById('audit-variance').innerText = `Var = ${a.rect_variance}`;
+            document.getElementById('audit-spnr').innerText = `SPNR = ${a.spnr_warp} / ${a.spnr_weft}`;
+
+            document.getElementById('audit-final-quality').innerText = `${r.confidence_score}%`;
+        }
+
+        // Initialize on load
+        window.onload = loadPresets;
+    </script>
+</body>
+</html>

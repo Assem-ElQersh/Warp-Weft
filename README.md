@@ -38,6 +38,7 @@ The system is architected to operate under resource constraints (standard laptop
 | Physical Validation on `W012.jpg` (Plain Weave, GT: Warp=38, Weft=33): 1D Projection extracts Warp = 38.0 ends/cm ($\Delta=0.0$) and Weft = 32.5 picks/cm ($\Delta=0.5$, exact integer 33) | `notebooks/04_real_fabric_benchmark.ipynb` | Empirically proves dual-engine pipeline accuracy on physical handheld microscopy without requiring pre-trained deep learning weights or external cloud inference. |
 | Orthogonal Frequency Swap on `W017.jpg` (Plain Weave, GT: Warp=32, Weft=23): 2D FFT detects $N_1 = 22.0\text{ threads/cm}$ ($\Delta=1.0$) and $N_2 = 30.0\text{ threads/cm}$ ($\Delta=2.0$) | `notebooks/04_real_fabric_benchmark.ipynb` | Unveils that physical $90^\circ$ textile rotation relative to the camera sensor inverts horizontal/vertical frequency axes; necessitates un-oriented orthogonal density pairing $(N_1, N_2)$. |
 | Automated Dual-Language Executive Demo Reports compiled to PDF (English: 7 pages via pdfTeX; Arabic: 8 pages via HarfBuzz/Amiri) with embedded diagnostic matrices and empirical tables | `reports/warp_weft_report_en.tex` & `reports/warp_weft_report_ar.tex` | Provides reproducible, client-ready technical deliverables in both English and Arabic demonstrating the dual-engine computer vision architecture, benchmark verifications, and physical deployment specs. |
+| Zero-dependency interactive Web Application & REST API (HTTP 8080/8085) serves dual-engine fabric analysis with user uploads, 4 benchmark presets, and full diagnostics in < 250 ms | `notebooks/05_web_app_interface.ipynb` & `web_app/server.py` | Eliminates external bulky framework dependencies (Flask/FastAPI); enables instant, offline, zero-download local deployment on any workstation with interactive dual-language (EN/AR) controls. |
 
 ---
 
@@ -279,5 +280,65 @@ For formal client presentations, technical audits, and industrial proposals, com
   7. كفاءة استهلاك الموارد وحسابات العتاد (استهلاك الذاكرة، بطاقة الرسوميات، زمن الاستجابة، التشغيل الذاتي دون إنترنت)
   8. الخاتمة والتوصيات التشغيلية للمصنع والعميل (مواصفات الميكروسكوب وحلقة الإضاءة LED وتثبيت الارتفاع للتشغيل الفوري)
 
+---
 
+## 10. Interactive Web Application Interface (`web_app/`)
 
+An interactive, self-contained web application has been constructed to enable users, textile engineers, and factory quality inspectors to test custom fabric imagery directly through an intuitive browser interface.
+
+### 10.1. Zero-Dependency Architectural Design
+* **Zero External Web Frameworks:** Implemented purely with Python standard library (`http.server.BaseHTTPRequestHandler` and `socketserver.ThreadingMixIn`). Operates in strictly managed Python environments (PEP 668 compliance) without requiring `pip install` of bulky frameworks (Flask, FastAPI, Uvicorn).
+* **Pure Computational Core:** Integrates directly with `web_app.engine`, utilizing NumPy and Pillow for sub-millisecond affine transformations, 2D FFT spectral peak extraction, 1D prominence profiling, and Base64 visualization rendering.
+* **Dual-Language Localization (EN / AR):** Real-time client-side language switching between English and Arabic (العربية) with instant typography and layout flipping (`direction: rtl` / `direction: ltr`).
+
+### 10.2. Core Capabilities & User Controls
+1. **Custom Fabric Upload:** Drag-and-drop or file-picker support for JPG, PNG, WEBP, and BMP images.
+2. **Benchmark Presets:** One-click preloaded swatches covering synthetic $+12^\circ$ / $+15^\circ$ tilted fabrics, real microscopic plain weave (`W012.jpg`), and real microscopic twill float weave (`W001.jpg`).
+3. **Spatial Calibration Selector:**
+   * USB Digital Microscope ($1280.0\text{ px/cm}$ — FabricNET standard)
+   * Pick-Glass Microscope ($1200.0\text{ px/cm}$)
+   * Flatbed Scanner 1200 DPI ($472.4\text{ px/cm}$)
+   * Flatbed Scanner 600 DPI ($236.2\text{ px/cm}$)
+   * Smartphone / Macro Lens ($400.0\text{ px/cm}$)
+   * Custom scale input (arbitrary $\text{px/cm}$)
+4. **Algorithmic Parameter Tuning:**
+   * Automated Skew Detection & Inverse Affine Rectification toggle
+   * Peak Prominence Sensitivity slider ($0.005$ to $0.040$)
+   * Weave Architecture Hint selector (Auto, Plain, Twill, Satin)
+5. **Real-Time KPI Cards:**
+   * Warp Thread Density ($N_{\text{warp}}$ Ends/cm) + Pitch ($P_{\text{warp}}$ in $\mu\text{m}$)
+   * Weft Thread Density ($N_{\text{weft}}$ Picks/cm) + Pitch ($P_{\text{weft}}$ in $\mu\text{m}$)
+   * Total Thread Density ($N_{\text{total}} = N_{\text{warp}} + N_{\text{weft}}$) + Skew Angle ($\theta^\circ$)
+   * Multi-Attribute Quality Confidence Score ($Q\%$) + Computational Latency ($\text{ms}$)
+6. **Multi-Tab Diagnostic Workbench:**
+   * **Tab 1: Overview:** Metric $1.0\text{ cm}^2$ ROI overlay and boundary-safe rectified fabric crop.
+   * **Tab 2: Skew Analysis:** Polar Radon radial ray integral energy curve across $[-45^\circ, +45^\circ]$.
+   * **Tab 3: 1D Projections:** Marginal column/row intensity waveforms with crowned peak markers and pitch measurements.
+   * **Tab 4: 2D FFT Spectrum:** Centered Fourier magnitude spectrum showing orthogonal harmonic impulses.
+   * **Tab 5: Audit Ledger:** Side-by-side comparison of 2D FFT vs. 1D Projection outputs, SPNR metrics, and profile variance.
+7. **Executive Report Integration:** Direct header links to view/download compiled English and Arabic executive demo PDFs.
+
+### 10.3. REST API Specification
+
+| Endpoint | Method | Payload / Parameters | Response | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `/` | `GET` | None | `text/html` | Serves the single-page application interface. |
+| `/api/health` | `GET` | None | `application/json` | System health check and engine capabilities. |
+| `/api/presets` | `GET` | None | `application/json` | Returns preloaded benchmark fabric swatches with Base64 thumbnails and recommended scales. |
+| `/api/analyze` | `POST` | `{"image": "<base64>", "pixels_per_cm": 400.0, "auto_skew": true, "prominence": 0.012, "weave_hint": "plain"}` | `application/json` | Executes dual-engine thread analysis, returning thread densities, pitches, skew angle, confidence score, audit table, and Base64 diagnostic plots. |
+| `/reports/<file>` | `GET` | `<filename>.pdf` | `application/pdf` | Serves compiled technical demo reports (`warp_weft_report_en.pdf` and `warp_weft_report_ar.pdf`). |
+
+### 10.4. Launch Instructions
+
+#### Option A: Standalone Execution (Recommended)
+Run the server directly via Python standard library on any machine:
+```bash
+python3 web_app/server.py
+```
+Open a web browser and navigate to:
+```
+http://localhost:8080/
+```
+
+#### Option B: Embedded Execution via Jupyter Notebook
+Launch the embedded pipeline in [`notebooks/05_web_app_interface.ipynb`](notebooks/05_web_app_interface.ipynb) to inspect API responses and interact with the UI directly inside an `IPython.display.IFrame` widget.

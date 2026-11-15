@@ -933,11 +933,42 @@
         function processUploadedFile(file) {
             const reader = new FileReader();
             reader.onload = function(evt) {
-                currentImageBase64 = evt.target.result;
-                activePresetId = '';
-                document.querySelectorAll('.preset-item').forEach(e => e.classList.remove('active'));
-                document.getElementById('txt-drop-text').innerText = file.name;
-                executeAnalysis();
+                const rawData = evt.target.result;
+                const img = new Image();
+                img.onload = function() {
+                    const w = img.width;
+                    const h = img.height;
+                    let sx = 0, sy = 0, sWidth = w, sHeight = h;
+                    let dWidth = w, dHeight = h;
+
+                    // If image is a large mobile camera capture (> 1600 px),
+                    // crop the central square window. This preserves 100% of spatial scale (px/cm)
+                    // without any resampling distortion while drastically reducing network payload.
+                    const maxDim = 1600;
+                    if (w > maxDim || h > maxDim) {
+                        const cropDim = Math.min(w, h, maxDim);
+                        sx = Math.round((w - cropDim) / 2);
+                        sy = Math.round((h - cropDim) / 2);
+                        sWidth = cropDim;
+                        sHeight = cropDim;
+                        dWidth = cropDim;
+                        dHeight = cropDim;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = dWidth;
+                    canvas.height = dHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, dWidth, dHeight);
+
+                    // Re-compress to optimized JPEG (reduces 15 MB mobile payloads to ~250 KB)
+                    currentImageBase64 = canvas.toDataURL('image/jpeg', 0.88);
+                    activePresetId = '';
+                    document.querySelectorAll('.preset-item').forEach(e => e.classList.remove('active'));
+                    document.getElementById('txt-drop-text').innerText = `${file.name} (${dWidth}×${dHeight} px)`;
+                    executeAnalysis();
+                };
+                img.src = rawData;
             };
             reader.readAsDataURL(file);
         }
@@ -991,12 +1022,17 @@
                 weave_hint: weaveHint
             };
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
             try {
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
                 const res = await response.json();
 
                 if (res.status === 'success') {
@@ -1005,8 +1041,13 @@
                     alert('Analysis error: ' + (res.error || 'Unknown failure'));
                 }
             } catch (err) {
+                clearTimeout(timeoutId);
                 console.error("API error", err);
-                alert("Failed to communicate with analysis server");
+                if (err.name === 'AbortError') {
+                    alert(currentLanguage === 'ar' ? 'انتهت مهلة الاتصال بالخادم. قد يكون النفق الخارجي بطيئاً بسبب قيود النطاق الترددي.' : 'Connection timed out. The remote tunnel may be throttling bandwidth.');
+                } else {
+                    alert(currentLanguage === 'ar' ? 'تعذر الاتصال بخادم التحليل. يرجى التأكد من استقرار الاتصال أو تجربة الاتصال عبر شبكة واي-فاي المحلية.' : 'Failed to communicate with analysis server. Please verify connection stability.');
+                }
             } finally {
                 btn.disabled = false;
                 btnText.innerText = i18n[currentLanguage].runText;

@@ -137,13 +137,13 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 }
             ]
 
-            # Populate Base64 thumbnails
+            # Populate Base64 thumbnails with compact dimension (120 px)
             for p in presets:
                 fpath = os.path.join(WORKSPACE_ROOT, p["path"])
                 if os.path.exists(fpath):
                     try:
                         im = Image.open(fpath)
-                        p["thumbnail_b64"] = pil_to_base64_data_url(im, max_size=250)
+                        p["thumbnail_b64"] = pil_to_base64_data_url(im, max_size=120)
                     except Exception:
                         p["thumbnail_b64"] = None
 

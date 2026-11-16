@@ -83,15 +83,28 @@ class TestValidationMetrics(unittest.TestCase):
             evaluate_prediction_records(records)
 
     def test_per_weave_and_per_specimen_breakdowns(self):
-        records = [
-            {"fabric_id":"A","weave_type":"plain","warp_manual_density":31,"weft_manual_density":27,"warp_predicted_density":31,"weft_predicted_density":27,"runtime_ms":10},
-            {"fabric_id":"A","weave_type":"plain","warp_manual_density":30,"weft_manual_density":28,"warp_predicted_density":None,"weft_predicted_density":29,"runtime_ms":12},
-            {"fabric_id":"B","weave_type":"twill","warp_manual_density":32,"weft_manual_density":27,"warp_predicted_density":30,"weft_predicted_density":None,"runtime_ms":14},
-        ]
+        records = []
+        for region in range(5):
+            records.append({
+                "fabric_id": "A", "weave_type": "plain",
+                "warp_manual_density": 31 if region < 3 else 30,
+                "weft_manual_density": 27,
+                "warp_predicted_density": None if region == 1 else 31,
+                "weft_predicted_density": 27,
+                "runtime_ms": 10,
+            })
+            records.append({
+                "fabric_id": "B", "weave_type": "twill",
+                "warp_manual_density": 32,
+                "weft_manual_density": 27,
+                "warp_predicted_density": 30,
+                "weft_predicted_density": 27,
+                "runtime_ms": 14,
+            })
         result = evaluate_prediction_records(records, bootstrap_samples=50)
         self.assertIn("plain", result["per_weave"])
         self.assertIn("A", result["per_specimen"])
-        self.assertEqual(result["per_specimen"]["A"]["warp"]["n_total"], 2)
+        self.assertEqual(result["per_specimen"]["A"]["warp"]["n_total"], 5)
         self.assertEqual(result["warp"]["n_rejected"], 1)
 
 

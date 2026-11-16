@@ -64,6 +64,16 @@ class TestWebServerIntegration(unittest.TestCase):
         self.assertEqual(result["status"], "unavailable")
         self.assertEqual(result["code"], "analysis_mode_unavailable")
 
+    def test_unavailable_hybrid_mode_is_rejected_before_image_decode(self):
+        status, result, _ = self.request("POST", "/api/analyze", {
+            "analysis_mode": "hybrid",
+            "image": "not-valid-base64",
+        })
+        self.assertEqual(status, 409)
+        self.assertEqual(result["status"], "unavailable")
+        self.assertEqual(result["analysis_mode"], "hybrid")
+        self.assertEqual(result["code"], "analysis_mode_unavailable")
+
     def test_unknown_analysis_mode_is_rejected(self):
         status, result, _ = self.request("POST", "/api/analyze", {
             "analysis_mode": "neural-magically",

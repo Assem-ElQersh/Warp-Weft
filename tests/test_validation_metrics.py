@@ -20,7 +20,7 @@ class TestValidationMetrics(unittest.TestCase):
         second = axis_metrics([31, 31, 31], [29, 30, 33], bootstrap_samples=200, seed=7)
         self.assertEqual(first["within_2_pct"], 100.0)
         stricter = axis_metrics([31, 31], [29, 30], tolerance=1.0, bootstrap_samples=0)
-        self.assertEqual(stricter["within_2_pct"], 50.0)
+        self.assertEqual(stricter["within_2_pct"], 100.0)
         self.assertEqual(stricter["within_tolerance_pct"], 50.0)
         self.assertEqual(first["mae_bootstrap_95_ci"], second["mae_bootstrap_95_ci"])
 

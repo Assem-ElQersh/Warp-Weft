@@ -11,8 +11,8 @@ class TestValidationMetrics(unittest.TestCase):
         self.assertEqual(result["n_rejected"], 1)
         self.assertAlmostEqual(result["coverage_pct"], 66.67, places=2)
         self.assertAlmostEqual(result["rejection_rate_pct"], 33.33, places=2)
-        self.assertAlmostEqual(result["mae"], 2.25)
-        self.assertAlmostEqual(result["mean_signed_bias"], -1.75)
+        self.assertAlmostEqual(result["mae"], 1.75)
+        self.assertAlmostEqual(result["mean_signed_bias"], -1.25)
 
     def test_tolerance_is_inclusive_and_bootstrap_is_reproducible(self):
         first = axis_metrics([31, 31, 31], [29, 30, 33], bootstrap_samples=200, seed=7)

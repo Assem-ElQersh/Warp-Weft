@@ -14,7 +14,7 @@ class TestWebModeAvailability(unittest.TestCase):
         self.assertTrue(modes["classical"]["available"])
         self.assertFalse(modes["learned"]["available"])
         self.assertFalse(modes["hybrid"]["available"])
-        self.assertIn("No committed model registry", modes["learned"]["reason"])
+        self.assertIn("no validated learned inference dispatcher", modes["learned"]["reason"])
 
     def test_learned_modes_require_registry_checkpoint_and_adapter(self):
         with tempfile.TemporaryDirectory() as root:
@@ -30,8 +30,9 @@ class TestWebModeAvailability(unittest.TestCase):
                 handle.write("# adapter placeholder")
             result = get_analysis_modes(root)
         modes = {item["id"]: item for item in result["modes"]}
-        self.assertTrue(modes["learned"]["available"])
-        self.assertTrue(modes["hybrid"]["available"])
+        self.assertFalse(modes["learned"]["available"])
+        self.assertFalse(modes["hybrid"]["available"])
+        self.assertTrue(modes["learned"]["artifacts_present"])
 
 
 if __name__ == "__main__":

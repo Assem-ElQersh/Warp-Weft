@@ -26,7 +26,7 @@ def get_analysis_modes(repository_root: Optional[str] = None) -> Dict[str, Any]:
         )
     except (OSError, ValueError, TypeError):
         checkpoint_ready = False
-    artifact_ready = checkpoint_ready and os.path.isfile(adapter)
+    artifacts_present = checkpoint_ready and os.path.isfile(adapter)
 
     return {
         "default_mode": "classical",
@@ -42,22 +42,24 @@ def get_analysis_modes(repository_root: Optional[str] = None) -> Dict[str, Any]:
             {
                 "id": "learned",
                 "label": "Learned models",
-                "available": bool(artifact_ready),
+                "available": False,
+                "artifacts_present": bool(artifacts_present),
                 "production_ready": False,
                 "description": "Supervised yarn perception/regression using a versioned model artifact.",
-                "reason": None if artifact_ready else (
-                    "No committed model registry referencing an existing checkpoint and inference adapter are available. "
-                    "Reported external/local experiment metrics are not reproducible from this checkout."
+                "reason": (
+                    "A learned checkpoint and adapter may be present, but this server has no validated learned inference dispatcher. "
+                    "The mode remains disabled to prevent silently returning classical results."
                 ),
             },
             {
                 "id": "hybrid",
                 "label": "Hybrid learned perception + physical measurement",
-                "available": bool(artifact_ready),
+                "available": False,
+                "artifacts_present": bool(artifacts_present),
                 "production_ready": False,
                 "description": "Learned perception proposes yarn evidence; calibrated physical measurement computes density.",
-                "reason": None if artifact_ready else (
-                    "Hybrid inference requires the same missing, versioned learned-model artifacts and adapter. "
+                "reason": (
+                    "Hybrid inference has no validated learned inference dispatcher in this server. "
                     "No neural prediction will be substituted for a physical measurement."
                 ),
             },

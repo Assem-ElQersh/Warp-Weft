@@ -31,6 +31,13 @@ jobs:
         run: python scripts/check_inline_javascript.py
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+      - name: Prepare original main baseline worktree
+        run: |
+          git fetch --no-tags origin 8f55927d910197d6778b2d56217092973bf9cc56
+          git worktree add --detach ${{ runner.temp }}/warp-weft-original-main 8f55927d910197d6778b2d56217092973bf9cc56
+      - name: Run original main baseline tests (retrospective)
+        working-directory: ${{ runner.temp }}/warp-weft-original-main
+        run: python -m unittest discover -s tests -v
       - name: Prepare first-remediation source worktree
         run: |
           git fetch --no-tags origin 7b9b55fdcd6e7e08d9b591b6b55d862a116f4c0e

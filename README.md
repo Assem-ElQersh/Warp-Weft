@@ -99,10 +99,10 @@ To eliminate heavy model downloads (>6 GB) and prevent hardware bottlenecks on l
 flowchart TD
     A["Raw Fabric Sample Image"] --> B["Spatial Calibration Engine"]
     B --> C["1.0 cm x 1.0 cm ROI Cropper"]
-    C --> D["Grayscale & CLAHE Enhancement"]
-    D --> E["Radon / Hessian Skew Rectification Engine"]
+    C --> D["Grayscale Normalization"]
+    D --> E["Polar-Radon Skew Detection & Metric Rectification"]
     
-    E --> F1["Engine 1: PyTorch 2D FFT Spectral Analysis"]
+    E --> F1["Engine 1: NumPy 2D FFT Spectral Analysis"]
     E --> F2["Engine 2: 1D Spatial Projection Profile Engine"]
     
     F1 --> G1["Fundamental Harmonic Peaks (u0, v0)"]
@@ -113,11 +113,11 @@ flowchart TD
     H --> I["Outputs: Ends/cm (Warp), Picks/cm (Weft), Thread Spacing"]
 ```
 
-### Algorithmic Advantages:
-1. **Zero Model Download Overhead:** Employs mathematical signal processing and PyTorch tensor operations (`torch.fft`).
-2. **Sub-Second Execution:** Processes a 1 cm² ROI in $< 10\text{ ms}$ on standard laptop CPUs.
-3. **Memory Footprint:** Operates within $< 100\text{ MB}$ of system RAM.
-4. **Environment Portability:** Fully functional offline with zero cloud API dependencies.
+### Verified implementation properties and measurement limits
+1. **Classical inference has no learned-weight dependency:** The current engine uses NumPy FFT and Pillow-based image processing; it does not execute PyTorch `torch.fft` in the production pipeline.
+2. **Offline execution:** The classical path does not call a cloud inference API once the repository, dependencies, and input assets are available.
+3. **Runtime:** Per-image latency is recorded by the benchmark runner. No universal `<10 ms` guarantee is made; latency depends on image size and hardware.
+4. **Memory:** Peak memory has not been benchmarked in a controlled experiment, so no `<100 MB` claim is made.
 
 ### 6.2. Operational Control Parameters & Mechanistic Justifications
 
@@ -127,8 +127,8 @@ The execution of the dual-engine pipeline is parameterized by four core variable
    * *Mechanism:* The linear conversion operator mapping 2D discrete sensor pixels to continuous metric dimensions: $S = \text{px} / \text{cm}$, with optical pitch $\Delta x = 10,000 / S\,\mu\text{m/pixel}$.
    * *Justification:* Digital arrays lack metric awareness. The Fourier spectrum yields dimensionless cycles per window ($f_{\text{norm}}$); multiplying by $S / W$ directly yields physical thread density in Ends/cm and Picks/cm.
 2. **Weave Architecture Hint (`auto`, `plain`, `twill`, `satin`):**
-   * *Mechanism:* Guides the decision arbiter's engine weighting based on the physical interlacing topology.
-   * *Justification:* Plain weaves alternate symmetrically at every intersection, producing balanced 1D projection peaks. Twill and satin weaves feature elongated float ridges that smooth out 1D marginal projection troughs; the hint shifts weighting to 2D FFT spectral harmonics (70% FFT / 30% Projection) to eliminate float-induced undercounting.
+   * *Current status:* The UI/API accepts this field, but the current core spectral selector and evidence-fusion arbiter do not branch on it. The dropdown must not be interpreted as a validated 70/30 engine weighting or as a proven accuracy improvement.
+   * *Research rationale:* Weave topology can affect yarn visibility and harmonic ambiguity, especially for twill and satin floats. A future implementation requires controlled per-weave validation before it is enabled as an algorithmic control.
 3. **Peak Prominence Sensitivity ($\Delta y_{\text{prom}} \in [0.005, 0.040]$):**
    * *Mechanism:* Specifies the required vertical altitude drop of a projection peak relative to adjacent local troughs.
    * *Justification:* Spun fibers, yarn fuzz, and micro-shadows introduce high-frequency profile ripple. A prominence threshold (default $0.012$) prevents surface hairiness from triggering false peak detections while preserving genuine inter-yarn crown valleys.
@@ -143,283 +143,26 @@ The execution of the dual-engine pipeline is parameterized by four core variable
 * **Total Fabric Density (Threads / cm²):** Areal product $N_{\text{warp}} \times N_{\text{weft}}$. Serves as an index of fabric tightness and basis weight categorization.
 * **Physical Yarn Pitch ($P$ in $\mu\text{m}$):** Mean center-to-center thread spacing calculated as $P = 10,000 / N$. Indicates yarn thickness and inter-thread porosity.
 * **Angular Skew Angle ($\theta$ in $^\circ$):** Rotational angle of deviation from the optical sensor grid. Quantifies sample mounting tilt or structural textile skewing flaws.
-* **Confidence Quality Score ($Q$ in %):** Tri-factor composite metric:
-  $$Q = 0.35 \times \text{SPNR}_{\text{norm}} + 0.35 \times \sigma_{\text{norm}} + 0.30 \times (1 - \Delta_{\text{rel}})$$
-  Combining Spectral Peak-to-Noise Ratio, Spatial Projection Contrast Variance, and Inter-Engine Concordance.
-* **Decision Status / Engine Mode:** Identifies the algorithmic decision branch:
-  * *Dual-Engine Consensus:* Both engines agree within $\Delta \le 2\text{ threads/cm}$ (maximum analytical confidence).
-  * *2D FFT Primary (Discrepancy Arbiter):* Engines diverged ($\Delta > 2$); 2D FFT was selected due to higher spectral peak sharpness.
-  * *2D FFT Dominant (Float Structure):* Enforced by twill/satin hint to bypass float-induced projection attenuation.
-  * *1D Projection Primary:* Selected under high-contrast conditions where spatial crown peaks are unequivocally resolved.
+* **Signal Quality Index (SQI):** A heuristic combining spectral peak-to-noise ratio, projection contrast, estimator discrepancy, and interval regularity. It is not a calibrated probability and must not be interpreted as a percentage chance that a measurement is correct.
+* **Decision Status:** `VALIDATED` means the current algorithmic evidence rules accept both axes; `CONSISTENT_WITH_WARNING` means only one axis is accepted; `NEEDS_REVIEW` means neither axis is accepted. These are algorithmic states, not independent physical ground-truth certification. Accepted values and unvalidated FFT/projection candidates are separate fields.
 
 ---
 
-## 7. Implementation Notebook Directory Structure
+## 7. Repository Structure
 
-All implementation code is strictly maintained as `.ipynb` files:
+The notebooks preserve the research history. The current maintained implementation is a Python package used by the web server, benchmark runners, and automated tests.
 
-```
-Warp Weft Project/
-├── README.md                                    # Central Project Memory, Rules & Visual Ledger
-├── data/
-│   ├── fabricnet/                               # 130 microscopic images (640x480, 5x4mm FOV) with ground truth Warp/Weft/GSM
-│   ├── aitex_database/                          # 245 high-res images (4096x256) + binary defect masks
-│   ├── ten_fabrics/                             # 10 surface texture categories (440 MB)
-│   ├── multiclass_defects/                      # 3,077 PNG images (1280x720) with directional horizontal/vertical defect labels
-│   ├── fabric_defects_benchmark/                # 2,739 benchmark images combining AITEX & Moratuwa (2.2 GB)
-│   ├── textile_weaving_tabular/                 # 121,148 industrial production rows across 18-22 columns
-│   ├── textile_knitting_tabular/                # 12,569 structural knitted fabric rows across 38 columns
-│   ├── synthetic/                               # Synthetically generated micro-fabrics with known ground truth
-│   └── samples/                                 # Physical macro textile test captures
-├── notebooks/
-│   ├── 01_optical_and_spectral_sandbox.ipynb    # Mathematical validation of 2D FFT & 1D projection
-│   ├── 02_skew_rectification_engine.ipynb       # Automatic thread rotation & alignment
-│   ├── 03_end_to_end_thread_counter.ipynb       # Integrated production pipeline for 1.0 cm analysis
-│   └── 04_real_fabric_benchmark.ipynb           # Benchmark evaluation on physical microscopic FabricNET images
-└── results/
-    ├── output.txt                               # Raw mathematical outputs from notebook runs
-    ├── output.json                              # Structured verification metrics
-    ├── output_skew.txt                          # Skew engine verification report
-    ├── output_skew.json                         # Skew engine structured metrics
-    ├── skew_rectification_comparison.png        # 6-panel empirical diagnostic matrix
-    ├── end_to_end_analysis_report.png           # 6-panel production report
-    └── fabricnet_benchmark_report.png           # Real microscopy benchmark matrix
+```text
+Warp-Weft/
+├── src/fabric_analysis/       # Authoritative calibration, ROI, orientation, FFT, projection, fusion, metrics
+├── web_app/                   # HTTP server, frontend, classical analysis adapter, mode registry
+├── notebooks/                 # Research and benchmark notebooks
+├── scripts/                   # Reproducible first/current 130-image benchmark runners
+├── schemas/                   # Versioned client ground-truth JSON schema
+├── tests/                     # Unit, benchmark, API integration, and UI contract tests
+├── docs/                      # Client protocol, learned-model audit, benchmark reproduction
+├── data/fabricnet/            # 130 images and FabricNet_parameters.xlsx
+└── results/                   # Historical and current benchmark records
 ```
 
----
-
-## 8. Empirical Results, Visual Diagnostics & Mechanistic Explanations
-
-### 8.1. Skew Rectification Diagnostic Matrix (`notebooks/02_skew_rectification_engine.ipynb`)
-
-![Skew Detection and Affine Rectification Diagnostic Matrix](results/skew_rectification_comparison.png)
-
-### 8.2. Quantitative Metric Ledger
-
-| Experimental Variable | Target / Ground Truth | Measured Output | Error / Recovery Delta |
-| :--- | :--- | :--- | :--- |
-| **Angular Skew Orientation ($\theta$)** | $+15.00^\circ$ | $+15.00^\circ$ | $\Delta\theta = 0.00^\circ$ |
-| **Warp Thread Density ($N_{\text{warp}}$)** | $32.0\text{ ends/cm}$ | $31.7\text{ ends/cm}$ (parabolic) | $\Delta N = 0.3\text{ ends/cm}$ |
-| **Weft Thread Density ($N_{\text{weft}}$)** | $28.0\text{ picks/cm}$ | $28.3\text{ picks/cm}$ (parabolic) | $\Delta N = 0.3\text{ picks/cm}$ |
-| **Skewed Projection Profile Variance** | N/A | $\sigma = 0.005678$ | Flatline collapse |
-| **Rectified Projection Profile Variance** | N/A | $\sigma = 0.163332$ | Harmonic peaks restored |
-| **Projection Contrast Recovery Ratio** | $\ge 2.0\times$ | $\mathbf{28.77\times}$ | Sharpness recovered |
-| **GPU Hardware Allocation** | N/A | RTX 3050 Ti Laptop GPU | $0.00\text{ MB}$ persistent |
-
-### 8.3. Mechanistic Interrogation of Diagnostic Panels
-
-1. **Panel (0, 0) — Skewed Fabric Sample:** Demonstrates the typical real-world physical failure mode where the fabric swatch is captured with a $+15.0^\circ$ non-orthogonal tilt relative to the camera sensor.
-2. **Panel (0, 1) — 2D FFT Magnitude Spectrum (Skewed):** In the spatial frequency domain, the fundamental yarn impulses rotate identically by $+15.0^\circ$. High-frequency radial energy shifts away from the orthogonal axes $(u=0, v=0)$, distributing energy diagonally.
-3. **Panel (0, 2) — Polar Radon Radial Integration Sweep:** By calculating radial ray integrals $R(\theta) = \int_{r_{\min}}^{r_{\max}} |F(r \cos\theta, -r \sin\theta)|\,dr$ from $-45^\circ$ to $+45^\circ$ in steps of $0.5^\circ$, the spectral energy exhibits an unequivocal global spike peaking precisely at $+15.0^\circ$, enabling deterministic orientation detection with zero manual annotation.
-4. **Panel (1, 0) — Inverse Affine Rectified Fabric:** The swatch is rotated by $-\theta_{\text{detected}} = -15.0^\circ$ via bicubic interpolation and center-cropped with a $15\%$ boundary margin ($280\times 280\text{ px}$) to eliminate zero-padding rotation artifacts, fully restoring orthogonal alignment.
-5. **Panel (1, 1) — Marginal Spatial Projection Profile Contrast Gain:** Demonstrates the physical mechanism that destroys spatial projection profiling when skewed: when unaligned, columns intersect both yarn crowns and interlacing valleys simultaneously, washing out variation ($\sigma = 0.00568$). Rectification concentrates yarn crowns along discrete columns, restoring deep troughs and peaks ($\sigma = 0.16333$), yielding a **$28.77\times$ contrast recovery ratio**.
-6. **Panel (1, 2) — Rectified Continuous Harmonic Spectrum:** Spatial cropping down to $280\text{ px}$ causes integer DFT bin discretization error ($280 / 400 = 0.70$ scale factor). Applying quadratic parabolic sub-bin interpolation on the 3-point peak neighborhood ($\alpha, \beta, \gamma$) interpolates continuous spatial frequencies, yielding $31.7\text{ ends/cm}$ and $28.3\text{ picks/cm}$, aligning with the 32 and 28 ground truth values.
-
----
-
-### 8.4. Production End-to-End Analysis Report (`notebooks/03_end_to_end_thread_counter.ipynb`)
-
-![Production End-to-End Fabric Analysis Report](results/end_to_end_analysis_report.png)
-
-#### Quantitative Production Metrics
-
-| Pipeline Component | Metric / Specification | Value / Result | Status |
-| :--- | :--- | :--- | :--- |
-| **Input Macro Swatch** | Field of View & Native Resolution | $800\times 800\text{ px}$ ($2.0\times 2.0\text{ cm}$) | Ingested |
-| **Spatial Calibration** | Pixel Resolution & Pitch | $400\text{ px/cm}$ ($25.0\,\mu\text{m/px}$) | Calibrated |
-| **ROI Cropper** | Centered Metric Window | $400\times 400\text{ px}$ ($1.0\times 1.0\text{ cm}$) | Extracted |
-| **Skew Rectification** | True vs. Detected Orientation | True: $+12.00^\circ$ \| Detected: $+11.50^\circ$ ($\Delta\theta = 0.50^\circ$) | Rectified |
-| **Engine 1 (2D FFT)** | Warp Ends/cm & SPNR | $35.8\text{ ends/cm}$ ($\Delta = 0.2$) \| $\text{SPNR} = 150.49$ | Peak Harmonic Isolated |
-| **Engine 1 (2D FFT)** | Weft Picks/cm & SPNR | $30.0\text{ picks/cm}$ ($\Delta = 0.0$) \| $\text{SPNR} = 265.09$ | Peak Harmonic Isolated |
-| **Engine 2 (1D Projection)** | Warp Ends/cm & Physical Pitch | $36\text{ ends/cm}$ ($\Delta = 0$) \| $P_{\text{warp}} = 277.08\,\mu\text{m}$ (Theor: $277.78\,\mu\text{m}$) | Prominence Counted |
-| **Engine 2 (1D Projection)** | Weft Picks/cm & Physical Pitch | $30\text{ picks/cm}$ ($\Delta = 0$) \| $P_{\text{weft}} = 332.50\,\mu\text{m}$ (Theor: $333.33\,\mu\text{m}$) | Prominence Counted |
-| **Consensus Engine** | Inter-Engine Discrepancy | $\Delta_{\text{warp}} = 0.20$ \| $\Delta_{\text{weft}} = 0.00$ | Verified ($\le 2.0$) |
-| **Final Validated Output** | Physical Thread Density | **$36\text{ Ends/cm}$ (Warp) \| $30\text{ Picks/cm}$ (Weft)** | **Exact Match** |
-| **Quality Confidence Score** | Multi-attribute $Q$ Metric | **$98.5\%$ Confidence** | Production Ready |
-
-#### Mechanistic Interrogation of Production Report Panels
-
-1. **Panel (0, 0) — Raw Macro Swatch & 1.0 cm² ROI Overlay:** Demonstrates automated localization of the central $1.0\text{ cm} \times 1.0\text{ cm}$ metric inspection area ($400\times 400\text{ px}$) within an arbitrary macro capture field ($800\times 800\text{ px}$), with non-uniform illumination and $+12.0^\circ$ angular tilt.
-2. **Panel (0, 1) — Polar Radon Orientation Sweep:** Computes radial ray integrals in GPU frequency space across $[-45^\circ, +45^\circ]$, isolating the global maximum at $+11.5^\circ$ ($\Delta\theta = 0.5^\circ$), overcoming non-uniform lighting via prior CLAHE filtering.
-3. **Panel (0, 2) — Rectified Fabric Crop:** Shows the orthogonally aligned, boundary-safe cropped textile sample ($280\times 280\text{ px}$, $0.70\text{ cm}$ effective span) with all corner zero-padding artifacts eliminated.
-4. **Panel (1, 0) — Warp Marginal Projection Profile:** Shows column-wise intensity integration with 25 distinct peak markers located across $0.70\text{ cm}$, scaling exactly to $25 / 0.70 = 35.7 \approx 36\text{ ends/cm}$, with mean physical spacing $277.08\,\mu\text{m}$.
-5. **Panel (1, 1) — Weft Marginal Projection Profile:** Shows row-wise intensity integration with 21 distinct peak markers located across $0.70\text{ cm}$, scaling exactly to $21 / 0.70 = 30.0\text{ picks/cm}$, with mean physical spacing $332.50\,\mu\text{m}$.
-6. **Panel (1, 2) — Rectified 2D FFT Spectrum:** Displays high-energy orthogonal spectral impulses along the horizontal and vertical frequency axes, confirming absence of residual skew and validating the $98.5\%$ confidence score.
-
----
-
-### 8.5. Real Physical Fabric Benchmark Matrix (`notebooks/04_real_fabric_benchmark.ipynb`)
-
-![FabricNET Real Microscopy Benchmark](results/fabricnet_benchmark_report.png)
-
-#### Comprehensive 130-Sample FabricNET Empirical Benchmark Summary
-
-Evaluated across all 130 samples in `data/fabricnet/` under exact optical calibration ($S_x=1280.0\text{ px/cm}, S_y=1200.0\text{ px/cm}$, FOV $5.0 \times 4.0\text{ mm}$):
-
-| Weave Architecture | Sample Count ($N$) | Warp MAE (ends/cm) | Weft MAE (picks/cm) | Warp Acc ($\le \pm 2$) | Weft Acc ($\le \pm 2$) | Mean SQI (%) | Primary Failure Mode / Optical Boundary |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Plain Weave** (`plain`) | **50 samples** | **$7.73$** | **$4.93$** | **$42.0\%$** | **$40.0\%$** | $43.2\%$ | High interlace contrast; weft axis tracks consistently |
-| **Twill Weave** (`twill`) | **39 samples** | **$22.05$** | **$8.12$** | **$2.6\%$** | **$28.2\%$** | $24.3\%$ | Diagonal float ridges ($2/1, 2/2$) create severe projection sub-peaks |
-| **Satin Weave** (`satin`) | **41 samples** | **$12.18$** | **$21.93$** | **$31.7\%$** | **$12.2\%$** | $22.6\%$ | Long floats ($4/1, 5/1$) diminish surface contrast; reflection hides interlaces |
-| **Overall Direct Axis** | **130 samples** | **$13.43$** | **$11.25$** | **$26.9\%$** | **$27.7\%$** | $31.8\%$ | Camera axis aligned with image bounds (X=Warp, Y=Weft) |
-| **Orientation Invariant** | **130 samples** | **$12.39$** | **$11.78$** | — | — | — | Diagnostic offline paired evaluation for un-oriented dataset swatches |
-
-> [!WARNING]
-> **Calibration Verification Status & Uncertainty:** The spatial scale calibration ($S_x=1280.0, S_y=1200.0\text{ px/cm}$) is derived from author-reported $5 \times 4\text{ mm}$ field-of-view specifications, but lacks physical stage micrometer verification. An unverified $\pm 3\text{--}5\%$ optical magnification tolerance introduces an irreducible systematic baseline offset of $\pm 1.5\text{--}3.0\text{ ends/cm}$.
->
-> **Strict Offline Scope for Orientation-Invariant Pairing:** In the FabricNET dataset, physical fabric swatches were mounted arbitrarily under the microscope without a standardized warp-parallel orientation protocol. Orientation-invariant pairing is strictly an offline benchmark diagnostic evaluation method used solely to assess frequency recovery invariance against un-oriented ground truth labels. The production application and unified pipeline NEVER perform ground-truth-dependent pairing; the web app and API assign spatial frequency along the image horizontal axis to vertical warp threads and along the vertical axis to horizontal weft picks based purely on user calibration and skew alignment.
->
-> **Honest Limitation Assessment:** The objective of universal, autonomous thread counting across arbitrary float architectures is NOT validated under single-side optical macro capture. While plain weaves achieve acceptable fidelity on the weft axis ($\text{MAE} = 4.93\text{ picks/cm}$), twill ($\text{Warp MAE} = 22.05$) and satin ($\text{Weft MAE} = 21.93$) exhibit severe harmonic ambiguity where long yarn floats hide interlace points from surface reflection. Universal resolution across all weaves requires multi-spectral transmission illumination or topological 3D profilometry.
-
-#### Metric semantics and accepted-output coverage
-
-The recorded 13.43/11.25 MAE values are **candidate-estimate** errors: when the arbiter rejected an axis, Notebook 04 substituted its FFT candidate into pred_warp / pred_weft so a candidate error could still be measured. They must not be called accepted production measurement accuracy.
-
-The accepted-output fields in the same JSON contain 25 Warp predictions (19.2% axis coverage; MAE 2.48; 80.0% within ±2) and 32 Weft predictions (24.6% coverage; MAE 2.38; 62.5% within ±2). The status counts in the actual sample records are 15 VALIDATED, 27 CONSISTENT_WITH_WARNING, and 88 NEEDS_REVIEW. These figures correct older documentation that incorrectly stated 0 validated / 42 warning. Error rates use only returned accepted values; coverage uses all 130 samples as denominator.
-
-The offline orientation-invariant score chooses whether to swap axes by comparing errors against ground truth. It is therefore an optimistic, ground-truth-assisted diagnostic, not a model or production result.
-
-#### Exemplar Physical Sample Validation Metrics
-
-| Sample ID | Weave Architecture | Ground Truth Specs | Detected Skew | Engine 1 (2D FFT) | Engine 2 (1D Projection) | Final Validated Density | Discrepancy / Delta |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`W012.jpg`** | **Plain Weave** ($105\text{ g/m}^2$) | Warp: $38\text{ ends/cm}$<br>Weft: $33\text{ picks/cm}$ | $+1.00^\circ$ | Warp: $39.2$<br>Weft: $27.1$ | Warp: $38.8$<br>Weft: $13.8$ | **$39\text{ ends/cm}$ (Warp)<br>$27\text{ picks/cm}$ (Weft)** | $\Delta_{\text{warp}} = 1.0\text{ ends/cm}$<br>$\Delta_{\text{weft}} = 6.0\text{ picks/cm}$ (`NEEDS_REVIEW`) |
-| **`W017.jpg`** | **Plain Weave** ($85\text{ g/m}^2$) | Warp: $32\text{ ends/cm}$<br>Weft: $23\text{ picks/cm}$ | $0.00^\circ$ | $N_1 = 30.0$<br>$N_2 = 22.0$ | $N_1 = 36.0$<br>$N_2 = 32.5$ | **$30.0\text{ ends/cm}$ ($N_1$)<br>$22.0\text{ picks/cm}$ ($N_2$)** | $\Delta_1 = 2.0\text{ ends/cm}$<br>$\Delta_2 = 1.0\text{ picks/cm}$ |
-| **`W001.jpg`** | **Twill Weave** ($140\text{ g/m}^2$) | Warp: $32\text{ ends/cm}$<br>Weft: $30\text{ picks/cm}$ | $+1.00^\circ$ | $N_x = 25.8$<br>$N_y = 27.9$ | Float sub-peaks ($42.0$, $40.0$) | **$26\text{ ends/cm}$ (Warp)<br>$28\text{ picks/cm}$ (Weft)** | 2D FFT captures fundamental weave periodicity |
-| **`W067.jpg`** | **Satin Weave** ($120\text{ g/m}^2$) | Warp: $62\text{ ends/cm}$<br>Weft: $35\text{ picks/cm}$ | $-16.50^\circ$ | $N_x = 29.2$<br>$N_y = 27.6$ | Sub-filament striations | 2D FFT Dominant | Long floats require 2D FFT |
-
-#### Mechanistic Interrogation of Real Microscopy Diagnostic Panels
-
-1. **Panel (0, 0) — W012 Plain Weave Real Microscopic Capture:** Shows physical macro surface of a $105\text{ g/m}^2$ plain weave captured under a handheld digital microscope ($640\times 480\text{ px}$, $5.0\times 4.0\text{ mm}$ field of view). Individual warp and weft yarn crowns are distinctly visible with slight fiber hairiness.
-2. **Panel (0, 1) — W012 Warp Projection Profile & Harmonic Analysis:** Marginal column-wise integration across the active physical span isolates the underlying yarn peaks, scaling to $38.8\text{ ends/cm}$ along warp. The evidence fusion engine compares projection against the 2D FFT estimate ($39.2\text{ ends/cm}$) and flags `NEEDS_REVIEW` due to weft contrast attenuation.
-3. **Panel (0, 2) — W012 2D FFT Magnitude Spectrum:** Exhibits sharp, orthogonal harmonic impulse pairs along the horizontal and vertical frequency axes, validating clean weave periodicity and orthogonal alignment.
-4. **Panel (1, 0) — W001 Twill Weave Real Microscopic Capture:** Displays a heavier $140\text{ g/m}^2$ twill fabric with characteristic diagonal floating ridges ($\sim 45^\circ$ float angle).
-5. **Panel (1, 1) — W001 Warp Projection Profile (Diagonal Float Sub-Peaks):** Demonstrates the mathematical failure mode of 1D spatial projection on twill weaves: diagonal float interlacing causes multiple intra-period peaks to project onto the orthogonal axis, producing an apparent count of 42 peaks/cm.
-6. **Panel (1, 2) — W001 2D FFT Spectrum (Diagonal Float Harmonics):** Illustrates how the 2D Fourier transform cleanly separates diagonal float harmonics from the fundamental spatial yarn frequencies ($25.8$ and $27.9\text{ cycles/cm}$), proving that 2D FFT must dominate when twill or satin weaves are inspected.
-
----
-
-## 9. Executive Project Demo Reports (PDF & LaTeX)
-
-For formal client presentations, technical audits, and industrial proposals, complete self-contained demo reports have been authored and compiled in both **English** and **Arabic**:
-
-### 9.1. English Technical Report
-* **Compiled PDF:** [`reports/warp_weft_report_en.pdf`](reports/warp_weft_report_en.pdf) (7 pages, 20 MB with high-resolution diagnostic matrices)
-* **LaTeX Source:** [`reports/warp_weft_report_en.tex`](reports/warp_weft_report_en.tex)
-* **Compilation Command:**
-  ```bash
-  cd reports && pdflatex -interaction=nonstopmode warp_weft_report_en.tex
-  ```
-* **Contents:**
-  1. Abstract & Executive Problem Definition
-  2. Optical Physics & Spatial Resolution Invariants (Nyquist-Shannon theorem, DPI calibration)
-  3. System Architecture & Dual-Engine Formulation (CLAHE, Polar Radon Skew Rectification, 2D FFT, 1D Projection, Quality Score $Q$)
-  4. Empirical Production Pipeline Benchmark (swatch with $+12.0^\circ$ skew, $36\text{ ends/cm} \times 30\text{ picks/cm}$, $98.5\%$ confidence)
-  5. Real Physical FabricNET Microscopic Benchmark (W012 Plain, W017 Plain, W001 Twill, W067 Satin)
-  6. Hardware Utilization & Resource Bounds ($< 100\text{ MB}$ RAM, $0.00\text{ MB}$ persistent GPU VRAM, $< 10\text{ ms}$ latency)
-  7. Client Deployment Recommendations (USB microscope hardware lock, LED illumination, fixed stand)
-
-### 9.2. Arabic Technical Demo Report (تقرير العرض الفني والتجريبي باللغة العربية)
-* **Compiled PDF:** [`reports/warp_weft_report_ar.pdf`](reports/warp_weft_report_ar.pdf) (8 pages, 1.86 MB, formatted with authentic Amiri typography, RTL alignment, and embedded diagnostic matrices)
-* **LaTeX Source (XeLaTeX/LuaLaTeX):** [`reports/warp_weft_report_ar.tex`](reports/warp_weft_report_ar.tex)
-* **OpenDocument Source (LibreOffice):** [`reports/warp_weft_report_ar.fodt`](reports/warp_weft_report_ar.fodt)
-* **Compilation Command:**
-  ```bash
-  # Via LibreOffice Headless (Native Arabic Text Shaping):
-  libreoffice --headless --convert-to pdf reports/warp_weft_report_ar.fodt
-  
-  # Via XeLaTeX (for standard TeXLive with polyglossia):
-  xelatex -interaction=nonstopmode reports/warp_weft_report_ar.tex
-  ```
-* **Arabic Report Sections (الأقسام الموثقة باللغة العربية):**
-  1. ملخص تنفيذي (Executive Abstract)
-  2. المقدمة والمشكلة التشغيلية (Introduction & Operational Problem: خيوط السداء واللحمة وعدسة الفحص)
-  3. فيزياء البصريات ومعايير الاستبانة المكانية (Optical Physics: معيار نايكست-شانون، طرق المعايرة المترية)
-  4. البنية المعمارية للنظام وصياغة المحرك المزدوج (شكل 1: مصفوفة تصحيح الانحراف الزاوي، محرك فورييه 2D ومحرك الإسقاط 1D)
-  5. التقييم التجريبي وخط الإنتاج المتكامل (شكل 2: تقرير خط الإنتاج، جدول 1: ملخص الأداء القياسي)
-  6. التحقق المجهري الفيزيائي على قاعدة بيانات FabricNET (شكل 3: مصفوفة التحقق، جدول 2: النتائج المقاسة للعينات الحقيقية)
-  7. كفاءة استهلاك الموارد وحسابات العتاد (استهلاك الذاكرة، بطاقة الرسوميات، زمن الاستجابة، التشغيل الذاتي دون إنترنت)
-  8. الخاتمة والتوصيات التشغيلية للمصنع والعميل (مواصفات الميكروسكوب وحلقة الإضاءة LED وتثبيت الارتفاع للتشغيل الفوري)
-
----
-
-## 10. Interactive Web Application Interface (`web_app/`)
-
-An interactive, self-contained web application has been constructed to enable users, textile engineers, and factory quality inspectors to test custom fabric imagery directly through an intuitive browser interface.
-
-### 10.1. Zero-Dependency Architectural Design
-* **Zero External Web Frameworks:** Implemented purely with Python standard library (`http.server.BaseHTTPRequestHandler` and `socketserver.ThreadingMixIn`). Operates in strictly managed Python environments (PEP 668 compliance) without requiring `pip install` of bulky frameworks (Flask, FastAPI, Uvicorn).
-* **Pure Computational Core:** Integrates directly with `web_app.engine`, utilizing NumPy and Pillow for sub-millisecond affine transformations, 2D FFT spectral peak extraction, 1D prominence profiling, and Base64 visualization rendering.
-* **Dual-Language Localization (EN / AR):** Real-time client-side language switching between English and Arabic (العربية) with instant typography and layout flipping (`direction: rtl` / `direction: ltr`).
-
-### 10.2. Core Capabilities & User Controls
-1. **Custom Fabric Upload:** Drag-and-drop or file-picker support for JPG, PNG, WEBP, and BMP images.
-2. **Benchmark Presets:** One-click preloaded swatches covering synthetic $+12^\circ$ / $+15^\circ$ tilted fabrics, real microscopic plain weave (`W012.jpg`), and real microscopic twill float weave (`W001.jpg`).
-3. **Spatial Calibration Selector:**
-   * USB Digital Microscope ($1280.0\text{ px/cm}$ — FabricNET standard)
-   * Pick-Glass Microscope ($1200.0\text{ px/cm}$)
-   * Flatbed Scanner 1200 DPI ($472.4\text{ px/cm}$)
-   * Flatbed Scanner 600 DPI ($236.2\text{ px/cm}$)
-   * Smartphone / Macro Lens ($400.0\text{ px/cm}$)
-   * Custom scale input (arbitrary $\text{px/cm}$)
-4. **Algorithmic Parameter Tuning:**
-   * Automated Skew Detection & Inverse Affine Rectification toggle
-   * Peak Prominence Sensitivity slider ($0.005$ to $0.040$)
-   * Weave Architecture Hint selector (Auto, Plain, Twill, Satin)
-5. **Real-Time KPI Cards:**
-   * Warp Thread Density ($N_{\text{warp}}$ Ends/cm) + Pitch ($P_{\text{warp}}$ in $\mu\text{m}$)
-   * Weft Thread Density ($N_{\text{weft}}$ Picks/cm) + Pitch ($P_{\text{weft}}$ in $\mu\text{m}$)
-   * Total Thread Density ($N_{\text{total}} = N_{\text{warp}} + N_{\text{weft}}$) + Skew Angle ($\theta^\circ$)
-   * Multi-Attribute Quality Confidence Score ($Q\%$) + Computational Latency ($\text{ms}$)
-6. **Multi-Tab Diagnostic Workbench:**
-   * **Tab 1: Overview:** Metric $1.0\text{ cm}^2$ ROI overlay and boundary-safe rectified fabric crop.
-   * **Tab 2: Skew Analysis:** Polar Radon radial ray integral energy curve across $[-45^\circ, +45^\circ]$.
-   * **Tab 3: 1D Projections:** Marginal column/row intensity waveforms with crowned peak markers and pitch measurements.
-   * **Tab 4: 2D FFT Spectrum:** Centered Fourier magnitude spectrum showing orthogonal harmonic impulses.
-   * **Tab 5: Audit Ledger:** Side-by-side comparison of 2D FFT vs. 1D Projection outputs, SPNR metrics, and profile variance.
-7. **Executive Report Integration:** Direct header links to view/download compiled English and Arabic executive demo PDFs.
-
-### 10.3. REST API Specification
-
-| Endpoint | Method | Payload / Parameters | Response | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `/` | `GET` | None | `text/html` | Serves the single-page application interface. |
-| `/api/health` | `GET` | None | `application/json` | System health check and engine capabilities. |
-| `/api/presets` | `GET` | None | `application/json` | Returns preloaded benchmark fabric swatches with Base64 thumbnails and recommended scales. |
-| `/api/analyze` | `POST` | `{"image": "<base64>", "pixels_per_cm": 400.0, "auto_skew": true, "prominence": 0.012, "weave_hint": "plain"}` | `application/json` | Executes dual-engine thread analysis, returning thread densities, pitches, skew angle, confidence score, audit table, and Base64 diagnostic plots. |
-| `/reports/<file>` | `GET` | `<filename>.pdf` | `application/pdf` | Serves compiled technical demo reports (`warp_weft_report_en.pdf` and `warp_weft_report_ar.pdf`). |
-
-### 10.4. Analysis Modes and Comparison
-
-The browser exposes three modes:
-
-- Classical deterministic: the existing FFT, spatial projection and evidence-fusion pipeline; available.
-- Learned models: visible but unavailable until a versioned model, checkpoint, and validated server inference dispatcher are committed.
-- Hybrid: visible but unavailable until learned yarn perception is integrated with calibrated physical measurement and validated.
-
-The model registry selector remains disabled when no verified inference implementation is present. Comparison mode runs every currently available method on the same image, displays the results and explicitly lists methods that were not executed. In the current repository checkout, only Classical can execute; comparison mode must not be interpreted as a three-model benchmark.
-
-The API adds GET /api/models for method availability and registered-model metadata. POST /api/analyze accepts analysis_mode and compare_methods. Requests for unavailable Learned/Hybrid modes return HTTP 409 instead of silently executing the deterministic engine under a false label.
-
-### 10.5. First vs. Second Remediation Reproduction
-
-CI reruns both historical source revisions on all 130 FabricNET images in separate source contexts. Both reproduced their own committed sample outputs/statuses exactly. Under all-image direct-axis candidate metrics, first-remediation MAE is 11.7385 Warp / 10.3000 Weft; second-remediation candidate MAE is 13.4318 / 11.2490. V2's lower accepted-only MAE is selective and covers only 19.23% Warp / 24.62% Weft. The new version is more conservative, not more accurate overall. See docs/FIRST_VS_SECOND_REMEDIATION_COMPARISON.md.
-
-### 10.6. Reproducible FabricNET Benchmark
-
-The CI workflow executes scripts/run_fabricnet_benchmark.py over all 130 committed FabricNET images and uploads a JSON/CSV rerun artifact. The latest recorded run exactly reproduced the committed candidate estimates, accepted measurements and decision statuses across all 130 rows. See docs/FABRICNET_BENCHMARK_RERUN.md and results/fabricnet_benchmark_rerun_summary.json.
-
-### 10.7. Launch Instructions
-
-#### Option A: Standalone Execution (Recommended)
-Run the server directly via Python standard library on any machine:
-```bash
-python3 web_app/server.py
-```
-Open a web browser and navigate to:
-```
-http://localhost:8080/
-```
-
-#### Option B: Embedded Execution via Jupyter Notebook
-Launch the embedded pipeline in [`notebooks/05_web_app_interface.ipynb`](notebooks/05_web_app_interface.ipynb) to inspect API responses and interact with the UI directly inside an `IPython.display.IFrame` widget.
+The current CI workflow compiles Python modules, checks inline JavaScript syntax, runs the full test suite, reruns the original-main baseline retrospectively, and reproduces both first-remediation and current-engine FabricNET results.

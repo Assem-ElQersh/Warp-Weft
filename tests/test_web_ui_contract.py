@@ -34,6 +34,12 @@ class TestWebUIContract(unittest.TestCase):
         for mode in ('value="classical"', 'value="learned"', 'value="hybrid"'):
             self.assertIn(mode, self.html)
 
+    def test_calibration_uncertainty_is_displayed_and_not_called_confidence(self):
+        self.assertIn("calibration_uncertainty", self.html)
+        self.assertIn("calibrationOnly", self.html)
+        self.assertIn("calibrationUnverified", self.html)
+        self.assertIn("Calibration-only bounds are distinct from image/model confidence", self.html)
+
     def test_bilingual_mode_and_comparison_labels_exist(self):
         for phrase in (
             "Compare all available methods on the same image",

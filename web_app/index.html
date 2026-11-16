@@ -1117,6 +1117,8 @@
                 comparisonSqi: "SQI",
                 comparisonLatency: "Latency",
                 comparisonSkipped: "Not executed",
+                calibrationOnly: "Calibration only",
+                calibrationUnverified: "unverified calibration",
                 modeClassical: "Classical deterministic (available)",
                 modeLearned: "Learned models (unavailable)",
                 modeHybrid: "Hybrid (unavailable)",
@@ -1172,6 +1174,8 @@
                 comparisonSqi: "مؤشر الجودة",
                 comparisonLatency: "الزمن",
                 comparisonSkipped: "لم يتم التنفيذ",
+                calibrationOnly: "المعايرة فقط",
+                calibrationUnverified: "معايرة غير متحققة",
                 modeClassical: "خوارزميات حتمية (متاح)",
                 modeLearned: "نماذج مدربة (غير متاحة)",
                 modeHybrid: "هجين (غير متاح)",
@@ -1585,16 +1589,23 @@
             const warpAccepted = (r.accepted_warp_density_ends_per_cm != null) ? r.accepted_warp_density_ends_per_cm : (r.warp_ends_per_cm != null ? r.warp_ends_per_cm : null);
             const weftAccepted = (r.accepted_weft_density_picks_per_cm != null) ? r.accepted_weft_density_picks_per_cm : (r.weft_picks_per_cm != null ? r.weft_picks_per_cm : null);
 
-            // KPIs: Never expose unvalidated guesses as verified primary density
+            // KPIs: Never expose unvalidated guesses as verified primary density.
+            // Calibration-only bounds are distinct from image/model confidence.
+            const cal = r.calibration_uncertainty || {};
+            const calLabel = `${i18n[currentLanguage].calibrationOnly} ±${cal.relative_uncertainty_pct ?? "--"}%` +
+                (cal.is_verified ? "" : ` (${i18n[currentLanguage].calibrationUnverified})`);
+            const formatInterval = interval => interval ? ` [${interval.lower}–${interval.upper}]` : "";
             document.getElementById('kpi-warp').innerText = warpAccepted != null ? warpAccepted : '--';
-            document.getElementById('kpi-warp-pitch').innerText = r.pitch_warp_um != null 
-                ? `Pitch: ${r.pitch_warp_um} µm` 
-                : `Unvalidated (FFT: ${a.fft_warp} | Proj: ${a.proj_warp})`;
+            document.getElementById('kpi-warp-pitch').innerText = (r.pitch_warp_um != null
+                ? `Pitch: ${r.pitch_warp_um} µm`
+                : `Unvalidated (FFT: ${a.fft_warp} | Proj: ${a.proj_warp})`) +
+                ` | ${calLabel}${formatInterval(cal.warp_ends_per_cm)}`;
 
             document.getElementById('kpi-weft').innerText = weftAccepted != null ? weftAccepted : '--';
-            document.getElementById('kpi-weft-pitch').innerText = r.pitch_weft_um != null 
-                ? `Pitch: ${r.pitch_weft_um} µm` 
-                : `Unvalidated (FFT: ${a.fft_weft} | Proj: ${a.proj_weft})`;
+            document.getElementById('kpi-weft-pitch').innerText = (r.pitch_weft_um != null
+                ? `Pitch: ${r.pitch_weft_um} µm`
+                : `Unvalidated (FFT: ${a.fft_weft} | Proj: ${a.proj_weft})`) +
+                ` | ${calLabel}${formatInterval(cal.weft_picks_per_cm)}`;
 
             const totVal = r.linear_density_sum_per_cm != null ? r.linear_density_sum_per_cm : (r.total_thread_density != null ? r.total_thread_density : '--');
             document.getElementById('kpi-total').innerText = totVal;

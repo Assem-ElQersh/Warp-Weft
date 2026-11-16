@@ -269,7 +269,20 @@ def analyze_fabric(
             "engine_mode": fusion_res["engine_mode"],
             "signal_quality_index": fusion_res["signal_quality_index"],
             "confidence_score": fusion_res["confidence_score"],
-            "decision_rationale": fusion_res["decision_rationale"]
+            "decision_rationale": fusion_res["decision_rationale"],
+            "calibration_uncertainty": {
+                "interpretation": "Calibration-only relative scale envelope; not a statistical confidence interval and excludes image, model, sampling, and manual-count uncertainty.",
+                "is_verified": calibration.is_verified,
+                "relative_uncertainty_pct": calibration.uncertainty_pct,
+                "warp_ends_per_cm": calibration.density_interval(fusion_res["accepted_warp_density_ends_per_cm"]),
+                "weft_picks_per_cm": calibration.density_interval(fusion_res["accepted_weft_density_picks_per_cm"]),
+                "candidate_measurements": {
+                    "warp_fft": calibration.density_interval(warp_fft),
+                    "warp_projection": calibration.density_interval(warp_proj),
+                    "weft_fft": calibration.density_interval(weft_fft),
+                    "weft_projection": calibration.density_interval(weft_proj),
+                },
+            }
         },
         "audit": {
             "fft_warp": round(float(warp_fft), 2),

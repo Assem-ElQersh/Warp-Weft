@@ -98,6 +98,10 @@ class TestWebServerIntegration(unittest.TestCase):
         self.assertIn("results", result)
         self.assertIn("audit", result)
         self.assertIn("visuals", result)
+        uncertainty = result["results"]["calibration_uncertainty"]
+        self.assertEqual(uncertainty["relative_uncertainty_pct"], 5.0)
+        self.assertFalse(uncertainty["is_verified"])
+        self.assertIn("not a statistical confidence interval", uncertainty["interpretation"])
 
     def test_comparison_executes_every_currently_available_method(self):
         status, result, _ = self.request("POST", "/api/analyze", {

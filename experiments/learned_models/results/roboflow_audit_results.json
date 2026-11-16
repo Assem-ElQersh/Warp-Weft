@@ -1,0 +1,120 @@
+{
+  "audit_metadata": {
+    "projects": [
+      {
+        "project_name": "warp-weft-new-prod",
+        "workspace": "ayushiit",
+        "url": "https://universe.roboflow.com/ayushiit/warp-weft-new-prod",
+        "task_type": "Object Detection",
+        "classes": [
+          "warp",
+          "weft"
+        ],
+        "class_count": 2,
+        "annotation_type": "Longitudinal Bounding Boxes & Polygons covering full yarn strands",
+        "sample_counts": {
+          "base_raw_images": 52,
+          "v1_generated_images": 274,
+          "v1_splits": {
+            "train": 259,
+            "val": 10,
+            "test": 5
+          },
+          "v2_generated_images": 200,
+          "v2_splits": {
+            "train": 185,
+            "val": 10,
+            "test": 5
+          }
+        },
+        "input_resolution": "640x640 (Stretched)",
+        "native_resolution": "875x879",
+        "architecture": "Roboflow 3.0 Fast (YOLOv8-based)",
+        "reported_metrics": {
+          "mAP50": 0.954,
+          "precision": 0.851,
+          "recall": 0.912
+        },
+        "export_formats": [
+          "YOLOv8",
+          "COCO JSON",
+          "Pascal VOC XML",
+          "TFRecord"
+        ],
+        "physical_scale_available": false,
+        "suitability_assessment": "Unsuitable for direct thread density counting: predicts uncalibrated box counts in 640x640 space without spatial scale. Suffer from NMS suppression on dense yarns."
+      },
+      {
+        "project_name": "fabric-lby7e",
+        "workspace": "cheomseongdae",
+        "url": "https://universe.roboflow.com/cheomseongdae/fabric-lby7e",
+        "task_type": "Semantic Segmentation",
+        "classes": [
+          "warp",
+          "weft",
+          "measure"
+        ],
+        "class_count": 3,
+        "annotation_type": "Fine multi-point polygon masks on exposed yarn float points + bounding box on physical ruler (measure)",
+        "sample_counts": {
+          "base_raw_images": 74,
+          "versions": 6,
+          "v6_generated_images": 308,
+          "v6_splits": {
+            "train": 284,
+            "val": 16,
+            "test": 8
+          }
+        },
+        "input_resolution": "1184x1184 (Grayscale)",
+        "native_resolution": "1792x1184",
+        "architecture": "Roboflow 2.0 Base Semantic Segmentation",
+        "reported_metrics": {
+          "mIoU": 0.357
+        },
+        "export_formats": [
+          "COCO Segmentation",
+          "YOLOv8 Segmentation",
+          "PNG Mask"
+        ],
+        "physical_scale_available": true,
+        "suitability_assessment": "Partially suitable for float-point localization and scale detection, but low mIoU (35.7%) causes severe float fragmentation, necessitating heuristic graph tracking."
+      }
+    ]
+  },
+  "empirical_nms_simulation": {
+    "true_yarns": 32,
+    "pitch_px": 20.0,
+    "yarn_width_px": 18.0,
+    "adjacent_box_iou": 0.09118838151096213,
+    "nms_vulnerability_summary": "In dense fabric geometries, adjacent parallel yarns yield bounding box overlap that triggers NMS suppression at standard thresholds (0.45-0.50), causing 30-50% undercounting unless NMS is disabled."
+  },
+  "benchmark_swatch_comparison": [
+    {
+      "swatch": "sample_plain_32x28.png",
+      "dimensions": "400x400",
+      "ground_truth": {
+        "warp": 32,
+        "weft": 28
+      },
+      "spatial_calibration": "480.0 px/cm",
+      "bounding_box_vulnerability": "High (Parallel longitudinal boxes suppress adjacent threads under IoU >= 0.40)",
+      "spatial_scale_required": true
+    },
+    {
+      "swatch": "macro_swatch_skewed_12deg.png",
+      "dimensions": "800x800",
+      "ground_truth": {
+        "warp": 32,
+        "weft": 28
+      },
+      "spatial_calibration": "480.0 px/cm",
+      "bounding_box_vulnerability": "High (Parallel longitudinal boxes suppress adjacent threads under IoU >= 0.40)",
+      "spatial_scale_required": true
+    }
+  ],
+  "conclusions": {
+    "direct_box_counting_feasibility": "Fails: lacks metric calibration ($S_x, S_y$) and suffers from severe NMS suppression on parallel strands.",
+    "segmentation_mask_feasibility": "Viable ONLY when coupled with geometric tracking / skeletonization and metric calibration ($S_x, S_y$)."
+  }
+}

@@ -55,3 +55,24 @@ Before learned-model accuracy is used for a decision or UI claim, publish:
 8. Separate FabricNET microscopy and client smartphone domain results.
 
 The web application exposes Classical, Learned, and Hybrid choices. Only Classical is available in this checkout. Learned and Hybrid remain unavailable until a verifiable model registry, checkpoint, inference adapter, and explicit server-side dispatch implementation are committed and validated. Merely placing a checkpoint or adapter file in the repository must not enable the mode. The UI/API must not synthesize or substitute a model prediction.
+
+## Research Package Recovery & Execution Status (2026-11-16)
+
+The research package has been generated, executed, and placed under version control in `experiments/learned_models/`:
+
+1. **Jupyter Notebooks (Executed & Serialized)**:
+   - `01_fabricnet_feature_regression.ipynb`: 262-d feature extraction (GLCM 96, LBP 54, Gabor 96, IFV 16) and Random Forest / XGBoost / MLP regression on 26 held-out test specimens.
+   - `02_roboflow_projects_audit_and_eval.ipynb`: Audit of `ayushiit/warp-weft-new-prod` and `cheomseongdae/fabric-lby7e`; mathematical demonstration of greedy NMS suppression on parallel yarns.
+   - `03_textile_defect_fcn_inspection.ipynb`: Audit of `net.h5` checkpoint (SHA-256 `d2439b2fd7c...`), verifying the 6-channel paired front/back illumination requirement.
+   - `04_unet_segmentation_training.ipynb`: PyTorch `WarpWeftUNet` trained on GPU across 120 synthetic swatches; achieved 97.82% pixel accuracy and 91.81% mIoU on synthetic test patches.
+   - `05_hybrid_geometric_measurement.ipynb`: Semantic segmentation coupled with morphological centerline extraction and physical pitch calculation.
+   - `06_comprehensive_side_by_side_comparison.ipynb`: Cross-paradigm comparison on identical benchmark swatches.
+
+2. **Model Checkpoints & Inventories**:
+   - `experiments/learned_models/checkpoints/unet_yarn_segmentation.pt` (7.4 MB; SHA-256 `3ef9b96ebc0c7ba07e8ef8c40ff497b7b134812845c47854e7d58fbb2fc134b2`).
+   - `experiments/learned_models/checkpoints/inventory.json`: Versioned checkpoint registry.
+   - External reference repo `experiments/reference_repos/` excluded from git tracking to prevent pushing the 94 MB legacy TensorFlow `net.h5`.
+
+3. **Domain Integrity & Production Constraints**:
+   - The U-Net mIoU (91.81%) is strictly a synthetic-domain metric; real-domain pixel ground truth is required before production deployment.
+   - The production server (`web_app/modes.py`) maintains `available: false` for Learned and Hybrid modes. No unvalidated model output is exposed to production users.

@@ -1,0 +1,27 @@
+{
+  "checkpoint_id": "textile_defect_detection_fcn_v1",
+  "filename": "net.h5",
+  "filepath": "experiments/reference_repos/TextileDefectDetection/example/net.h5",
+  "sha256": "d2439b2fd7c94154950ec2805b99ece91472150f53b7ad1760d7645b894944b7",
+  "size_bytes": 93740448,
+  "framework": "TensorFlow/Keras 1.11 (Python 3.6)",
+  "architecture": "Modified U-Net (14 Conv2D + BatchNorm + LeakyReLU + Softmax)",
+  "input_shape": [
+    null,
+    null,
+    6
+  ],
+  "input_channels": 6,
+  "output_classes": 3,
+  "class_labels": [
+    "background",
+    "warp_float",
+    "weft_float"
+  ],
+  "dual_illumination_required": true,
+  "weave_compatibility": [
+    "plain"
+  ],
+  "direct_density_prediction": false,
+  "integration_recommendation": "Do not use for general single-image thread density measurement. Preserve as specialized reference model for dual-illumination float tracking."
+}

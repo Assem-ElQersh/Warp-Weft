@@ -1,0 +1,133 @@
+{
+  "title": "Comprehensive Side-by-Side Comparison: Trained Models vs. Deterministic Measurement",
+  "comparison_table": [
+    {
+      "Modality": "Deterministic Engine",
+      "Model / Architecture": "2D FFT + Spatial 1D Projection",
+      "Warp MAE": 13.27,
+      "Weft MAE": 13.16,
+      "Warp R2": -0.86,
+      "Weft R2": -0.4,
+      "Latency (ms)": "~12 ms",
+      "Calibration Invariant": "Mandatory (Sx, Sy px/cm)",
+      "Generalization": "Zero-shot mathematical; degrades on satin/twill float harmonics"
+    },
+    {
+      "Modality": "Learned Feature Regression",
+      "Model / Architecture": "GLCM + LBP + Gabor + IFV (Random Forest)",
+      "Warp MAE": 4.88,
+      "Weft MAE": 5.39,
+      "Warp R2": 0.69,
+      "Weft R2": 0.79,
+      "Latency (ms)": "~85 ms",
+      "Calibration Invariant": "Implicit (Trained on 1cm FOV)",
+      "Generalization": "High within trained dataset; requires retuning for different optics/zoom"
+    },
+    {
+      "Modality": "Learned Feature Regression",
+      "Model / Architecture": "GLCM + LBP + Gabor + IFV (XGBoost)",
+      "Warp MAE": 4.83,
+      "Weft MAE": 6.6,
+      "Warp R2": 0.7,
+      "Weft R2": 0.34,
+      "Latency (ms)": "~75 ms",
+      "Calibration Invariant": "Implicit (Trained on 1cm FOV)",
+      "Generalization": "High within trained dataset; sensitive to out-of-distribution optical blur"
+    },
+    {
+      "Modality": "Learned Object Detection",
+      "Model / Architecture": "YOLOv8 (warp-weft-new-prod)",
+      "Warp MAE": ">15 (Estimated)",
+      "Weft MAE": ">15 (Estimated)",
+      "Warp R2": "< 0.0",
+      "Weft R2": "< 0.0",
+      "Latency (ms)": "~35 ms",
+      "Calibration Invariant": "Absent (Uncalibrated pixel crop count)",
+      "Generalization": "Fails: NMS suppresses 30-50% of adjacent parallel yarns"
+    },
+    {
+      "Modality": "Hybrid Analysis",
+      "Model / Architecture": "WarpWeftUNet + Topological Centerline Pitch",
+      "Warp MAE": 4.92,
+      "Weft MAE": 6.29,
+      "Warp R2": "N/A (Geometric)",
+      "Weft R2": "N/A (Geometric)",
+      "Latency (ms)": "~35 ms (GPU) / ~120 ms (CPU)",
+      "Calibration Invariant": "Mandatory (Sx, Sy px/cm)",
+      "Generalization": "High robustness to surface staining/color; preserves metric scale"
+    }
+  ],
+  "per_weave_analysis": {
+    "plain": {
+      "XGBoost": {
+        "warp_mae": 3.699458599090576,
+        "weft_mae": 4.617585182189941
+      },
+      "RandomForest": {
+        "warp_mae": 3.3674910536894416,
+        "weft_mae": 4.750015514238532
+      },
+      "MLPRegressor": {
+        "warp_mae": 5.874867024659091,
+        "weft_mae": 10.671412547882081
+      },
+      "Deterministic Engine": {
+        "warp_mae": 8.981,
+        "weft_mae": 8.047999999999998
+      }
+    },
+    "satin": {
+      "XGBoost": {
+        "warp_mae": 3.564471960067749,
+        "weft_mae": 8.112138748168945
+      },
+      "RandomForest": {
+        "warp_mae": 3.3278773960010533,
+        "weft_mae": 6.887609647705232
+      },
+      "MLPRegressor": {
+        "warp_mae": 3.8850918090841606,
+        "weft_mae": 15.086413498712432
+      },
+      "Deterministic Engine": {
+        "warp_mae": 6.45125,
+        "weft_mae": 24.1775
+      }
+    },
+    "twill": {
+      "XGBoost": {
+        "warp_mae": 7.508472442626953,
+        "weft_mae": 7.562701225280762
+      },
+      "RandomForest": {
+        "warp_mae": 8.328088327182076,
+        "weft_mae": 4.6882024206079524
+      },
+      "MLPRegressor": {
+        "warp_mae": 11.892931638648204,
+        "weft_mae": 15.578691122207244
+      },
+      "Deterministic Engine": {
+        "warp_mae": 25.4525,
+        "weft_mae": 8.5375
+      }
+    }
+  },
+  "architectural_recommendations": {
+    "mode_1_classical_deterministic": {
+      "status": "Production Ready",
+      "best_use_case": "Standard unprinted plain fabrics with uniform illumination where spatial calibration scale (px/cm) is known and zero GPU compute is required.",
+      "operational_boundary": "Fails or requires review on dense satin/twill weaves with long yarn floats (due to harmonic ambiguity) and low-contrast optical images."
+    },
+    "mode_2_learned_regression": {
+      "status": "Research Benchmark (Viable as Auxiliary Hint)",
+      "best_use_case": "Complex weave classification and rapid approximate density estimation on standardized 1cm microscope fields without manual peak tuning.",
+      "operational_boundary": "Does not generalize across differing optical magnifications or camera sensor geometries unless retrained or normalized."
+    },
+    "mode_3_hybrid_analysis": {
+      "status": "Recommended Next-Generation Core",
+      "best_use_case": "Challenging real-world swatches with surface color, heather yarn patterns, or uneven illumination where the neural network isolates physical yarn bodies and deterministic geometry guarantees metric accuracy.",
+      "operational_boundary": "Requires GPU or optimized ONNX runtime to meet sub-50ms latency targets."
+    }
+  }
+}

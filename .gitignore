@@ -96,6 +96,8 @@ reports/*.html
 *.bin
 *.weights
 *.h5
+!experiments/learned_models/checkpoints/*.pt
+experiments/reference_repos/
 
 # Large Archives & Package Installers
 *.zip

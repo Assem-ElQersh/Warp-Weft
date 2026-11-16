@@ -1,0 +1,58 @@
+{
+  "checkpoints": [
+    {
+      "checkpoint_id": "textile_defect_detection_fcn_v1",
+      "filename": "net.h5",
+      "filepath": "experiments/reference_repos/TextileDefectDetection/example/net.h5",
+      "sha256": "d2439b2fd7c94154950ec2805b99ece91472150f53b7ad1760d7645b894944b7",
+      "size_bytes": 93740448,
+      "framework": "TensorFlow/Keras 1.11 (Python 3.6)",
+      "architecture": "Modified U-Net (14 Conv2D + BatchNorm + LeakyReLU + Softmax)",
+      "input_shape": [
+        null,
+        null,
+        6
+      ],
+      "input_channels": 6,
+      "output_classes": 3,
+      "class_labels": [
+        "background",
+        "warp_float",
+        "weft_float"
+      ],
+      "dual_illumination_required": true,
+      "weave_compatibility": [
+        "plain"
+      ],
+      "direct_density_prediction": false,
+      "integration_recommendation": "Do not use for general single-image thread density measurement. Preserve as specialized reference model for dual-illumination float tracking."
+    },
+    {
+      "checkpoint_id": "unet_yarn_segmentation_v1",
+      "filename": "unet_yarn_segmentation.pt",
+      "filepath": "experiments/learned_models/checkpoints/unet_yarn_segmentation.pt",
+      "sha256": "5b3fb3da3980ee4d0056b35745c5edc5a7dbe2cc2cc2c9aed58a5eb2e2c7cb6e",
+      "size_bytes": 7750029,
+      "framework": "PyTorch 2.13.0+cu130",
+      "architecture": "WarpWeftUNet (DoubleConv encoder-decoder with skip connections)",
+      "input_shape": [
+        null,
+        1,
+        256,
+        256
+      ],
+      "input_channels": 1,
+      "output_classes": 3,
+      "class_labels": [
+        "background_interstice",
+        "warp_yarn_core",
+        "weft_yarn_core"
+      ],
+      "best_val_miou": 0.9258,
+      "test_pixel_accuracy": 0.9782,
+      "test_miou": 0.9181,
+      "direct_density_prediction": false,
+      "integration_recommendation": "Recommended for Mode 3 (Hybrid Analysis): use model output for topological skeletonization followed by calibrated spatial pitch measurement."
+    }
+  ]
+}

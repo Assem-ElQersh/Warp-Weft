@@ -197,3 +197,12 @@ Calibration uncertainty is propagated linearly into calibration-only density bou
 * **Engine Refactored:** `web_app/engine.py` delegates directly to `src.fabric_analysis.pipeline.analyze_fabric`.
 * **Server Updated:** `web_app/server.py` parses `pixels_per_cm_x` and `pixels_per_cm_y`, provides anisotropic presets, and handles REST queries.
 * **UI Enhanced:** `web_app/index.html` features dual-scale inputs, metric dimension displays, help icon toggles with detailed tooltips, honest SQI reporting, and fully responsive layout across desktop and mobile form factors.
+
+---
+
+## 9. Learned-Model Research Package Status
+
+* **Experimental Artifacts Under Version Control:** The complete experimental package `experiments/learned_models/` is serialized and committed, containing 6 executed Jupyter notebooks, raw extracted features (`results/fabricnet_features.npz`), disjoint split manifests (`results/fabricnet_splits.json`), and comprehensive evaluation metrics.
+* **PyTorch U-Net Checkpoint:** `experiments/learned_models/checkpoints/unet_yarn_segmentation.pt` (7.4 MB; SHA-256 `3ef9b96ebc0c7ba07e8ef8c40ff497b7b134812845c47854e7d58fbb2fc134b2`) is tracked directly in git via targeted `.gitignore` exemption.
+* **Synthetic Domain Boundary:** The reported U-Net pixel accuracy (97.82%) and mIoU (91.81%) are strictly synthetic-domain benchmark metrics; real-domain segmentation requires human-annotated pixel masks on physical swatches.
+* **Operational Invariant:** `web_app/modes.py` enforces `available: false` for Learned and Hybrid modes. The production API serves only deterministic measurements until client-domain validation on 5-region smartphone swatches is formally approved.

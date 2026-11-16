@@ -6,7 +6,7 @@
 ## 1. Executive Summary
 This report documents the comprehensive remediation of the Warp & Weft AI codebase. Prior to this remediation, the project suffered from 15 confirmed architectural and mathematical defects, including hardcoded validation values on benchmark samples, an invalid square-pixel assumption that distorted anisotropic optical microscopy scales ($S_x=1280.0\text{ px/cm}, S_y=1200.0\text{ px/cm}$), undersized ROI reporting without physical coverage disclosure, naive peak detection suppressing high yarn counts, blind defaulting to 2D FFT on estimator divergence, and parallel divergent implementations across notebooks and the production web server.
 
-To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression suite. The current feature branch passes 57 Python tests and an inline JavaScript syntax check in GitHub Actions (verified in run 43943493543). A separate reproducibility step reruns all 130 FabricNET images and compares every candidate prediction, accepted density, and decision status against the committed benchmark.
+To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression suite. The current feature branch passes 62 Python tests and an inline JavaScript syntax check in GitHub Actions (verified in run 43946623447). A separate reproducibility step reruns all 130 FabricNET images and compares every candidate prediction, accepted density, and decision status against the committed benchmark.
 
 ---
 
@@ -104,7 +104,7 @@ The rerun exactly matched the committed benchmark for all 130 rows: zero changed
 
 Accepted-output coverage is 25/130 Warp (19.23%) and 32/130 Weft (24.62%). Accepted-only MAE is 2.48 ends/cm Warp and 2.375 picks/cm Weft; the 95% group-bootstrap intervals are [1.44, 3.601] and [1.71875, 3.0625], respectively. Candidate-estimate MAE remains 13.4318 Warp and 11.249 Weft. Per-weave results and methodology are recorded in docs/FABRICNET_BENCHMARK_RERUN.md.
 
-The 2026-11-16 validation of the latest feature-branch head passed 54 Python tests, including HTTP integration tests for existing health/preset routes, Classical analysis, mode rejection, comparison execution, malformed model-registry handling, and strict comparison-flag validation. The inline JavaScript syntax check also passed, and all 130 FabricNET images were re-run successfully.
+The 2026-11-16 validation of the latest implementation head passed 62 Python tests, including the versioned schema compatibility test, notebook AST/integrity tests, calibration uncertainty propagation, Classical analysis, Learned/Hybrid mode rejection, comparison execution, malformed model-registry handling, and strict comparison-flag validation. The inline JavaScript syntax check passed. Both first-remediation and current-engine runs processed all 130 FabricNET images.
 
 ### 4.4. First vs. second remediation comparison on the same 130 FabricNET images
 
@@ -179,10 +179,10 @@ The original `main` baseline at `8f55927` contained 22 tests; GitHub Actions rer
 - HTTP API compatibility, analysis-mode rejection, and comparison behavior.
 - Existing frontend controls, bilingual mode labels, and calibration uncertainty display.
 
-Latest verified run: [43943493543](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43943493543).
+Latest verified run: [43946623447](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43946623447).
 
 ```text
-Current feature branch: Ran 57 tests — OK
+Current feature branch: Ran 62 tests — OK
 Original main baseline: Ran 22 tests — OK
 Inline JavaScript syntax check: passed
 First-remediation rerun: 130/130 images, zero changed prediction/status fields

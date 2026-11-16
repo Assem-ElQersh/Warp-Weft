@@ -126,12 +126,18 @@
   },
   "interpretation": "Exact deterministic reproduction of current benchmark. Not client smartphone validation or model validation. Accepted-only accuracy is selective and must be reported with coverage.",
   "latest_validation": {
-    "branch_head_commit": "147d27ac18adc4df036a69031b9f17ff56a002e4",
-    "workflow_run_url": "https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43907041685",
-    "python_tests": 54,
+    "branch_head_commit": "65580886d6a839148f8704c72db6b355924a03ca",
+    "workflow_run_url": "https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43946623447",
+    "python_tests": 62,
+    "original_main_baseline_tests": 22,
     "javascript_syntax_check": "passed",
-    "full_130_image_rerun": "passed",
-    "artifact_id": 14246042495,
-    "artifact_sha256": "e6579398ea1ebadf878b79131a74c7bfcf7a24f111411c94a776c6ebc83fbdfd"
+    "first_remediation_full_130_image_rerun": "passed",
+    "current_engine_full_130_image_rerun": "passed",
+    "exact_historical_field_comparison": "zero changed fields; zero maximum numeric delta",
+    "artifact_id": 14264244008,
+    "artifact_sha256": "d988dc156035ed00412ebb7e9b0e3c8c6a505c9c53e3541cef063a6f4853aa95",
+    "first_remediation_artifact_id": 14263789030,
+    "first_remediation_artifact_sha256": "4d38459da40b1f8ff9604b55a7dcd0eb4e570638cc01ca4145973706a34ebda6",
+    "continuous_accepted_values": "Emitted in rerun artifact; not compared because absent from historical benchmark."
   }
 }

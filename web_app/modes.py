@@ -7,8 +7,8 @@ from typing import Any, Dict, Optional
 def get_analysis_modes(repository_root: Optional[str] = None) -> Dict[str, Any]:
     """Describe modes without pretending uncommitted/unvalidated weights exist.
 
-    A learned mode becomes available only after a model registry that points to
-    an existing checkpoint and an inference adapter are all present.
+    Artifact presence is reported separately. The mode remains unavailable until
+    the HTTP server has an explicit, validated learned inference dispatcher.
     """
     root = repository_root or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     learned_dir = os.path.join(root, "experiments", "learned_models")

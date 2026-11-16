@@ -252,6 +252,27 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 * **Impact:** The reported model results could not be independently reproduced from the public checkout.
 * **Correction:** A learned-model audit records the missing evidence. The UI exposes Classical, Learned, and Hybrid modes but only enables Classical until a complete versioned model package, inference adapter, and explicit server-side dispatcher are implemented and validated.
 
+### Defect 2.19 — Candidate/Accepted Metrics Were Not Independently Re-Executed from the Full Dataset
+
+* Severity: High
+* Affected Files: scripts/run_fabricnet_benchmark.py, .github/workflows/tests.yml, results/fabricnet_benchmark_rerun_summary.json.
+* Root Cause: The committed 130-sample JSON had previously been structurally checked but not rerun through the entire image pipeline in the same CI execution.
+* Correction: CI now reruns all 130 FabricNET images through src.fabric_analysis, writes strict JSON/CSV artifacts, and compares predictions/statuses to the committed file. The 2026-11-16 rerun exactly reproduced 130/130 samples with zero changed values/statuses.
+
+### Defect 2.20 — Manual Five-Region Client Protocol Was Not Reflected in Aggregate Evaluation
+
+* Severity: High
+* Affected Files: src/fabric_analysis/ground_truth.py, src/fabric_analysis/validation_metrics.py, schemas/client_ground_truth.schema.json.
+* Root Cause: A specimen-level mean could be confused with a local-region label, and row-wise bootstrap could treat correlated regions from one specimen as independent observations.
+* Correction: Versioned five-region ground truth, region/specimen supervision separation, five-region specimen aggregation, all-five-predictions-required acceptance, and specimen-cluster bootstrap confidence intervals.
+
+### Defect 2.21 — Analysis Mode Selection Needed HTTP-Level and Feature-Preservation Tests
+
+* Severity: Medium
+* Affected Files: web_app/server.py, web_app/index.html, tests/test_web_server_integration.py, tests/test_web_ui_contract.py.
+* Root Cause: Static presence of selectors did not prove API enforcement or preservation of existing application routes/controls.
+* Correction: HTTP tests now exercise health/presets/model catalog, unknown and unavailable mode rejection, Classical analysis, and comparison execution. UI contract tests assert the legacy upload, preset, calibration, skew, diagnostic, and report controls remain present.
+
 ## 4. Remediation Plan & Architectural Single Source of Truth
 To permanently eliminate divergence, we will construct a clean, authoritative Python package `src/fabric_analysis/` containing:
 1. `calibration.py`: Independent $S_x, S_y$ physical scale object, unit conversions, pixel pitch.

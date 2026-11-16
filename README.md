@@ -389,7 +389,23 @@ An interactive, self-contained web application has been constructed to enable us
 | `/api/analyze` | `POST` | `{"image": "<base64>", "pixels_per_cm": 400.0, "auto_skew": true, "prominence": 0.012, "weave_hint": "plain"}` | `application/json` | Executes dual-engine thread analysis, returning thread densities, pitches, skew angle, confidence score, audit table, and Base64 diagnostic plots. |
 | `/reports/<file>` | `GET` | `<filename>.pdf` | `application/pdf` | Serves compiled technical demo reports (`warp_weft_report_en.pdf` and `warp_weft_report_ar.pdf`). |
 
-### 10.4. Launch Instructions
+### 10.4. Analysis Modes and Comparison
+
+The browser exposes three modes:
+
+- Classical deterministic: the existing FFT, spatial projection and evidence-fusion pipeline; available.
+- Learned models: visible but unavailable until a versioned model, checkpoint, and validated server inference dispatcher are committed.
+- Hybrid: visible but unavailable until learned yarn perception is integrated with calibrated physical measurement and validated.
+
+The model registry selector remains disabled when no verified inference implementation is present. Comparison mode runs every currently available method on the same image, displays the results and explicitly lists methods that were not executed. In the current repository checkout, only Classical can execute; comparison mode must not be interpreted as a three-model benchmark.
+
+The API adds GET /api/models for method availability and registered-model metadata. POST /api/analyze accepts analysis_mode and compare_methods. Requests for unavailable Learned/Hybrid modes return HTTP 409 instead of silently executing the deterministic engine under a false label.
+
+### 10.5. Reproducible FabricNET Benchmark
+
+The CI workflow executes scripts/run_fabricnet_benchmark.py over all 130 committed FabricNET images and uploads a JSON/CSV rerun artifact. The latest recorded run exactly reproduced the committed candidate estimates, accepted measurements and decision statuses across all 130 rows. See docs/FABRICNET_BENCHMARK_RERUN.md and results/fabricnet_benchmark_rerun_summary.json.
+
+### 10.6. Launch Instructions
 
 #### Option A: Standalone Execution (Recommended)
 Run the server directly via Python standard library on any machine:

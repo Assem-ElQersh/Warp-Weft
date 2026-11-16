@@ -144,3 +144,34 @@ For marginal projection profiles $P_{\text{warp}}(x)$ and $P_{\text{weft}}(y)$:
 6. The span-based density is:
    $$N_{\text{proj, span}} = \frac{K - 1}{(x_K - x_1) / S_x}$$
 7. If the intervals are highly regular ($\text{IQR} / \tilde{p}_x \le 0.15$), $N_{\text{proj, pitch}}$ and $N_{\text{proj, span}}$ converge. If irregular, outlier rejection is applied.
+
+
+---
+
+## 5. Client Ground Truth and Validation Design
+
+The client-confirmed manual protocol measures each specimen at five distinct locations over 1 cm, counts warp and weft independently at each location, and uses the average of the five readings as the specimen reference. The stated example is 31 ends/cm Warp and 27 picks/cm Weft, with inclusive ±2 factory tolerance. These specimen-level averages must not be copied onto individual region photographs as if they were local labels.
+
+The implemented data contract is versioned (schemas/client_ground_truth.schema.json, schema version 1.0.0). Each of five regions stores raw region Warp/Weft counts, exact measurement length, image identity or null, camera and calibration metadata, weave, lighting, focus, and date. A region is eligible for local supervised training only when its own photograph is tied to its own manual count. Specimen-only records remain separate.
+
+Evaluation now reports local-region metrics and specimen-level aggregates. A specimen aggregate is accepted on an axis only if all five regional model outputs are available on that axis. Cluster bootstrap resamples fabric_id specimens rather than treating five correlated regions as independent observations. All reported accuracies include explicit coverage and rejection rates.
+
+## 6. Learned-Model Evidence and Current Research Boundary
+
+The public repository baseline inspected for this work did not contain the reported experiments/learned_models directory, model notebooks, feature extraction source, checkpoint files, training logs, split manifests, real segmentation annotations, or learned inference dispatcher. The earlier agent's reported Random Forest, XGBoost, MLP, U-Net, Roboflow and FCN results therefore cannot currently be reproduced from the public checkout.
+
+Those results must remain unverified until the source code, exact input/label data, specimen-grouped splits, configurations, checkpoints and per-sample predictions are committed. In particular:
+
+- A synthetic U-Net mIoU is not real-fabric segmentation accuracy.
+- Roboflow object-detection mAP is not physical threads/cm accuracy.
+- A custom handcrafted feature vector should not be described as an exact reproduction of FabricNET's IFV method without code-level equivalence.
+- The legacy TextileDefectDetection FCN is a reference candidate whose paired illumination input assumptions differ from the client's single smartphone exposure.
+- Learned regression, yarn segmentation, and hybrid segmentation-plus-geometric-measurement are separate experiments.
+
+The webpage now exposes Classical, Learned and Hybrid choices, but only Classical is enabled because it is the only mode with an implemented inference path in this checkout. Method-comparison mode executes every currently available method and labels unavailable methods explicitly. It does not fabricate learned results.
+
+## 7. Deterministic Benchmark Reproduction Result
+
+A dedicated CI runner re-executed all 130 FabricNET images using the authoritative src.fabric_analysis engine and the nominal 5 × 4 mm FOV (1280 × 1200 px/cm). The rerun exactly reproduced all candidate predictions, accepted densities and decision statuses in the committed benchmark (zero changed fields across 130 images). This establishes source/data/configuration reproducibility, not satisfaction of the client's ±2 tolerance in a smartphone/factory acquisition domain.
+
+See docs/FABRICNET_BENCHMARK_RERUN.md for the full per-weave breakdown, acceptance coverage, confidence intervals and artifact provenance.

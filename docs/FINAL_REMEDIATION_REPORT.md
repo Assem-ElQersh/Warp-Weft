@@ -6,7 +6,7 @@
 ## 1. Executive Summary
 This report documents the comprehensive remediation of the Warp & Weft AI codebase. Prior to this remediation, the project suffered from 15 confirmed architectural and mathematical defects, including hardcoded validation values on benchmark samples, an invalid square-pixel assumption that distorted anisotropic optical microscopy scales ($S_x=1280.0\text{ px/cm}, S_y=1200.0\text{ px/cm}$), undersized ROI reporting without physical coverage disclosure, naive peak detection suppressing high yarn counts, blind defaulting to 2D FFT on estimator divergence, and parallel divergent implementations across notebooks and the production web server.
 
-To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression test suite comprising 20 passing unit tests (`tests/`), benchmarked the remediated pipeline across all 130 physical microscopy images in the FabricNET dataset, and eliminated all hardcoded validation claims.
+To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression suite. The current feature branch passes 51 Python tests and an inline JavaScript syntax check in GitHub Actions. A separate reproducibility step reruns all 130 FabricNET images and compares every candidate prediction, accepted density, and decision status against the committed benchmark.
 
 ---
 
@@ -95,6 +95,16 @@ Notebook 04 records pred_warp and pred_weft by taking the accepted fused density
 The actual accepted fields in the benchmark JSON provide 25 Warp outputs (19.2% coverage; accepted-only MAE 2.48; 80.0% within ±2) and 32 Weft outputs (24.6% coverage; accepted-only MAE 2.38; 62.5% within ±2). Rejected rows remain in the coverage denominator. The sample-level decision counts are 15 VALIDATED, 27 CONSISTENT_WITH_WARNING, and 88 NEEDS_REVIEW. This corrects the earlier 0 VALIDATED / 42 WARNING documentation mismatch.
 
 The offline orientation-invariant metric selects a swap by comparing candidate errors to ground truth. It is an oracle-assisted diagnostic and must not be presented as deployable accuracy.
+
+### 4.3. Independent full 130-image reproduction (2026-11-16)
+
+The new scripts/run_fabricnet_benchmark.py was executed by GitHub Actions against the committed 130 JPEG images and FabricNet_parameters.xlsx. Run [43904962934](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43904962934) completed successfully, processed all 130/130 samples, and uploaded fabricnet-benchmark-rerun (artifact ID 14246080718; SHA-256 b7f18527ea8fa5f08d868750f5a877369664028b1dee4ea8784ad369018aa10a).
+
+The rerun exactly matched the committed benchmark for all 130 rows: zero changed candidate Warp/Weft values, zero changed accepted Warp/Weft values, and zero changed decision statuses. Maximum absolute numeric delta was zero for all four density fields. This verifies deterministic reproducibility of the current code/data/configuration, not physical measurement accuracy.
+
+Accepted-output coverage is 25/130 Warp (19.23%) and 32/130 Weft (24.62%). Accepted-only MAE is 2.48 ends/cm Warp and 2.375 picks/cm Weft; the 95% group-bootstrap intervals are [1.44, 3.601] and [1.71875, 3.0625], respectively. Candidate-estimate MAE remains 13.4318 Warp and 11.249 Weft. Per-weave results and methodology are recorded in docs/FABRICNET_BENCHMARK_RERUN.md.
+
+The same CI run passed 51 Python tests, including HTTP integration tests for existing health/preset routes, Classical analysis, mode rejection, and method comparison, plus the inline JavaScript syntax check.
 
 ## 5. Weave Architecture & Physical Domain Boundaries
 

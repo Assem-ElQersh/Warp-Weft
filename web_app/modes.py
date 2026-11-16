@@ -19,14 +19,19 @@ def get_analysis_modes(repository_root: Optional[str] = None) -> Dict[str, Any]:
     try:
         with open(registry, "r", encoding="utf-8") as handle:
             registry_data = json.load(handle)
-        checkpoint_path = registry_data.get("checkpoint_path")
-        checkpoint_ready = bool(
-            isinstance(checkpoint_path, str)
-            and checkpoint_path
-            and os.path.isfile(os.path.join(learned_dir, checkpoint_path))
-        )
+        if isinstance(registry_data, dict):
+            checkpoint_path = registry_data.get("checkpoint_path")
+            if isinstance(checkpoint_path, str) and checkpoint_path:
+                learned_root = os.path.realpath(learned_dir)
+                resolved_checkpoint = os.path.realpath(os.path.join(learned_root, checkpoint_path))
+                try:
+                    within_learned_root = os.path.commonpath([learned_root, resolved_checkpoint]) == learned_root
+                except ValueError:
+                    within_learned_root = False
+                checkpoint_ready = within_learned_root and os.path.isfile(resolved_checkpoint)
     except (OSError, ValueError, TypeError):
         checkpoint_ready = False
+        registry_data = {}
     artifacts_present = checkpoint_ready and os.path.isfile(adapter)
     raw_models = registry_data.get("models", []) if isinstance(registry_data, dict) else []
     registered_models = []

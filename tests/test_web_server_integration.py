@@ -72,6 +72,15 @@ class TestWebServerIntegration(unittest.TestCase):
         self.assertEqual(status, 400)
         self.assertEqual(result["code"], "unknown_analysis_mode")
 
+
+    def test_compare_methods_requires_a_boolean(self):
+        status, result, _ = self.request("POST", "/api/analyze", {
+            "compare_methods": "false",
+            "image": "not-valid-base64",
+        })
+        self.assertEqual(status, 400)
+        self.assertEqual(result["code"], "invalid_compare_methods")
+
     def test_classical_mode_still_runs_through_http_api(self):
         status, result, _ = self.request("POST", "/api/analyze", {
             "analysis_mode": "classical",
@@ -112,6 +121,7 @@ class TestWebServerIntegration(unittest.TestCase):
             {item["id"] for item in comparison["unavailable_methods"]},
             {"learned", "hybrid"},
         )
+        self.assertIn("candidate_measurements", comparison["methods"][0])
 
 
 if __name__ == "__main__":

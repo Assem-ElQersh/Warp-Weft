@@ -954,7 +954,7 @@
                     <table class="audit-table">
                         <thead>
                             <tr>
-                                <th>Method</th><th>Warp (ends/cm)</th><th>Weft (picks/cm)</th><th>Status</th><th>SQI</th><th>Latency</th>
+                                <th id="th-comparison-method">Method</th><th id="th-comparison-warp">Accepted Warp</th><th id="th-comparison-weft">Accepted Weft</th><th id="th-comparison-candidate-warp">FFT candidate Warp</th><th id="th-comparison-candidate-weft">FFT candidate Weft</th><th id="th-comparison-status">Status</th><th id="th-comparison-sqi">SQI</th><th id="th-comparison-latency">Latency</th>
                             </tr>
                         </thead>
                         <tbody id="comparison-rows"></tbody>
@@ -1108,6 +1108,14 @@
                 noRegisteredModels: "No validated models registered",
                 compareMethods: "Compare all available methods on the same image",
                 comparisonTitle: "Method Comparison",
+                comparisonMethod: "Method",
+                comparisonWarp: "Accepted Warp (ends/cm)",
+                comparisonWeft: "Accepted Weft (picks/cm)",
+                comparisonCandidateWarp: "FFT candidate Warp",
+                comparisonCandidateWeft: "FFT candidate Weft",
+                comparisonStatus: "Status",
+                comparisonSqi: "SQI",
+                comparisonLatency: "Latency",
                 comparisonSkipped: "Not executed",
                 modeClassical: "Classical deterministic (available)",
                 modeLearned: "Learned models (unavailable)",
@@ -1155,6 +1163,14 @@
                 noRegisteredModels: "لا توجد نماذج معتمدة مسجلة",
                 compareMethods: "مقارنة جميع الطرق المتاحة على نفس الصورة",
                 comparisonTitle: "مقارنة طرق التحليل",
+                comparisonMethod: "الطريقة",
+                comparisonWarp: "السداء المقبول (خيط/سم)",
+                comparisonWeft: "اللحمة المقبولة (خيط/سم)",
+                comparisonCandidateWarp: "مرشح فورييه للسداء",
+                comparisonCandidateWeft: "مرشح فورييه للحمة",
+                comparisonStatus: "الحالة",
+                comparisonSqi: "مؤشر الجودة",
+                comparisonLatency: "الزمن",
                 comparisonSkipped: "لم يتم التنفيذ",
                 modeClassical: "خوارزميات حتمية (متاح)",
                 modeLearned: "نماذج مدربة (غير متاحة)",
@@ -1235,6 +1251,14 @@
             document.getElementById('lbl-learned-model').innerText = strings.learnedModel;
             document.getElementById('txt-compare-methods').innerText = strings.compareMethods;
             document.getElementById('comparison-title').innerText = strings.comparisonTitle;
+            document.getElementById('th-comparison-method').innerText = strings.comparisonMethod;
+            document.getElementById('th-comparison-warp').innerText = strings.comparisonWarp;
+            document.getElementById('th-comparison-weft').innerText = strings.comparisonWeft;
+            document.getElementById('th-comparison-candidate-warp').innerText = strings.comparisonCandidateWarp;
+            document.getElementById('th-comparison-candidate-weft').innerText = strings.comparisonCandidateWeft;
+            document.getElementById('th-comparison-status').innerText = strings.comparisonStatus;
+            document.getElementById('th-comparison-sqi').innerText = strings.comparisonSqi;
+            document.getElementById('th-comparison-latency').innerText = strings.comparisonLatency;
             const modeSelect = document.getElementById('select-analysis-mode');
             modeSelect.options[0].text = strings.modeClassical;
             modeSelect.options[1].text = strings.modeLearned;
@@ -1532,6 +1556,8 @@
                     method.label || method.id,
                     method.warp_ends_per_cm == null ? "Not accepted" : method.warp_ends_per_cm,
                     method.weft_picks_per_cm == null ? "Not accepted" : method.weft_picks_per_cm,
+                    method.candidate_measurements && method.candidate_measurements.warp_fft != null ? method.candidate_measurements.warp_fft : "--",
+                    method.candidate_measurements && method.candidate_measurements.weft_fft != null ? method.candidate_measurements.weft_fft : "--",
                     method.decision_status || method.status || "Unknown",
                     method.signal_quality_index == null ? "--" : `${method.signal_quality_index}%`,
                     method.latency_ms == null ? "--" : `${method.latency_ms} ms`

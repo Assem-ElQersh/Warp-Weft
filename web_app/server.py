@@ -196,9 +196,15 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 content_length = int(self.headers.get("Content-Length", 0))
                 raw_body = self.rfile.read(content_length)
                 payload = json.loads(raw_body.decode("utf-8"))
+                if not isinstance(payload, dict):
+                    self.send_json_response({"status": "error", "code": "invalid_payload", "error": "Request payload must be a JSON object."}, status_code=400)
+                    return
 
                 # 0. Enforce requested analysis-mode availability before decoding image bytes.
-                compare_methods = bool(payload.get("compare_methods", False))
+                compare_methods = payload.get("compare_methods", False)
+                if not isinstance(compare_methods, bool):
+                    self.send_json_response({"status": "error", "code": "invalid_compare_methods", "error": "compare_methods must be a JSON boolean."}, status_code=400)
+                    return
                 analysis_mode = "classical" if compare_methods else str(payload.get("analysis_mode", "classical")).strip().lower()
                 mode_catalog = get_analysis_modes(WORKSPACE_ROOT)
                 mode_map = {item["id"]: item for item in mode_catalog["modes"]}

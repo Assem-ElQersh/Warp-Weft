@@ -27,6 +27,7 @@ class TestWebUIContract(unittest.TestCase):
             "select-analysis-mode", "select-learned-model",
             "model-config-status", "chk-compare-methods",
             "comparison-panel", "comparison-rows", "comparison-unavailable",
+            "th-comparison-candidate-warp", "th-comparison-candidate-weft",
         ):
             with self.subTest(element_id=element_id):
                 self.assertIn(f'id="{element_id}"', self.html)

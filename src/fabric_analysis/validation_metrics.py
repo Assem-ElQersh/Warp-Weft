@@ -76,6 +76,7 @@ def axis_metrics(
         "mean_signed_bias": None,
         "within_1_pct": None,
         "within_2_pct": None,
+        "within_tolerance_pct": None,
         "runtime_mean_ms": round(sum(accepted_runtimes) / len(accepted_runtimes), 3) if accepted_runtimes else None,
         "runtime_median_ms": round(median(accepted_runtimes), 3) if accepted_runtimes else None,
         "runtime_observations": len(accepted_runtimes),
@@ -91,7 +92,8 @@ def axis_metrics(
         "median_absolute_error": round(median(errors), 6),
         "mean_signed_bias": round(sum(signed_errors) / predicted, 6),
         "within_1_pct": round(sum(error <= 1.0 for error in errors) / predicted * 100.0, 2),
-        "within_2_pct": round(sum(error <= tol for error in errors) / predicted * 100.0, 2),
+        "within_2_pct": round(sum(error <= 2.0 for error in errors) / predicted * 100.0, 2),
+        "within_tolerance_pct": round(sum(error <= tol for error in errors) / predicted * 100.0, 2),
     })
 
     if bootstrap_samples:

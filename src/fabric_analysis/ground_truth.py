@@ -22,6 +22,8 @@ def _required_text(value: Any, field: str) -> str:
 def _optional_positive_float(value: Any, field: str) -> Optional[float]:
     if value is None:
         return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{field} must be a finite positive number or null")
     result = float(value)
     if not isfinite(result) or result <= 0:
         raise ValueError(f"{field} must be a finite positive number or null")
@@ -61,6 +63,8 @@ class RegionMeasurement:
             value = getattr(self, field)
             if isinstance(value, bool) or not isinstance(value, int) or value < 0:
                 raise ValueError(f"{field} must be a non-negative integer")
+        if isinstance(self.measurement_length_cm, bool) or not isinstance(self.measurement_length_cm, (int, float)):
+            raise ValueError("measurement_length_cm must be a finite positive number")
         length = float(self.measurement_length_cm)
         if not isfinite(length) or length <= 0:
             raise ValueError("measurement_length_cm must be finite and positive")

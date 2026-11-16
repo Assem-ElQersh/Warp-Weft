@@ -1,5 +1,7 @@
 # Client Ground-Truth Collection Protocol
 
+**Schema version:** 1.0.0 (schema_version is required by the JSON schema and Python parser).
+
 ## Purpose and client-confirmed acceptance rule
 
 The client measures one physical fabric specimen at five distinct locations. At each location, the operator marks a 1 cm measurement length, counts warp ends and weft picks, and computes the specimen average across the five readings.
@@ -56,6 +58,8 @@ FabricNET's published/repository nominal optical geometry is different from the 
 
 ## Validation metrics
 
+Report both local-region accuracy and specimen-aggregate accuracy. Specimen-aggregate predictions are averages of all five regional predictions and are accepted only when all five regional predictions exist for that axis. Do not use a partial four-of-five prediction average as if it were the client five-location procedure.
+
 Report separately for warp and weft:
 
 - MAE and RMSE.
@@ -65,7 +69,7 @@ Report separately for warp and weft:
 - Number of eligible predictions, rejected predictions, coverage, and rejection rate.
 - Runtime statistics.
 - Per-weave and per-specimen breakdowns.
-- A bootstrap 95% confidence interval for MAE where sample size supports it.
+- A bootstrap 95% confidence interval for MAE where sample size supports it. For region-level results, resample fabric_id clusters rather than individual regions; for specimen-aggregate results, resample specimens.
 
 Compute error statistics only on predictions that were actually returned, but always report coverage/rejection using all eligible rows as the denominator. Never convert a rejected measurement into a candidate FFT prediction for the purpose of accepted-measurement accuracy.
 
@@ -77,7 +81,7 @@ All regions, crops, augmentations, and repeat images belonging to one physical s
 
 ## Machine-readable implementation
 
-- Schema: schemas/client_ground_truth.schema.json
+- Schema: schemas/client_ground_truth.schema.json (version 1.0.0)
 - Python types and validation: src/fabric_analysis/ground_truth.py
 - Metrics: src/fabric_analysis/validation_metrics.py
 - Specimen-grouped folds and holdout splits: src/fabric_analysis/grouped_splits.py

@@ -30,6 +30,58 @@ class TestValidationMetrics(unittest.TestCase):
         self.assertEqual(result["coverage_pct"], 0.0)
         self.assertEqual(result["rejection_rate_pct"], 100.0)
 
+
+    def test_cluster_bootstrap_resamples_specimens_not_individual_regions(self):
+        targets = [10, 10, 10, 20, 20, 20]
+        predictions = [9, 9, 9, 22, 22, 22]
+        groups = ["A", "A", "A", "B", "B", "B"]
+        result = axis_metrics(targets, predictions, groups=groups, bootstrap_samples=100, seed=11)
+        self.assertEqual(result["mae_bootstrap_95_ci"]["unit"], "group")
+        self.assertEqual(result["mae_bootstrap_95_ci"]["group_count"], 2)
+        self.assertEqual(result["mae_bootstrap_95_ci"], axis_metrics(
+            targets, predictions, groups=groups, bootstrap_samples=100, seed=11
+        )["mae_bootstrap_95_ci"])
+
+    def test_specimen_aggregate_uses_five_region_means_and_rejects_partial_predictions(self):
+        records = []
+        for region in range(5):
+            records.append({
+                "fabric_id": "A", "weave_type": "plain",
+                "warp_manual_density": 30 + region,
+                "weft_manual_density": 26 + region,
+                "warp_predicted_density": 31 + region,
+                "weft_predicted_density": 27 + region,
+                "runtime_ms": 10,
+            })
+            records.append({
+                "fabric_id": "B", "weave_type": "twill",
+                "warp_manual_density": 32,
+                "weft_manual_density": 28,
+                "warp_predicted_density": None if region == 4 else 32,
+                "weft_predicted_density": 28,
+                "runtime_ms": 12,
+            })
+        result = evaluate_prediction_records(records, bootstrap_samples=100)
+        aggregate = result["specimen_aggregate"]
+        self.assertEqual(aggregate["protocol_regions_per_specimen"], 5)
+        self.assertEqual(aggregate["warp"]["n_total"], 2)
+        self.assertEqual(aggregate["warp"]["n_predicted"], 1)
+        self.assertEqual(aggregate["warp"]["n_rejected"], 1)
+        self.assertEqual(aggregate["specimens"][0]["fabric_id"], "A")
+        self.assertEqual(aggregate["specimens"][0]["warp_manual_density"], 32.0)
+        self.assertEqual(aggregate["specimens"][0]["warp_predicted_density"], 33.0)
+        self.assertIsNone(aggregate["specimens"][1]["warp_predicted_density"])
+        self.assertEqual(aggregate["weft"]["n_predicted"], 2)
+
+    def test_specimen_aggregate_rejects_incomplete_five_region_groups(self):
+        records = [{
+            "fabric_id": "A", "weave_type": "plain",
+            "warp_manual_density": 31, "weft_manual_density": 27,
+            "warp_predicted_density": 31, "weft_predicted_density": 27,
+        }]
+        with self.assertRaisesRegex(ValueError, "exactly 5 region records"):
+            evaluate_prediction_records(records)
+
     def test_per_weave_and_per_specimen_breakdowns(self):
         records = [
             {"fabric_id":"A","weave_type":"plain","warp_manual_density":31,"weft_manual_density":27,"warp_predicted_density":31,"weft_predicted_density":27,"runtime_ms":10},

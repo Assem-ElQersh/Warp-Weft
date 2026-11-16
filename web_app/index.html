@@ -1099,7 +1099,7 @@
                 dropHint: "or click to browse JPG, PNG, WEBP, BMP",
                 lblCalibration: "Spatial Calibration Scale",
                 lblPixelsCm: "Pixels per Centimeter (px/cm)",
-                lblWeaveHint: "Weave Architecture Hint",
+                lblWeaveHint: "Weave label (metadata only)",
                 lblProminence: "Peak Prominence Sensitivity",
                 autoSkew: "Auto Skew Detection & Rectification",
                 runText: "Run Thread Analysis",
@@ -1137,14 +1137,14 @@
                 bannerText: "Ready to present to clients or review complete scientific derivations?",
                 btnDlEn: "Download English PDF",
                 btnDlAr: "تحميل التقرير الفني (عربي)",
-                helpScale: "Relates image pixels to physical metric distance. Optimal choices: 1280 px/cm for USB digital microscopes (FabricNET scale), 1200 px/cm for 10× pick-glass magnifiers, or 400 px/cm for direct smartphone macro close-ups.",
-                helpWeave: "Informs the decision arbiter of the interlacing topology. Plain weave uses balanced 50/50 consensus. Twill and satin weaves feature long float ridges that flatten 1D projection troughs; choosing Twill/Satin weights 2D FFT harmonics dominant (70% FFT / 30% Proj) to prevent float undercounting.",
+                helpScale: "Relates pixels to physical distance. The listed scales are presets, not guarantees. Smartphone magnification varies; calibrate with a known reference in the same plane, lens, focus, and zoom. FabricNET's 1280 × 1200 px/cm is specific to its 5 × 4 mm microscopy field of view.",
+                helpWeave: "The weave label is currently passed as metadata only. The current spectral selector and evidence-fusion arbiter do not branch on it, so changing this control does not currently change the density estimate. Do not treat it as a validated model or weighting option.",
                 helpProminence: "Minimum altitude drop for a spatial projection peak to qualify as a real yarn crown. Lower values (0.006–0.010) capture subtle fine yarns in poplin/satin; higher values (0.016–0.025) filter out fiber hairiness in fuzzy fabrics. Default 0.012 is balanced for standard weaves.",
                 helpSkew: "Automatically detects fabric placement tilt between -45° and +45° via 2D FFT Polar Radon integration and rotates the swatch before spatial projection, preventing profile contrast collapse.",
                 helpKpiWarp: "Vertical lengthwise threads per 1.0 physical centimeter (10,000 µm). Dictates longitudinal tensile strength.",
                 helpKpiWeft: "Horizontal crosswise filling threads (picks) per 1.0 physical centimeter (10,000 µm). Dictates crosswise elasticity and compactness.",
-                helpKpiTotal: "Combined areal thread count per square centimeter (Threads/cm² = Warp × Weft). Indicates fabric tightness and weight class.",
-                helpKpiQuality: "Multi-factor composite confidence score: Q = 35% Spectral Sharpness (SPNR) + 35% Projection Contrast Variance + 30% Inter-Engine Concordance. Scores > 60% indicate verified analytical certainty."
+                helpKpiTotal: "The displayed linear sum is Warp + Weft in threads/cm. The separate areal intersection density is Warp × Weft in crossings/cm²; it is shown in the skew/details line when both axes are accepted.",
+                helpKpiQuality: "Heuristic Signal Quality Index combining spectral peak-to-noise ratio, projection contrast, estimator discrepancy, and interval regularity. It is not a probability and does not independently verify physical accuracy; inspect decision status and calibration-only bounds."
             },
             ar: {
                 appTitle: "القياس الآلي لكثافة خيوط النسيج (سداء ولحمة)",
@@ -1156,7 +1156,7 @@
                 dropHint: "أو اضغط لاختيار ملف من جهازك (JPG, PNG, WEBP)",
                 lblCalibration: "مقياس المعايرة المكانية",
                 lblPixelsCm: "عدد البكسلات لكل سنتيمتر (بكسل/سم)",
-                lblWeaveHint: "نوع التركيب النسجي",
+                lblWeaveHint: "نوع النسيج (بيانات وصفية فقط)",
                 lblProminence: "حساسية بروز قمم الخيوط",
                 autoSkew: "كشف وتصحيح الانحراف الزاوي أوتوماتيكياً",
                 runText: "بدء تحليل كثافة الخيوط",
@@ -1194,14 +1194,14 @@
                 bannerText: "هل ترغب في استعراض التقرير الهندسي الكامل المعتمد للعميل؟",
                 btnDlEn: "English PDF Report",
                 btnDlAr: "تحميل التقرير الفني بالعربية (PDF)",
-                helpScale: "يربط بكسلات الصورة بالقياس المتري الفعلي. الخيارات المثالية: 1280 بكسل/سم للميكروسكوب الرقمي (مقياس FabricNET)، أو 1200 بكسل/سم لعدسة قياس النسيج (Pick-Glass 10x)، أو 400 بكسل/سم لكاميرا الهاتف الماكرو.",
-                helpWeave: "يحدد نوع التركيب النسجي للقماش. النسج السادة يعتمد توافقاً متوازناً بين المحركين. أنسجة المبرد والأطلس تتميز بتراكيب طولية (Floats) تضعف قمم الإسقاط الخطي؛ اختيار المبرد أو الأطلس يوجه المحرك للاعتماد على فورييه 2D لتجنب نقص العد.",
+                helpScale: "يربط البكسلات بالمسافة الفعلية. القيم المعروضة إعدادات مسبقة وليست ضماناً للمعايرة. يختلف تكبير الهاتف؛ يجب المعايرة باستخدام مرجع معلوم في نفس المستوى والعدسة والتركيز والتكبير. قيمة FabricNET ‏1280 × 1200 بكسل/سم خاصة بمجال تصوير مجهري 5 × 4 مم.",
+                helpWeave: "يُمرر نوع النسيج حالياً كبيانات وصفية فقط. لا يغيّر محرك اختيار الترددات أو دمج الأدلة طريقة الحساب بناءً عليه؛ لذلك لا يؤدي تغيير هذا الخيار حالياً إلى تغيير التقدير. لا تعتبره إعداداً معتمداً للنموذج أو أوزان المحركات.",
                 helpProminence: "الارتفاع الأدنى لقمة الإسقاط لاعتبارها خيطاً فعلياً. القيم المنخفضة (0.006–0.010) تلتقط الخيوط الدقيقة الناعمة في الأطلس والبوبلين، بينما القيم المرتفعة (0.016–0.025) تتجاهل الشعيرات السطحية والوبر. القيمة الافتراضية 0.012 متوازنة للأقمشة القياسية.",
                 helpSkew: "يكتشف ميلان القماش تلقائياً عبر فحص طاقة الترددات في مجال فورييه بين -45° و+45°، ثم يعدل دوران العينة لحماية تباين الإسقاط الخطي من الانهيار.",
                 helpKpiWarp: "عدد خيوط السداء الرأسية لكل 1.0 سم متري (10,000 ميكرومتر). يحدد مقاومة الشد الطولي للقماش.",
                 helpKpiWeft: "عدد خيوط اللحمة العرضية لكل 1.0 سم متري (10,000 ميكرومتر). يحدد كثافة النسيج العرضي ومرونته.",
-                helpKpiTotal: "الكثافة الإجمالية المحسوبة لمساحة السنتيمتر المربع (خيوط/سم² = السداء × اللحمة). تدل على تماسك القماش ووزنه.",
-                helpKpiQuality: "درجة موثوقية مركبة: 35% وضوح ترددات فورييه + 35% تباين الإسقاط الخطي + 30% نسبة التوافق بين المحركين. نسبة أعلى من 60% تعكس ثقة تحليلية عالية."
+                helpKpiTotal: "المجموع المعروض خطي: السداء + اللحمة بوحدة خيط/سم. أما كثافة التقاطعات المساحية فهي حاصل الضرب السداء × اللحمة بوحدة تقاطع/سم²، وتظهر في سطر الميل والتفاصيل عند قبول المحورين.",
+                helpKpiQuality: "مؤشر جودة إشارة استدلالي يجمع نسبة الإشارة إلى الضوضاء وتباين الإسقاط واختلاف المحركات وانتظام الفواصل. ليس احتمالاً إحصائياً ولا يثبت الدقة الفيزيائية بمفرده؛ راجع حالة القرار وحدود عدم يقين المعايرة.",
             }
         };
 

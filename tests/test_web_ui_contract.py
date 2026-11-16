@@ -40,6 +40,13 @@ class TestWebUIContract(unittest.TestCase):
         self.assertIn("calibrationUnverified", self.html)
         self.assertIn("Calibration-only bounds are distinct from image/model confidence", self.html)
 
+    def test_weave_and_quality_help_do_not_claim_unimplemented_weighting_or_probability(self):
+        self.assertIn("metadata only", self.html)
+        self.assertIn("does not currently change the density estimate", self.html)
+        self.assertIn("It is not a probability", self.html)
+        self.assertNotIn("70% FFT / 30% Proj", self.html)
+        self.assertNotIn("Scores > 60% indicate verified analytical certainty", self.html)
+
     def test_bilingual_mode_and_comparison_labels_exist(self):
         for phrase in (
             "Compare all available methods on the same image",

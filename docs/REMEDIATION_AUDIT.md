@@ -26,7 +26,7 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 | `data/synthetic/macro_swatch_skewed_12deg.png` | PNG image | 453.6 KB | Inspected (100%) | Synthetic test swatch ($800 \times 800$ px, $+12^\circ$ tilt) |
 | `data/synthetic/sample_plain_32x28.png` | PNG image | 132.7 KB | Inspected (100%) | Synthetic test swatch ($400 \times 400$ px, $0^\circ$ tilt) |
 | `data/synthetic/sample_skewed_15deg.png` | PNG image | 116.7 KB | Inspected (100%) | Synthetic test swatch ($400 \times 400$ px, $+15^\circ$ tilt) |
-| `results/fabricnet_benchmark.json` | JSON | 1.4 KB | Inspected (100%) | Recorded benchmark output for W012, W017, W001, W067 |
+| `results/fabricnet_benchmark.json` | JSON | ~90 KB | Inspected (100%) | 130-sample FabricNET v2 candidate/accepted metrics and per-sample statuses |
 | `results/output.json` | JSON | 1.1 KB | Inspected (100%) | Recorded end-to-end production verification metrics |
 | `results/output.txt` | Text | 767 B | Inspected (100%) | Raw benchmark execution log |
 | `results/output_skew.json` | JSON | 477 B | Inspected (100%) | Skew engine metrics |
@@ -227,6 +227,58 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 * **Impact:** Broken external reproducibility.
 
 ---
+
+### Defect 2.16 — Candidate FFT Fallback Reported as a Direct Prediction
+
+* **Severity:** High
+* **Affected Files:** notebooks/04_real_fabric_benchmark.ipynb, results/fabricnet_benchmark.json, README benchmark tables.
+* **Root Cause:** Notebook 04 substitutes the FFT candidate when the evidence arbiter returns None for an accepted density. The resulting 13.43/11.25 MAE is a candidate-estimate metric, not accepted-output accuracy.
+* **Impact:** Candidate error and measurement coverage were conflated. A rejected candidate could be interpreted as a delivered measurement.
+* **Correction:** Benchmark artifacts now distinguish candidate estimates from accepted output, preserve nulls for rejected axes, and report accepted coverage separately.
+
+### Defect 2.17 — Benchmark Status Documentation Contradicted Serialized Sample Records
+
+* **Severity:** High
+* **Affected Files:** results/fabricnet_benchmark.json, data/README.md, docs/FINAL_REMEDIATION_REPORT.md.
+* **Root Cause:** The JSON sample records sum to 15 VALIDATED, 27 CONSISTENT_WITH_WARNING, and 88 NEEDS_REVIEW, while older documentation claimed 0 validated and 42 warning.
+* **Impact:** The published status breakdown was inconsistent with the underlying 130 rows.
+* **Correction:** Documentation and summary fields are reconciled to the sample records. Non-standard JSON NaN tokens are converted to standard JSON null.
+
+### Defect 2.18 — Learned-Model Claims Were Not Reproducible from Public Main
+
+* **Severity:** High
+* **Affected Files:** experiments/learned_models/ (absent at audit baseline), model reports, webpage.
+* **Root Cause:** The public tree at 8f55927 did not contain the reported learned-model notebooks, checkpoints, feature source, split manifests, or inference implementation.
+* **Impact:** The reported model results could not be independently reproduced from the public checkout.
+* **Correction:** A learned-model audit records the missing evidence. The UI exposes Classical, Learned, and Hybrid modes but only enables Classical until a complete versioned model package, inference adapter, and explicit server-side dispatcher are implemented and validated.
+
+### Defect 2.19 — Candidate/Accepted Metrics Were Not Independently Re-Executed from the Full Dataset
+
+* Severity: High
+* Affected Files: scripts/run_fabricnet_benchmark.py, .github/workflows/tests.yml, results/fabricnet_benchmark_rerun_summary.json.
+* Root Cause: The committed 130-sample JSON had previously been structurally checked but not rerun through the entire image pipeline in the same CI execution.
+* Correction: CI now reruns all 130 FabricNET images through src.fabric_analysis, writes strict JSON/CSV artifacts, and compares predictions/statuses to the committed file. The 2026-11-16 rerun exactly reproduced 130/130 samples with zero changed values/statuses.
+
+### Defect 2.20 — Manual Five-Region Client Protocol Was Not Reflected in Aggregate Evaluation
+
+* Severity: High
+* Affected Files: src/fabric_analysis/ground_truth.py, src/fabric_analysis/validation_metrics.py, schemas/client_ground_truth.schema.json.
+* Root Cause: A specimen-level mean could be confused with a local-region label, and row-wise bootstrap could treat correlated regions from one specimen as independent observations.
+* Correction: Versioned five-region ground truth, region/specimen supervision separation, five-region specimen aggregation, all-five-predictions-required acceptance, and specimen-cluster bootstrap confidence intervals.
+
+### Defect 2.21 — Analysis Mode Selection Needed HTTP-Level and Feature-Preservation Tests
+
+* Severity: Medium
+* Affected Files: web_app/server.py, web_app/index.html, tests/test_web_server_integration.py, tests/test_web_ui_contract.py.
+* Root Cause: Static presence of selectors did not prove API enforcement or preservation of existing application routes/controls.
+* Correction: HTTP tests now exercise health/presets/model catalog, unknown and unavailable mode rejection, Classical analysis, and comparison execution. UI contract tests assert the legacy upload, preset, calibration, skew, diagnostic, and report controls remain present.
+
+### Defect 2.22 — First- and Second-Remediation Benchmark Results Needed Historical Source Reproduction
+
+* Severity: High
+* Affected Files: scripts/run_first_remediation_benchmark.py, scripts/run_fabricnet_benchmark.py, .github/workflows/tests.yml.
+* Root Cause: The two published benchmark summaries came from different engine revisions and had not both been re-executed from their exact source revisions in a common CI run.
+* Correction: CI runs the first-remediation source in a detached worktree at 7b9b55f and the second-remediation source on the current authoritative package. Both process all 130 images and exactly reproduce their own saved prediction/status records. The common direct-axis comparison shows second-version candidate MAE is worse, while accepted-only MAE improves only on a small selective subset.
 
 ## 4. Remediation Plan & Architectural Single Source of Truth
 To permanently eliminate divergence, we will construct a clean, authoritative Python package `src/fabric_analysis/` containing:

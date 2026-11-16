@@ -1,0 +1,62 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime/test dependencies
+        run: python -m pip install --upgrade pip numpy Pillow openpyxl
+      - name: Compile Python modules
+        run: python -m compileall -q src web_app tests scripts
+      - name: Validate inline webpage JavaScript
+        run: python scripts/check_inline_javascript.py
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Prepare original main baseline worktree
+        run: |
+          git fetch --no-tags origin 8f55927d910197d6778b2d56217092973bf9cc56
+          git worktree add --detach ${{ runner.temp }}/warp-weft-original-main 8f55927d910197d6778b2d56217092973bf9cc56
+      - name: Run original main baseline tests (retrospective)
+        working-directory: ${{ runner.temp }}/warp-weft-original-main
+        run: python -m unittest discover -s tests -v
+      - name: Prepare first-remediation source worktree
+        run: |
+          git fetch --no-tags origin 7b9b55fdcd6e7e08d9b591b6b55d862a116f4c0e
+          git worktree add --detach ${{ runner.temp }}/warp-weft-first-remediation 7b9b55fdcd6e7e08d9b591b6b55d862a116f4c0e
+          mkdir -p ${{ runner.temp }}/warp-weft-first-remediation/scripts
+          cp scripts/run_first_remediation_benchmark.py ${{ runner.temp }}/warp-weft-first-remediation/scripts/
+      - name: Re-run first-remediation engine on all 130 FabricNET images
+        run: python ${{ runner.temp }}/warp-weft-first-remediation/scripts/run_first_remediation_benchmark.py --output-dir ${{ runner.temp }}/first-remediation-benchmark
+      - name: Upload first-remediation benchmark outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: first-remediation-fabricnet-rerun
+          path: ${{ runner.temp }}/first-remediation-benchmark/
+          if-no-files-found: error
+      - name: Re-run all 130 FabricNET images
+        run: python scripts/run_fabricnet_benchmark.py --output-dir ${{ runner.temp }}/fabricnet-benchmark-rerun
+      - name: Upload reproducible FabricNET benchmark outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: fabricnet-benchmark-rerun
+          path: ${{ runner.temp }}/fabricnet-benchmark-rerun/
+          if-no-files-found: error

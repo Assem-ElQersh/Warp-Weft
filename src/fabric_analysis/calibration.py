@@ -7,6 +7,7 @@
 # distortion caused by non-square sensor aspect ratios or rectangular fields of view.
 
 from dataclasses import dataclass, asdict
+import math
 from typing import Tuple, Dict, Any, Optional
 
 
@@ -37,8 +38,11 @@ class PhysicalCalibration:
         """
         sx = float(sx)
         sy = float(sy) if sy is not None else sx
-        if sx <= 0.0 or sy <= 0.0:
-            raise ValueError(f"Spatial calibration scales must be positive: sx={sx}, sy={sy}")
+        uncertainty = float(uncertainty_pct)
+        if not math.isfinite(sx) or not math.isfinite(sy) or sx <= 0.0 or sy <= 0.0:
+            raise ValueError(f"Spatial calibration scales must be finite and positive: sx={sx}, sy={sy}")
+        if not math.isfinite(uncertainty) or uncertainty < 0.0 or uncertainty >= 100.0:
+            raise ValueError("uncertainty_pct must be finite and in the range [0, 100)")
 
         pitch_x = 10000.0 / sx
         pitch_y = 10000.0 / sy
@@ -50,7 +54,7 @@ class PhysicalCalibration:
             pixel_pitch_um_y=round(pitch_y, 4),
             calibration_source=str(source),
             is_verified=bool(is_verified),
-            uncertainty_pct=float(uncertainty_pct)
+            uncertainty_pct=uncertainty
         )
 
     @classmethod
@@ -112,6 +116,22 @@ class PhysicalCalibration:
     def aspect_ratio(self) -> float:
         """Ratio of horizontal pixel size to vertical pixel size (Sx / Sy)."""
         return self.pixels_per_cm_x / self.pixels_per_cm_y
+
+    def density_interval(self, density: Optional[float]) -> Optional[Dict[str, float]]:
+        """Return calibration-only bounds; this is not a statistical confidence interval."""
+        if density is None:
+            return None
+        value = float(density)
+        if not math.isfinite(value) or value < 0.0:
+            raise ValueError("density must be a finite non-negative number or null")
+        delta = value * self.uncertainty_pct / 100.0
+        return {
+            "nominal": round(value, 6),
+            "lower": round(max(0.0, value - delta), 6),
+            "upper": round(value + delta, 6),
+            "absolute_uncertainty": round(delta, 6),
+            "relative_uncertainty_pct": self.uncertainty_pct,
+        }
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize calibration object to JSON-serializable dictionary."""

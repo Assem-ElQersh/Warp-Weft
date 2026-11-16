@@ -72,11 +72,13 @@ FabricNET serves as the comprehensive physical optical benchmark across all 130 
 * **Satin Weave ($N=41$):** Warp $\text{MAE} = 12.18\text{ ends/cm}$, Weft $\text{MAE} = 21.93\text{ picks/cm}$; Accuracy $\le \pm 2\text{ threads/cm}$: $31.7\%$ (Warp), $12.2\%$ (Weft).
 * **Overall Direct Axis:** Warp $\text{MAE} = 13.43\text{ ends/cm}$, Weft $\text{MAE} = 11.25\text{ picks/cm}$.
 * **Orientation-Invariant Paired:** Warp $\text{MAE} = 12.39\text{ ends/cm}$, Weft $\text{MAE} = 11.78\text{ picks/cm}$.
-* **Decision Status Transparency:** $88\text{ samples}$ ($67.7\%$) flagged as `NEEDS_REVIEW`, $42\text{ samples}$ ($32.3\%$) as `CONSISTENT_WITH_WARNING`, and $0\text{ samples}$ as false `VALIDATED`.
+* **Decision Status Transparency:** $15/130$ samples (`VALIDATED`), $27/130$ (`CONSISTENT_WITH_WARNING`), and $88/130$ (`NEEDS_REVIEW`). This is read from the 130 sample records; older documentation stating 0 validated / 42 warning was incorrect.
 
 > [!WARNING]
 > **Optical Calibration Verification Status:** The scales $S_x=1280.0\text{ px/cm}$ and $S_y=1200.0\text{ px/cm}$ are calculated from author FOV claims ($5 \times 4\text{ mm}$), but have not been physically verified against an external stage micrometer. An unverified $\pm 3\text{--}5\%$ magnification error directly introduces a systematic baseline offset of $\pm 1.5\text{--}3.0\text{ ends/cm}$.
 >
+**Important metric interpretation:** The benchmark's 13.43 Warp / 11.25 Weft MAE values are candidate-estimate errors because the benchmark substitutes an FFT candidate when the fusion arbiter returns no accepted density. They are not accepted-output accuracy. From the accepted fields, Warp has 25/130 outputs (19.2% coverage; MAE 2.48; 80.0% within ±2) and Weft has 32/130 outputs (24.6% coverage; MAE 2.38; 62.5% within ±2). The accepted-output error denominator excludes rejected outputs; the coverage denominator remains all 130 samples.
+
 > **Strict Offline Scope for Orientation Pairing:** Orientation-invariant paired error calculation is strictly an offline diagnostic method for un-oriented swatch mounting in this dataset. The production web application and core pipeline NEVER perform ground-truth-dependent pairing.
 >
 > **Honest Limitation on Float Weaves:** The objective of universal autonomous thread counting across arbitrary float architectures is NOT validated under single-side optical surface capture. Float weaves (twill and satin) exhibit severe harmonic ambiguity where surface reflection obscures interior interlacing nodes.

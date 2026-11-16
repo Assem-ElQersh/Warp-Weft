@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0.0",
+  "dataset": "acseckn/fabricnet",
+  "samples": 130,
+  "acquisition": {
+    "resolution_px": [
+      640,
+      480
+    ],
+    "field_of_view_mm": [
+      5,
+      4
+    ],
+    "pixels_per_cm_x": 1280,
+    "pixels_per_cm_y": 1200,
+    "calibration_verified_with_stage_micrometer": false
+  },
+  "workflow_run": {
+    "id": 43909157336,
+    "url": "https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43909157336",
+    "python_tests": 54,
+    "javascript_syntax": "passed"
+  },
+  "reproductions": {
+    "first": {
+      "source_revision": "7b9b55fdcd6e7e08d9b591b6b55d862a116f4c0e",
+      "artifact_id": 14245419730,
+      "artifact_sha256": "102587abbcb91d5fa8dc24a86e3ef8670d061dc44d3baa2710176e660328340e",
+      "n": 130,
+      "changes": {
+        "pred_warp": 0,
+        "pred_weft": 0,
+        "decision_status": 0
+      }
+    },
+    "second": {
+      "source_revision": "8f55927d910197d6778b2d56217092973bf9cc56",
+      "artifact_id": 14246274329,
+      "artifact_sha256": "48681d36ea1ebadf878b79131aeff245da9ec9037f15814c31d00ac98fe977872a",
+      "n": 130,
+      "changes": {
+        "pred_warp": 0,
+        "pred_weft": 0,
+        "accepted_warp": 0,
+        "accepted_weft": 0,
+        "decision_status": 0
+      }
+    }
+  },
+  "candidate_estimates": {
+    "definition": "Full-130 direct-axis estimates. Second remediation uses accepted fusion output where present and FFT candidate when rejected. These are not accepted-production accuracy.",
+    "warp": {
+      "first_mae": 11.738462,
+      "second_mae": 13.431769,
+      "delta_mae": 1.693307,
+      "relative_delta_pct": 14.43,
+      "first_rmse": 16.2405,
+      "second_rmse": 18.675976,
+      "first_median_abs": 9,
+      "second_median_abs": 10,
+      "first_mean_bias": -8.538462,
+      "second_mean_bias": -12.825,
+      "first_within_2_pct": 28.46,
+      "second_within_2_pct": 26.92
+    },
+    "weft": {
+      "first_mae": 10.3,
+      "second_mae": 11.249,
+      "delta_mae": 0.949,
+      "relative_delta_pct": 9.21,
+      "first_rmse": 14.944255,
+      "second_rmse": 15.912905,
+      "first_median_abs": 6,
+      "second_median_abs": 7,
+      "first_mean_bias": -9.176923,
+      "second_mean_bias": -10.306846,
+      "first_within_2_pct": 33.08,
+      "second_within_2_pct": 27.69
+    }
+  },
+  "second_accepted_outputs": {
+    "warp": {
+      "accepted": 25,
+      "rejected": 105,
+      "coverage_pct": 19.23,
+      "mae": 2.48,
+      "rmse": 3.867816,
+      "median_abs": 2,
+      "bias": -0.96,
+      "within_2_pct": 80,
+      "bootstrap_95_ci": [
+        1.44,
+        3.601
+      ]
+    },
+    "weft": {
+      "accepted": 32,
+      "rejected": 98,
+      "coverage_pct": 24.62,
+      "mae": 2.375,
+      "rmse": 3.112475,
+      "median_abs": 2,
+      "bias": -1.5625,
+      "within_2_pct": 62.5,
+      "bootstrap_95_ci": [
+        1.71875,
+        3.0625
+      ]
+    }
+  },
+  "status_counts": {
+    "first": {
+      "CONSISTENT_WITH_WARNING": 80,
+      "NEEDS_REVIEW": 50,
+      "VALIDATED": 0
+    },
+    "second": {
+      "VALIDATED": 15,
+      "CONSISTENT_WITH_WARNING": 27,
+      "NEEDS_REVIEW": 88
+    },
+    "records_with_changed_status": 87
+  },
+  "interpretation": "Second-remediation candidate MAE is worse on both axes over all 130 samples. Its lower accepted-only MAE is a selective-subset result at 19.23% Warp and 24.62% Weft coverage. This is a coverage/abstention tradeoff, not an overall accuracy improvement."
+}

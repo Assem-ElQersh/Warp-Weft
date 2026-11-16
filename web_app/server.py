@@ -20,6 +20,7 @@ if WORKSPACE_ROOT not in sys.path:
     sys.path.insert(0, WORKSPACE_ROOT)
 
 from web_app.engine import run_complete_fabric_analysis, pil_to_base64_data_url
+from web_app.modes import get_analysis_modes
 
 STATIC_DIR = os.path.join(WORKSPACE_ROOT, "web_app")
 DATA_DIR = os.path.join(WORKSPACE_ROOT, "data")
@@ -73,7 +74,12 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 self.send_error(404, "index.html not found")
             return
 
-        # 2. Health Endpoint
+        # 2. Analysis mode capability endpoint
+        if url_path == "/api/models":
+            self.send_json_response(get_analysis_modes(WORKSPACE_ROOT))
+            return
+
+        # 3. Health Endpoint
         if url_path == "/api/health":
             self.send_json_response({
                 "status": "healthy",
@@ -190,6 +196,30 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 content_length = int(self.headers.get("Content-Length", 0))
                 raw_body = self.rfile.read(content_length)
                 payload = json.loads(raw_body.decode("utf-8"))
+                if not isinstance(payload, dict):
+                    self.send_json_response({"status": "error", "code": "invalid_payload", "error": "Request payload must be a JSON object."}, status_code=400)
+                    return
+
+                # 0. Enforce requested analysis-mode availability before decoding image bytes.
+                compare_methods = payload.get("compare_methods", False)
+                if not isinstance(compare_methods, bool):
+                    self.send_json_response({"status": "error", "code": "invalid_compare_methods", "error": "compare_methods must be a JSON boolean."}, status_code=400)
+                    return
+                analysis_mode = "classical" if compare_methods else str(payload.get("analysis_mode", "classical")).strip().lower()
+                mode_catalog = get_analysis_modes(WORKSPACE_ROOT)
+                mode_map = {item["id"]: item for item in mode_catalog["modes"]}
+                if analysis_mode not in mode_map:
+                    self.send_json_response({"status": "error", "code": "unknown_analysis_mode", "error": f"Unknown analysis mode: {analysis_mode}"}, status_code=400)
+                    return
+                if not mode_map[analysis_mode]["available"]:
+                    self.send_json_response({
+                        "status": "unavailable",
+                        "code": "analysis_mode_unavailable",
+                        "analysis_mode": analysis_mode,
+                        "mode": mode_map[analysis_mode],
+                        "error": mode_map[analysis_mode]["reason"],
+                    }, status_code=409)
+                    return
 
                 # 1. Parse Image Payload
                 img_data_b64 = payload.get("image", "")
@@ -232,6 +262,47 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     custom_roi=custom_roi
                 )
 
+                result["analysis_mode"] = "comparison" if compare_methods else "classical"
+                if compare_methods:
+                    comparison_methods = []
+                    unavailable_methods = []
+                    for method in mode_catalog["modes"]:
+                        if not method["available"]:
+                            unavailable_methods.append({
+                                "id": method["id"],
+                                "label": method["label"],
+                                "reason": method.get("reason"),
+                            })
+                            continue
+                        if method["id"] != "classical":
+                            # Never mark a mode available without an explicit dispatcher.
+                            unavailable_methods.append({
+                                "id": method["id"],
+                                "label": method["label"],
+                                "reason": "No inference dispatcher is registered for this method.",
+                            })
+                            continue
+                        result_values = result.get("results", {})
+                        comparison_methods.append({
+                            "id": "classical",
+                            "label": method["label"],
+                            "status": result.get("status", "success"),
+                            "decision_status": result_values.get("decision_status"),
+                            "warp_ends_per_cm": result_values.get("accepted_warp_density_ends_per_cm"),
+                            "weft_picks_per_cm": result_values.get("accepted_weft_density_picks_per_cm"),
+                            "signal_quality_index": result_values.get("signal_quality_index"),
+                            "latency_ms": result.get("latency_ms"),
+                            "candidate_measurements": result_values.get("candidate_measurements"),
+                        })
+                    result["comparison"] = {
+                        "requested": True,
+                        "methods": comparison_methods,
+                        "unavailable_methods": unavailable_methods,
+                        "note": (
+                            "Every currently available method was executed. Only Classical has a validated "
+                            "inference implementation in this checkout; Learned and Hybrid remain unavailable."
+                        ),
+                    }
                 self.send_json_response(result)
 
             except Exception as e:

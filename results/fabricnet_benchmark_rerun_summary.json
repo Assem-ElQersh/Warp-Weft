@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "reproduction_commit": "663a1656d8f5e2e50157bb903436ac89e8c3fdeb",
+  "workflow_run_url": "https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43904962934",
+  "artifact_id": 14246080718,
+  "artifact_name": "fabricnet-benchmark-rerun",
+  "artifact_sha256": "b7f18527ea8fa5f08d868750f5a877369664028b1dee4ea8784ad369018aa10a",
+  "total_samples": 130,
+  "calibration": {
+    "image_resolution_px": [
+      640,
+      480
+    ],
+    "field_of_view_mm": [
+      5,
+      4
+    ],
+    "pixels_per_cm_x": 1280,
+    "pixels_per_cm_y": 1200,
+    "stage_micrometer_verified": false
+  },
+  "reproduction_comparison": {
+    "common_samples": 130,
+    "changed_pred_warp": 0,
+    "changed_pred_weft": 0,
+    "changed_accepted_warp": 0,
+    "changed_accepted_weft": 0,
+    "changed_decision_status": 0,
+    "max_absolute_numeric_delta": 0
+  },
+  "candidate_estimates": {
+    "warp": {
+      "mae": 13.431769,
+      "rmse": 18.675976,
+      "within_2_pct": 26.92
+    },
+    "weft": {
+      "mae": 11.249,
+      "rmse": 15.912905,
+      "within_2_pct": 27.69
+    }
+  },
+  "accepted_measurements": {
+    "warp": {
+      "accepted": 25,
+      "rejected": 105,
+      "coverage_pct": 19.23,
+      "mae": 2.48,
+      "rmse": 3.867816,
+      "median_absolute_error": 2,
+      "mean_signed_bias": -0.96,
+      "within_1_pct": 48,
+      "within_2_pct": 80,
+      "mae_bootstrap_95_ci": [
+        1.44,
+        3.601
+      ]
+    },
+    "weft": {
+      "accepted": 32,
+      "rejected": 98,
+      "coverage_pct": 24.62,
+      "mae": 2.375,
+      "rmse": 3.112475,
+      "median_absolute_error": 2,
+      "mean_signed_bias": -1.5625,
+      "within_1_pct": 40.62,
+      "within_2_pct": 62.5,
+      "mae_bootstrap_95_ci": [
+        1.71875,
+        3.0625
+      ]
+    }
+  },
+  "accepted_per_weave": {
+    "plain": {
+      "samples": 50,
+      "warp": {
+        "accepted": 20,
+        "coverage_pct": 40,
+        "mae": 2.65,
+        "within_2_pct": 75
+      },
+      "weft": {
+        "accepted": 18,
+        "coverage_pct": 36,
+        "mae": 2.5,
+        "within_2_pct": 61.11
+      }
+    },
+    "twill": {
+      "samples": 39,
+      "warp": {
+        "accepted": 0,
+        "coverage_pct": 0,
+        "mae": null,
+        "within_2_pct": null
+      },
+      "weft": {
+        "accepted": 8,
+        "coverage_pct": 20.51,
+        "mae": 3.125,
+        "within_2_pct": 50
+      }
+    },
+    "satin": {
+      "samples": 41,
+      "warp": {
+        "accepted": 5,
+        "coverage_pct": 12.2,
+        "mae": 1.8,
+        "within_2_pct": 100
+      },
+      "weft": {
+        "accepted": 6,
+        "coverage_pct": 14.63,
+        "mae": 1,
+        "within_2_pct": 83.33
+      }
+    }
+  },
+  "decision_status_breakdown": {
+    "NEEDS_REVIEW": 88,
+    "CONSISTENT_WITH_WARNING": 27,
+    "VALIDATED": 15
+  },
+  "interpretation": "Exact deterministic reproduction of current benchmark. Not client smartphone validation or model validation. Accepted-only accuracy is selective and must be reported with coverage.",
+  "latest_validation": {
+    "branch_head_commit": "65580886d6a839148f8704c72db6b355924a03ca",
+    "workflow_run_url": "https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43946623447",
+    "python_tests": 62,
+    "original_main_baseline_tests": 22,
+    "javascript_syntax_check": "passed",
+    "first_remediation_full_130_image_rerun": "passed",
+    "current_engine_full_130_image_rerun": "passed",
+    "exact_historical_field_comparison": "zero changed fields; zero maximum numeric delta",
+    "artifact_id": 14264244008,
+    "artifact_sha256": "d988dc156035ed00412ebb7e9b0e3c8c6a505c9c53e3541cef063a6f4853aa95",
+    "first_remediation_artifact_id": 14263789030,
+    "first_remediation_artifact_sha256": "4d38459da40b1f8ff9604b55a7dcd0eb4e570638cc01ca4145973706a34ebda6",
+    "continuous_accepted_values": "Emitted in rerun artifact; not compared because absent from historical benchmark."
+  }
+}

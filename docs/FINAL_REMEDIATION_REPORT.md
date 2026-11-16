@@ -6,7 +6,7 @@
 ## 1. Executive Summary
 This report documents the comprehensive remediation of the Warp & Weft AI codebase. Prior to this remediation, the project suffered from 15 confirmed architectural and mathematical defects, including hardcoded validation values on benchmark samples, an invalid square-pixel assumption that distorted anisotropic optical microscopy scales ($S_x=1280.0\text{ px/cm}, S_y=1200.0\text{ px/cm}$), undersized ROI reporting without physical coverage disclosure, naive peak detection suppressing high yarn counts, blind defaulting to 2D FFT on estimator divergence, and parallel divergent implementations across notebooks and the production web server.
 
-To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression test suite comprising 20 passing unit tests (`tests/`), benchmarked the remediated pipeline across all 130 physical microscopy images in the FabricNET dataset, and eliminated all hardcoded validation claims.
+To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression suite. The current feature branch passes 62 Python tests and an inline JavaScript syntax check in GitHub Actions (verified in run 43946623447). A separate reproducibility step reruns all 130 FabricNET images and compares every candidate prediction, accepted density, and decision status against the committed benchmark.
 
 ---
 
@@ -84,9 +84,35 @@ The complete FabricNET dataset ($N=130$) was evaluated using the exact physical 
 | **Twill Weave Weft MAE (N=39)** | 5.90 picks/cm | **8.12 picks/cm** | Projection profiling tracks interlacing steps across diagonal ridges. |
 | **Satin Weave Warp MAE (N=41)** | 11.90 ends/cm | **12.18 ends/cm** | Long warp floats obscure interlacing nodes, lowering optical prominence. |
 | **Satin Weave Weft MAE (N=41)** | 24.15 picks/cm | **21.93 picks/cm** | Severe float harmonic error; identifies physical limit of surface reflection. |
-| **Decision Status Transparency** | 100% false "VALIDATED" | **NEEDS_REVIEW: 67.7% (88)<br>CONSISTENT_WITH_WARNING: 32.3% (42)<br>VALIDATED: 0.0% (0)** | Rejects false certainty; flags ambiguous float weaves for manual audit. |
+| **Decision Status Transparency** | 100% false "VALIDATED" | **NEEDS_REVIEW: 67.7% (88)<br>CONSISTENT_WITH_WARNING: 20.8% (27)<br>VALIDATED: 11.5% (15)** | Rejects false certainty; flags ambiguous float weaves for manual audit. |
 
 ---
+
+### 4.2. Interpretation correction: candidate errors versus accepted measurements
+
+Notebook 04 records pred_warp and pred_weft by taking the accepted fused density when available and otherwise falling back to the FFT candidate. The reported overall MAE (13.43 Warp / 11.25 Weft) is therefore a **candidate-estimate** metric, not accepted-output accuracy.
+
+The actual accepted fields in the benchmark JSON provide 25 Warp outputs (19.2% coverage; accepted-only MAE 2.48; 80.0% within ±2) and 32 Weft outputs (24.6% coverage; accepted-only MAE 2.38; 62.5% within ±2). Rejected rows remain in the coverage denominator. The sample-level decision counts are 15 VALIDATED, 27 CONSISTENT_WITH_WARNING, and 88 NEEDS_REVIEW. This corrects the earlier 0 VALIDATED / 42 WARNING documentation mismatch.
+
+The offline orientation-invariant metric selects a swap by comparing candidate errors to ground truth. It is an oracle-assisted diagnostic and must not be presented as deployable accuracy.
+
+### 4.3. Independent full 130-image reproduction (2026-11-16)
+
+The new scripts/run_fabricnet_benchmark.py was executed by GitHub Actions against the committed 130 JPEG images and FabricNet_parameters.xlsx. Run [43904962934](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43904962934) completed successfully, processed all 130/130 samples, and uploaded fabricnet-benchmark-rerun (artifact ID 14246080718; SHA-256 b7f18527ea8fa5f08d868750f5a877369664028b1dee4ea8784ad369018aa10a).
+
+The rerun exactly matched the committed benchmark for all 130 rows: zero changed candidate Warp/Weft values, zero changed accepted Warp/Weft values, and zero changed decision statuses. Maximum absolute numeric delta was zero for all four density fields. This verifies deterministic reproducibility of the current code/data/configuration, not physical measurement accuracy.
+
+Accepted-output coverage is 25/130 Warp (19.23%) and 32/130 Weft (24.62%). Accepted-only MAE is 2.48 ends/cm Warp and 2.375 picks/cm Weft; the 95% group-bootstrap intervals are [1.44, 3.601] and [1.71875, 3.0625], respectively. Candidate-estimate MAE remains 13.4318 Warp and 11.249 Weft. Per-weave results and methodology are recorded in docs/FABRICNET_BENCHMARK_RERUN.md.
+
+The 2026-11-16 validation of the latest implementation head passed 62 Python tests, including the versioned schema compatibility test, notebook AST/integrity tests, calibration uncertainty propagation, Classical analysis, Learned/Hybrid mode rejection, comparison execution, malformed model-registry handling, and strict comparison-flag validation. The inline JavaScript syntax check passed. Both first-remediation and current-engine runs processed all 130 FabricNET images.
+
+### 4.4. First vs. second remediation comparison on the same 130 FabricNET images
+
+The original first-remediation revision (7b9b55f) was rerun in a detached worktree using its own historical src.fabric_analysis package. It processed all 130 samples and exactly matched its saved first-remediation JSON: zero changed Warp predictions, zero changed Weft predictions, and zero changed decision statuses. The second-remediation version (8f55927) was also rerun and exactly matched its saved benchmark across all 130 rows.
+
+Under the same direct-axis, all-130 evaluation formula, first-remediation Warp/Weft MAE was 11.7385 / 10.3000. Second-remediation full-population candidate MAE was 13.4318 / 11.2490. Thus candidate MAE worsened by 14.43% Warp and 9.21% Weft; within-±2 rates also decreased by 1.54 and 5.39 percentage points.
+
+The second version's accepted-only MAE (2.48 Warp / 2.375 Weft) is based on only 25/130 Warp outputs and 32/130 Weft outputs. It must not be interpreted as a full-population accuracy improvement. The demonstrated improvement is in abstention/false-certainty control, with a substantial coverage cost. Detailed metrics, status transitions and artifact provenance are in docs/FIRST_VS_SECOND_REMEDIATION_COMPARISON.md.
 
 ## 5. Weave Architecture & Physical Domain Boundaries
 
@@ -140,37 +166,31 @@ To rigorously evaluate phone-based capture robustness without fabricating valida
 
 ## 9. Automated Regression Test Suite Verification
 
-The automated regression test suite (`tests/`) contains 22 comprehensive unit tests covering all components:
+The original `main` baseline at `8f55927` contained 22 tests; GitHub Actions reran those tests retrospectively and all passed. The current feature branch contains 57 tests covering:
 
+- Calibration and density uncertainty propagation.
+- Benchmark arithmetic, artifact integrity, and deterministic engine equivalence.
+- Fusion acceptance/rejection semantics.
+- Five-region ground truth and schema-version validation.
+- Specimen-grouped splitting and cluster bootstrap metrics.
+- ROI, orientation, spectral and spatial regression.
+- Synthetic smartphone failure-mode handling.
+- Model registry availability and malformed-registry safety.
+- HTTP API compatibility, analysis-mode rejection, and comparison behavior.
+- Existing frontend controls, bilingual mode labels, and calibration uncertainty display.
+
+Latest verified run: [43946623447](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43946623447).
+
+```text
+Current feature branch: Ran 62 tests — OK
+Original main baseline: Ran 22 tests — OK
+Inline JavaScript syntax check: passed
+First-remediation rerun: 130/130 images, zero changed prediction/status fields
+Current-engine rerun: 130/130 images, zero changed candidate/accepted/status fields
 ```
-Ran 22 tests in 1.018s
-OK
-```
 
-1. `test_benchmark_report_serialization_pipeline`: Validates end-to-end JSON, CSV, and TXT report generation from injected engine predictions, verifying round-trip schema and arithmetic consistency.
-2. `test_calculated_errors_match_arithmetic_truth`: Validates absence of hardcoded benchmark error constants.
-3. `test_fabricnet_w012_end_to_end_execution`: Validates complete pipeline on real physical swatch.
-4. `test_production_engine_and_src_package_equivalence`: Validates zero divergence between web app engine and core package.
-5. `test_anisotropic_fabricnet_calibration`: Validates independent $S_x, S_y$ scale calculation.
-6. `test_isotropic_calibration`: Verifies backward compatibility for single-scale inputs.
-7. `test_dpi_calibration`: Validates metric DPI conversion.
-8. `test_invalid_scales_raise_value_error`: Ensures negative or zero scales raise exceptions.
-9. `test_concordant_estimators_yield_validated_status`: Validates dual-engine agreement logic under physical aperture quantization limits.
-10. `test_density_semantics_dimensional_correctness`: Validates threads/cm sum vs crossings/cm² product.
-11. `test_divergent_estimators_yield_needs_review_and_none_accepted_density`: Validates that accepted measurements are None on discrepancy and candidates are isolated.
-12. `test_partial_concordance_yields_consistent_with_warning`: Validates partial axis agreement.
-13. `test_rectification_improves_contrast_variance`: Validates that rotation sharpens projection profiles.
-14. `test_skew_detection_synthetic_12deg`: Validates Polar Radon recovery of $+12^\circ$ tilt within $0.5^\circ$.
-15. `test_custom_roi_bounds`: Validates custom bounding box cropping.
-16. `test_full_roi_available_on_large_image`: Validates 1.0 cm² crop on large images.
-17. `test_undersized_image_reports_actual_coverage`: Validates honest coverage disclosure on FabricNET images.
-18. `test_degraded_synthetic_fixture_yields_needs_review_and_isolates_candidates`: Validates handling of degraded phone capture fixtures.
-19. `test_high_density_peaks_not_suppressed`: Validates yarn separation up to $120\text{ threads/cm}$.
-20. `test_median_filter_removes_single_pixel_spikes`: Validates noise suppression without peak shifting.
-21. `test_parabolic_sub_bin_interpolation`: Validates quadratic peak refinement to sub-pixel accuracy.
-22. `test_synthetic_2d_sinusoid_frequency_recovery`: Validates exact frequency extraction from 2D FFT.
+Calibration uncertainty is propagated linearly into calibration-only density bounds and shown separately from SQI. These bounds are not statistical confidence intervals; the current calibration model uses one configured relative uncertainty percentage for both axes.
 
----
 
 ## 8. Web Application & Production Deployment
 

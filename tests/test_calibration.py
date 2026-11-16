@@ -41,6 +41,22 @@ class TestPhysicalCalibration(unittest.TestCase):
         self.assertAlmostEqual(cal.pixels_per_cm_x, 118.1102, places=3)
         self.assertAlmostEqual(cal.pixels_per_cm_y, 118.1102, places=3)
 
+    def test_calibration_uncertainty_propagates_linearly_to_density_bounds(self):
+        cal = PhysicalCalibration.from_scales(1000.0, uncertainty_pct=5.0)
+        interval = cal.density_interval(40.0)
+        self.assertEqual(interval["nominal"], 40.0)
+        self.assertEqual(interval["lower"], 38.0)
+        self.assertEqual(interval["upper"], 42.0)
+        self.assertEqual(interval["absolute_uncertainty"], 2.0)
+        self.assertEqual(interval["relative_uncertainty_pct"], 5.0)
+        self.assertIsNone(cal.density_interval(None))
+
+    def test_invalid_uncertainty_is_rejected(self):
+        for value in (-1.0, 100.0, float("nan"), float("inf")):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    PhysicalCalibration.from_scales(400.0, uncertainty_pct=value)
+
     def test_invalid_scales_raise_value_error(self):
         with self.assertRaises(ValueError):
             PhysicalCalibration.from_scales(-100.0)

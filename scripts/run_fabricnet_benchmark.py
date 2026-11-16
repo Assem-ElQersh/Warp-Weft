@@ -312,6 +312,8 @@ def main() -> None:
             "pixels_per_cm_x": sx,
             "pixels_per_cm_y": sy,
             "calibration_verified_with_stage_micrometer": False,
+            "calibration_uncertainty_pct": calibration.uncertainty_pct,
+            "calibration_uncertainty_interpretation": "Configured relative scale envelope, not a statistical confidence interval or measured per-camera uncertainty.",
             "auto_skew": True,
             "prominence": PROMINENCE,
             "weave_hint_source": "FabricNET Texture label",

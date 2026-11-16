@@ -10,6 +10,8 @@ class TestPublishedFabricNetBenchmarkArtifact(unittest.TestCase):
             payload = json.load(handle, parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
         self.assertEqual(payload["schema_version"], "2.1.0")
         self.assertEqual(payload["total_samples"], 130)
+        self.assertFalse(payload["calibration"]["is_verified"])
+        self.assertEqual(payload["calibration"]["uncertainty_pct"], 5)
         self.assertEqual(len(payload["samples"]), 130)
         self.assertEqual(payload["aggregate_metrics"]["decision_status_breakdown"], {
             "NEEDS_REVIEW": 88,

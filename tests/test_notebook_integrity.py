@@ -1,3 +1,4 @@
+import ast
 import json
 import os
 import unittest
@@ -18,18 +19,28 @@ class TestFabricNetNotebookIntegrity(unittest.TestCase):
                 self.assertIsNone(cell["execution_count"])
                 self.assertEqual(cell["outputs"], [])
 
-    def test_notebook_uses_current_numpy_pipeline_and_rejects_partial_datasets(self):
-        source = "\n".join(
+    def test_notebook_uses_canonical_runner_and_python_cells_parse(self):
+        source = "\\n".join(
             "".join(cell["source"])
             for cell in self.notebook["cells"]
             if cell["cell_type"] == "code"
         )
-        self.assertIn("NumPy FFT and Pillow", source)
+        self.assertIn("scripts/run_fabricnet_benchmark.py", source)
+        self.assertIn('benchmark.get("total_samples") != 130', source)
         self.assertNotIn("import torch", source)
         self.assertNotIn("import cv2", source)
-        self.assertIn("len(df_res) != 130", source)
-        self.assertIn("allow_nan=False", source)
-        self.assertIn("rejection_rate_pct", source)
+        for cell in self.notebook["cells"]:
+            if cell["cell_type"] == "code":
+                ast.parse("".join(cell["source"]))
+
+        runner_path = os.path.join(
+            os.path.dirname(__file__), "..", "scripts", "run_fabricnet_benchmark.py"
+        )
+        with open(runner_path, "r", encoding="utf-8") as handle:
+            runner_source = handle.read()
+        self.assertIn("allow_nan=False", runner_source)
+        self.assertIn("bootstrap_samples=1000", runner_source)
+
 
 
 if __name__ == "__main__":

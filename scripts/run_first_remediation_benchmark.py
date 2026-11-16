@@ -189,7 +189,7 @@ def main() -> None:
         per_weave[weave] = {
             "n": len(weave_rows),
             "warp": summarize(weave_rows, "pred_warp", "gt_warp"),
-            "weft": summarize(weave_rows, "pred_weft", "gt_weft),
+            "weft": summarize(weave_rows, "pred_weft", "gt_weft"),
         }
 
     reference_path = ROOT / "results" / "fabricnet_benchmark.json"

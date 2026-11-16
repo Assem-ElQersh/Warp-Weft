@@ -75,6 +75,10 @@ Compute error statistics only on predictions that were actually returned, but al
 
 A production pass-rate target beyond the client's per-result ±2 interval has not been supplied. Report observed percentages; do not invent a population acceptance threshold.
 
+### Calibration uncertainty disclosure
+
+The inference response includes calibration-only density intervals. Since density is proportional to pixels/cm, a configured relative calibration envelope of ±u% propagates linearly to a density interval of nominal × (1 ± u/100). The UI labels these bounds as calibration-only and separately marks unverified calibration. They are not statistical confidence intervals and do not include image quality, estimator, sampling, yarn-boundary, or manual-count uncertainty. The current PhysicalCalibration contract uses one configured percentage for both axes; independent X/Y uncertainty budgets are not yet represented. The default 5% used by from_scales is a configured fallback, not a measured uncertainty for every camera.
+
 ## Leakage prevention
 
 All regions, crops, augmentations, and repeat images belonging to one physical specimen must remain in the same data partition. Group by fabric_id (and, when relevant, a broader specimen/lot identifier) before producing train/validation/test splits. Fit feature normalization and hyperparameter tuning on training data only. Keep a locked test group untouched until final evaluation.

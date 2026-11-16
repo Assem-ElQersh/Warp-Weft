@@ -39,7 +39,7 @@ The public project description is Roboflow 3.0 Object Detection (Fast). The repo
 
 ## FCN reference
 
-No FCN implementation, paired front/back illumination dataset, checkpoint, or inference output is present in this repository baseline. Treat it as a literature/reference candidate only. Do not claim it has been evaluated on the client's single-exposure phone image.
+No FCN implementation, paired front/back illumination dataset, checkpoint, or inference output is present in this repository baseline. The inherited research brief identifies a six-channel paired front/back input requirement, but the missing source/model card prevents verification of channel order, preprocessing, and normalization. Treat this as an unverified legacy input contract, not a reproducible experiment. Do not claim it has been evaluated on the client's single-exposure phone image.
 
 ## Experimental protocol requirements
 

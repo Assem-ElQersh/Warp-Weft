@@ -152,7 +152,7 @@ For marginal projection profiles $P_{\text{warp}}(x)$ and $P_{\text{weft}}(y)$:
 
 The client-confirmed manual protocol measures each specimen at five distinct locations over 1 cm, counts warp and weft independently at each location, and uses the average of the five readings as the specimen reference. The stated example is 31 ends/cm Warp and 27 picks/cm Weft, with inclusive ±2 factory tolerance. These specimen-level averages must not be copied onto individual region photographs as if they were local labels.
 
-The implemented data contract is versioned (schemas/client_ground_truth.schema.json, schema version 1.0.0). Each of five regions stores raw region Warp/Weft counts, exact measurement length, image identity or null, camera and calibration metadata, weave, lighting, focus, and date. A region is eligible for local supervised training only when its own photograph is tied to its own manual count. Specimen-only records remain separate.
+The implemented data contract is versioned (schemas/client_ground_truth.schema.json, schema version 1.0.0). Calibration-only relative uncertainty is propagated into lower/upper density bounds and disclosed separately from SQI; it is not a statistical confidence interval, and the current calibration object applies one configured percentage to both axes. Each of five regions stores raw region Warp/Weft counts, exact measurement length, image identity or null, camera and calibration metadata, weave, lighting, focus, and date. A region is eligible for local supervised training only when its own photograph is tied to its own manual count. Specimen-only records remain separate.
 
 Evaluation now reports local-region metrics and specimen-level aggregates. A specimen aggregate is accepted on an axis only if all five regional model outputs are available on that axis. Cluster bootstrap resamples fabric_id specimens rather than treating five correlated regions as independent observations. All reported accuracies include explicit coverage and rejection rates.
 
@@ -165,7 +165,7 @@ Those results must remain unverified until the source code, exact input/label da
 - A synthetic U-Net mIoU is not real-fabric segmentation accuracy.
 - Roboflow object-detection mAP is not physical threads/cm accuracy.
 - A custom handcrafted feature vector should not be described as an exact reproduction of FabricNET's IFV method without code-level equivalence.
-- The legacy TextileDefectDetection FCN is a reference candidate whose paired illumination input assumptions differ from the client's single smartphone exposure.
+- The legacy TextileDefectDetection FCN is a reference candidate whose paired front/back illumination is reported to require a six-channel input. However, no FCN implementation or model card is present in this repository to verify channel order, normalization, or preprocessing; treat the six-channel contract as an unverified inherited requirement until the original source is recovered. This paired capture requirement differs from the client's single smartphone exposure.
 - Learned regression, yarn segmentation, and hybrid segmentation-plus-geometric-measurement are separate experiments.
 
 The webpage now exposes Classical, Learned and Hybrid choices, but only Classical is enabled because it is the only mode with an implemented inference path in this checkout. Method-comparison mode executes every currently available method and labels unavailable methods explicitly. It does not fabricate learned results.

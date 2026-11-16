@@ -60,7 +60,7 @@ FabricNET's published/repository nominal optical geometry is different from the 
 
 Report both local-region accuracy and specimen-aggregate accuracy. Specimen-aggregate predictions are averages of all five regional predictions and are accepted only when all five regional predictions exist for that axis. Do not use a partial four-of-five prediction average as if it were the client five-location procedure.
 
-Report separately for warp and weft:
+Report separately for warp and weft. Preserve continuous accepted consensus and rounded displayed density as separate values; rejected axes remain null for accepted outputs:
 
 - MAE and RMSE.
 - Median absolute error.

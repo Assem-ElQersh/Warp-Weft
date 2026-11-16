@@ -135,10 +135,11 @@ def compare_to_committed(
 
     old_by_id = {row.get("image_id"): row for row in committed.get("samples", [])}
     common = [row for row in rerun_records if row["image_id"] in old_by_id]
-    fields = ("pred_warp", "pred_weft", "accepted_warp", "accepted_weft", "decision_status")
+    fields = ("pred_warp", "pred_weft", "accepted_warp", "accepted_weft", "accepted_warp_continuous", "accepted_weft_continuous", "decision_status")
     differences: Dict[str, int] = {field: 0 for field in fields}
-    max_abs_delta: Dict[str, Optional[float]] = {"pred_warp": 0.0, "pred_weft": 0.0,
-                                                 "accepted_warp": 0.0, "accepted_weft": 0.0}
+    max_abs_delta: Dict[str, Optional[float]] = {
+        field: 0.0 for field in fields if field != "decision_status"
+    }
     for new in common:
         old = old_by_id[new["image_id"]]
         for field in fields:
@@ -244,8 +245,16 @@ def main() -> None:
             **metadata_row,
             "pred_warp": float(candidate_warp) if finite_number(candidate_warp) else None,
             "pred_weft": float(candidate_weft) if finite_number(candidate_weft) else None,
-            "accepted_warp": float(accepted_warp) if finite_number(accepted_warp) else None,
-            "accepted_weft": float(accepted_weft) if finite_number(accepted_weft) else None,
+            "accepted_warp": int(accepted_warp) if finite_number(accepted_warp) else None,
+            "accepted_weft": int(accepted_weft) if finite_number(accepted_weft) else None,
+            "accepted_warp_continuous": (
+                float(values["warp_density_continuous"])
+                if finite_number(accepted_warp) and finite_number(values.get("warp_density_continuous")) else None
+            ),
+            "accepted_weft_continuous": (
+                float(values["weft_density_continuous"])
+                if finite_number(accepted_weft) and finite_number(values.get("weft_density_continuous")) else None
+            ),
             "pred_warp_source": "accepted_fusion" if accepted_warp is not None else "fft_candidate_unvalidated",
             "pred_weft_source": "accepted_fusion" if accepted_weft is not None else "fft_candidate_unvalidated",
             "fft_warp": values.get("candidate_measurements", {}).get("warp_fft"),
@@ -320,7 +329,7 @@ def main() -> None:
         },
         "metric_semantics": {
             "candidate_estimates": "Accepted fused density when available, otherwise the unvalidated FFT candidate.",
-            "accepted_measurements": "Non-null accepted fusion outputs only. Rejected outputs count against coverage.",
+            "accepted_measurements": "Non-null accepted fusion outputs only. accepted_warp/accepted_weft are rounded integers; accepted_*_continuous preserve the pre-rounding one-decimal consensus. Rejected outputs count against coverage.",
             "orientation_invariant_paired": paired_summary["policy"],
             "bootstrap": "1000-seed-42 specimen-level clusters (one FabricNET image per sample).",
         },

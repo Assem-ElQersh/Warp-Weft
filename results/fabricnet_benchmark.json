@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.1.0",
+  "schema_version": "2.2.0",
   "timestamp_iso": "2026-11-15T23:28:47.965271+00:00",
   "dataset": "acseckn/fabricnet",
   "total_samples": 130,
@@ -126,7 +126,9 @@
       "sqi": 17,
       "latency_ms": 66.84,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W002.jpg",
@@ -154,7 +156,9 @@
       "sqi": 17.2,
       "latency_ms": 65.62,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W003.jpg",
@@ -182,7 +186,9 @@
       "sqi": 14.1,
       "latency_ms": 70.59,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W004.jpg",
@@ -210,7 +216,9 @@
       "sqi": 13.6,
       "latency_ms": 95.81,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W005.jpg",
@@ -238,7 +246,9 @@
       "sqi": 13.9,
       "latency_ms": 72.71,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W006.jpg",
@@ -266,7 +276,9 @@
       "sqi": 20.5,
       "latency_ms": 69.81,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W007.jpg",
@@ -294,7 +306,9 @@
       "sqi": 28.1,
       "latency_ms": 65.13,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W008.jpg",
@@ -322,7 +336,9 @@
       "sqi": 22.7,
       "latency_ms": 77.54,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 28.9
     },
     {
       "image_id": "W009.jpg",
@@ -350,7 +366,9 @@
       "sqi": 16.3,
       "latency_ms": 66.3,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W010.jpg",
@@ -378,7 +396,9 @@
       "sqi": 15.5,
       "latency_ms": 65.71,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W011.jpg",
@@ -406,7 +426,9 @@
       "sqi": 28.5,
       "latency_ms": 48.83,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 26.7
     },
     {
       "image_id": "W012.jpg",
@@ -434,7 +456,9 @@
       "sqi": 72.2,
       "latency_ms": 83.01,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 39.3,
+      "accepted_weft_continuous": 27.5
     },
     {
       "image_id": "W013.jpg",
@@ -462,7 +486,9 @@
       "sqi": 66.5,
       "latency_ms": 66.19,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 39.7,
+      "accepted_weft_continuous": 30.2
     },
     {
       "image_id": "W014.jpg",
@@ -490,7 +516,9 @@
       "sqi": 70.5,
       "latency_ms": 77.43,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 39.8,
+      "accepted_weft_continuous": 29.7
     },
     {
       "image_id": "W015.jpg",
@@ -518,7 +546,9 @@
       "sqi": 69.4,
       "latency_ms": 67.42,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 39.6,
+      "accepted_weft_continuous": 31
     },
     {
       "image_id": "W016.jpg",
@@ -546,7 +576,9 @@
       "sqi": 67.5,
       "latency_ms": 61.74,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 39.1,
+      "accepted_weft_continuous": 31.5
     },
     {
       "image_id": "W017.jpg",
@@ -574,7 +606,9 @@
       "sqi": 31.9,
       "latency_ms": 69.42,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 30.3
     },
     {
       "image_id": "W018.jpg",
@@ -602,7 +636,9 @@
       "sqi": 44.9,
       "latency_ms": 65.43,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 22,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W019.jpg",
@@ -630,7 +666,9 @@
       "sqi": 43.9,
       "latency_ms": 75.8,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 22.3,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W020.jpg",
@@ -658,7 +696,9 @@
       "sqi": 43.6,
       "latency_ms": 72.44,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 22.3,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W021.jpg",
@@ -686,7 +726,9 @@
       "sqi": 28.7,
       "latency_ms": 73.51,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W022.jpg",
@@ -714,7 +756,9 @@
       "sqi": 39.5,
       "latency_ms": 70.34,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W023.jpg",
@@ -742,7 +786,9 @@
       "sqi": 36.1,
       "latency_ms": 84.76,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W024.jpg",
@@ -770,7 +816,9 @@
       "sqi": 36.8,
       "latency_ms": 68.3,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W025.jpg",
@@ -798,7 +846,9 @@
       "sqi": 41.8,
       "latency_ms": 73.62,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W026.jpg",
@@ -826,7 +876,9 @@
       "sqi": 41.6,
       "latency_ms": 99.18,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W027.jpg",
@@ -854,7 +906,9 @@
       "sqi": 32.4,
       "latency_ms": 90.18,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W028.jpg",
@@ -882,7 +936,9 @@
       "sqi": 39.8,
       "latency_ms": 61.76,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 23.9,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W029.jpg",
@@ -910,7 +966,9 @@
       "sqi": 40.2,
       "latency_ms": 83.87,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 24.8,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W030.jpg",
@@ -938,7 +996,9 @@
       "sqi": 33.9,
       "latency_ms": 67.54,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 24.9,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W031.jpg",
@@ -966,7 +1026,9 @@
       "sqi": 36.3,
       "latency_ms": 78.42,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W032.jpg",
@@ -994,7 +1056,9 @@
       "sqi": 23.4,
       "latency_ms": 74.48,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W033.jpg",
@@ -1022,7 +1086,9 @@
       "sqi": 12.6,
       "latency_ms": 79.33,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W034.jpg",
@@ -1050,7 +1116,9 @@
       "sqi": 37.3,
       "latency_ms": 48.29,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 32.5
     },
     {
       "image_id": "W035.jpg",
@@ -1078,7 +1146,9 @@
       "sqi": 11.8,
       "latency_ms": 60.55,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W036.jpg",
@@ -1106,7 +1176,9 @@
       "sqi": 29.6,
       "latency_ms": 44.37,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W037.jpg",
@@ -1134,7 +1206,9 @@
       "sqi": 37,
       "latency_ms": 78.4,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W038.jpg",
@@ -1162,7 +1236,9 @@
       "sqi": 38.4,
       "latency_ms": 82.04,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W039.jpg",
@@ -1190,7 +1266,9 @@
       "sqi": 38.2,
       "latency_ms": 66.03,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W040.jpg",
@@ -1218,7 +1296,9 @@
       "sqi": 37.8,
       "latency_ms": 74.31,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W041.jpg",
@@ -1246,7 +1326,9 @@
       "sqi": 22.5,
       "latency_ms": 81.18,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W042.jpg",
@@ -1274,7 +1356,9 @@
       "sqi": 30.7,
       "latency_ms": 47.55,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W043.jpg",
@@ -1302,7 +1386,9 @@
       "sqi": 30.1,
       "latency_ms": 100.31,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W044.jpg",
@@ -1330,7 +1416,9 @@
       "sqi": 30.2,
       "latency_ms": 70.47,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W045.jpg",
@@ -1358,7 +1446,9 @@
       "sqi": 30.4,
       "latency_ms": 71.59,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W046.jpg",
@@ -1386,7 +1476,9 @@
       "sqi": 30.4,
       "latency_ms": 79.55,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W047.jpg",
@@ -1414,7 +1506,9 @@
       "sqi": 57.3,
       "latency_ms": 53.64,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 66.7,
+      "accepted_weft_continuous": 28.3
     },
     {
       "image_id": "W048.jpg",
@@ -1442,7 +1536,9 @@
       "sqi": 18.2,
       "latency_ms": 87.8,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W049.jpg",
@@ -1470,7 +1566,9 @@
       "sqi": 52.5,
       "latency_ms": 52.69,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 64.7,
+      "accepted_weft_continuous": 27.9
     },
     {
       "image_id": "W050.jpg",
@@ -1498,7 +1596,9 @@
       "sqi": 18.7,
       "latency_ms": 67.08,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W051.jpg",
@@ -1526,7 +1626,9 @@
       "sqi": 21.6,
       "latency_ms": 66.29,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W052.jpg",
@@ -1554,7 +1656,9 @@
       "sqi": 35.8,
       "latency_ms": 89.04,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 26
     },
     {
       "image_id": "W053.jpg",
@@ -1582,7 +1686,9 @@
       "sqi": 67.1,
       "latency_ms": 66.96,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 43.9,
+      "accepted_weft_continuous": 28.3
     },
     {
       "image_id": "W054.jpg",
@@ -1610,7 +1716,9 @@
       "sqi": 38.8,
       "latency_ms": 62.99,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 27
     },
     {
       "image_id": "W055.jpg",
@@ -1638,7 +1746,9 @@
       "sqi": 61.7,
       "latency_ms": 68.68,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 45.3,
+      "accepted_weft_continuous": 28.1
     },
     {
       "image_id": "W056.jpg",
@@ -1666,7 +1776,9 @@
       "sqi": 56.4,
       "latency_ms": 64.06,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 26.2
     },
     {
       "image_id": "W057.jpg",
@@ -1694,7 +1806,9 @@
       "sqi": 27.2,
       "latency_ms": 67.28,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W058.jpg",
@@ -1722,7 +1836,9 @@
       "sqi": 28.8,
       "latency_ms": 78.15,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 30.9
     },
     {
       "image_id": "W059.jpg",
@@ -1750,7 +1866,9 @@
       "sqi": 25.7,
       "latency_ms": 71.4,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W060.jpg",
@@ -1778,7 +1896,9 @@
       "sqi": 29.4,
       "latency_ms": 83.94,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 31.3
     },
     {
       "image_id": "W061.jpg",
@@ -1806,7 +1926,9 @@
       "sqi": 28,
       "latency_ms": 87.1,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 31.2
     },
     {
       "image_id": "W062.jpg",
@@ -1834,7 +1956,9 @@
       "sqi": 29.5,
       "latency_ms": 81.74,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W063.jpg",
@@ -1862,7 +1986,9 @@
       "sqi": 31,
       "latency_ms": 68.51,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W064.jpg",
@@ -1890,7 +2016,9 @@
       "sqi": 30.1,
       "latency_ms": 83.08,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W065.jpg",
@@ -1918,7 +2046,9 @@
       "sqi": 30.1,
       "latency_ms": 77.4,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W066.jpg",
@@ -1946,7 +2076,9 @@
       "sqi": 30.1,
       "latency_ms": 85.09,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W067.jpg",
@@ -1974,7 +2106,9 @@
       "sqi": 16.5,
       "latency_ms": 79.76,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W068.jpg",
@@ -2002,7 +2136,9 @@
       "sqi": 11.2,
       "latency_ms": 92.82,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W069.jpg",
@@ -2030,7 +2166,9 @@
       "sqi": 12.3,
       "latency_ms": 94.04,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W070.jpg",
@@ -2058,7 +2196,9 @@
       "sqi": 11.2,
       "latency_ms": 72.59,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W071.jpg",
@@ -2086,7 +2226,9 @@
       "sqi": 11.5,
       "latency_ms": 81.75,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W072.jpg",
@@ -2114,7 +2256,9 @@
       "sqi": 15.5,
       "latency_ms": 92.83,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W073.jpg",
@@ -2142,7 +2286,9 @@
       "sqi": 15.2,
       "latency_ms": 100.67,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W074.jpg",
@@ -2170,7 +2316,9 @@
       "sqi": 15.1,
       "latency_ms": 94.38,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W075.jpg",
@@ -2198,7 +2346,9 @@
       "sqi": 19.1,
       "latency_ms": 55.63,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W076.jpg",
@@ -2226,7 +2376,9 @@
       "sqi": 22.2,
       "latency_ms": 65.89,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W077.jpg",
@@ -2254,7 +2406,9 @@
       "sqi": 75.5,
       "latency_ms": 69.6,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 24.1,
+      "accepted_weft_continuous": 46.1
     },
     {
       "image_id": "W078.jpg",
@@ -2282,7 +2436,9 @@
       "sqi": 68.8,
       "latency_ms": 63.51,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 23.8,
+      "accepted_weft_continuous": 45
     },
     {
       "image_id": "W079.jpg",
@@ -2310,7 +2466,9 @@
       "sqi": 73.6,
       "latency_ms": 65.55,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 24.6,
+      "accepted_weft_continuous": 44.1
     },
     {
       "image_id": "W080.jpg",
@@ -2338,7 +2496,9 @@
       "sqi": 72.5,
       "latency_ms": 65.11,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 23.7,
+      "accepted_weft_continuous": 45.5
     },
     {
       "image_id": "W081.jpg",
@@ -2366,7 +2526,9 @@
       "sqi": 69.4,
       "latency_ms": 66.77,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 24.7,
+      "accepted_weft_continuous": 44.1
     },
     {
       "image_id": "W082.jpg",
@@ -2394,7 +2556,9 @@
       "sqi": 18.8,
       "latency_ms": 50.8,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 32
     },
     {
       "image_id": "W083.jpg",
@@ -2422,7 +2586,9 @@
       "sqi": 11.4,
       "latency_ms": 56.45,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 36.5
     },
     {
       "image_id": "W084.jpg",
@@ -2450,7 +2616,9 @@
       "sqi": 17.5,
       "latency_ms": 78.46,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 34.9
     },
     {
       "image_id": "W085.jpg",
@@ -2478,7 +2646,9 @@
       "sqi": 24.6,
       "latency_ms": 47.94,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 35.6
     },
     {
       "image_id": "W086.jpg",
@@ -2506,7 +2676,9 @@
       "sqi": 14.8,
       "latency_ms": 61.75,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 36.3
     },
     {
       "image_id": "W087.jpg",
@@ -2534,7 +2706,9 @@
       "sqi": 36.3,
       "latency_ms": 61.21,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 28.5,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W088.jpg",
@@ -2562,7 +2736,9 @@
       "sqi": 32.9,
       "latency_ms": 54.72,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 28.5,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W089.jpg",
@@ -2590,7 +2766,9 @@
       "sqi": 36.5,
       "latency_ms": 57.94,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 28.1,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W090.jpg",
@@ -2618,7 +2796,9 @@
       "sqi": 57.9,
       "latency_ms": 50.69,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": 29.1,
+      "accepted_weft_continuous": 45.4
     },
     {
       "image_id": "W091.jpg",
@@ -2646,7 +2826,9 @@
       "sqi": 42.9,
       "latency_ms": 67.59,
       "pred_warp_source": "accepted_fusion",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": 28.2,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W092.jpg",
@@ -2674,7 +2856,9 @@
       "sqi": 30.3,
       "latency_ms": 48.95,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W093.jpg",
@@ -2702,7 +2886,9 @@
       "sqi": 30.2,
       "latency_ms": 50.29,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W094.jpg",
@@ -2730,7 +2916,9 @@
       "sqi": 30.3,
       "latency_ms": 47.59,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W095.jpg",
@@ -2758,7 +2946,9 @@
       "sqi": 31.1,
       "latency_ms": 66.93,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W096.jpg",
@@ -2786,7 +2976,9 @@
       "sqi": 31.2,
       "latency_ms": 77.75,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W097.jpg",
@@ -2814,7 +3006,9 @@
       "sqi": 28.7,
       "latency_ms": 67.98,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W098.jpg",
@@ -2842,7 +3036,9 @@
       "sqi": 26.7,
       "latency_ms": 83.77,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W099.jpg",
@@ -2870,7 +3066,9 @@
       "sqi": 30,
       "latency_ms": 64.84,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W100.jpg",
@@ -2898,7 +3096,9 @@
       "sqi": 31.6,
       "latency_ms": 94.65,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W101.jpg",
@@ -2926,7 +3126,9 @@
       "sqi": 25.6,
       "latency_ms": 70.6,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W102.jpg",
@@ -2954,7 +3156,9 @@
       "sqi": 27.6,
       "latency_ms": 71.33,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W103.jpg",
@@ -2982,7 +3186,9 @@
       "sqi": 18.7,
       "latency_ms": 76.19,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W104.jpg",
@@ -3010,7 +3216,9 @@
       "sqi": 20,
       "latency_ms": 68.77,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W105.jpg",
@@ -3038,7 +3246,9 @@
       "sqi": 27.1,
       "latency_ms": 72.66,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W106.jpg",
@@ -3066,7 +3276,9 @@
       "sqi": 27.7,
       "latency_ms": 87.75,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W107.jpg",
@@ -3094,7 +3306,9 @@
       "sqi": 23.6,
       "latency_ms": 99.26,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W108.jpg",
@@ -3122,7 +3336,9 @@
       "sqi": 20.5,
       "latency_ms": 79.1,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W109.jpg",
@@ -3150,7 +3366,9 @@
       "sqi": 30.5,
       "latency_ms": 104.04,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W110.jpg",
@@ -3178,7 +3396,9 @@
       "sqi": 20.9,
       "latency_ms": 83.97,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W111.jpg",
@@ -3206,7 +3426,9 @@
       "sqi": 27.7,
       "latency_ms": 87.04,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W112.jpg",
@@ -3234,7 +3456,9 @@
       "sqi": 17.4,
       "latency_ms": 80.25,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W113.jpg",
@@ -3262,7 +3486,9 @@
       "sqi": 30.6,
       "latency_ms": 57.77,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W114.jpg",
@@ -3290,7 +3516,9 @@
       "sqi": 33.9,
       "latency_ms": 85.73,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W115.jpg",
@@ -3318,7 +3546,9 @@
       "sqi": 24.2,
       "latency_ms": 77.51,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 27.3
     },
     {
       "image_id": "W116.jpg",
@@ -3346,7 +3576,9 @@
       "sqi": 23.3,
       "latency_ms": 78.81,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "accepted_fusion"
+      "pred_weft_source": "accepted_fusion",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": 28.1
     },
     {
       "image_id": "W117.jpg",
@@ -3374,7 +3606,9 @@
       "sqi": 25.4,
       "latency_ms": 77.02,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W118.jpg",
@@ -3402,7 +3636,9 @@
       "sqi": 16.4,
       "latency_ms": 94.53,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W119.jpg",
@@ -3430,7 +3666,9 @@
       "sqi": 15.3,
       "latency_ms": 79.28,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W120.jpg",
@@ -3458,7 +3696,9 @@
       "sqi": 14.6,
       "latency_ms": 78.82,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W121.jpg",
@@ -3486,7 +3726,9 @@
       "sqi": 13,
       "latency_ms": 64.25,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W122.jpg",
@@ -3514,7 +3756,9 @@
       "sqi": 16,
       "latency_ms": 63.08,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W123.jpg",
@@ -3542,7 +3786,9 @@
       "sqi": 25.3,
       "latency_ms": 62.17,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W124.jpg",
@@ -3570,7 +3816,9 @@
       "sqi": 25.1,
       "latency_ms": 58.93,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W125.jpg",
@@ -3598,7 +3846,9 @@
       "sqi": 20.7,
       "latency_ms": 49.9,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W126.jpg",
@@ -3626,7 +3876,9 @@
       "sqi": 22.1,
       "latency_ms": 104.32,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W127.jpg",
@@ -3654,7 +3906,9 @@
       "sqi": 21.1,
       "latency_ms": 66.8,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W128.jpg",
@@ -3682,7 +3936,9 @@
       "sqi": 13.8,
       "latency_ms": 80.75,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W129.jpg",
@@ -3710,7 +3966,9 @@
       "sqi": 23.6,
       "latency_ms": 70.07,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     },
     {
       "image_id": "W130.jpg",
@@ -3738,13 +3996,16 @@
       "sqi": 28.5,
       "latency_ms": 96.06,
       "pred_warp_source": "fft_candidate_unvalidated",
-      "pred_weft_source": "fft_candidate_unvalidated"
+      "pred_weft_source": "fft_candidate_unvalidated",
+      "accepted_warp_continuous": null,
+      "accepted_weft_continuous": null
     }
   ],
   "metric_semantics": {
     "direct_axis": "Candidate-estimate errors; the benchmark substitutes the FFT candidate when the arbiter rejects an accepted density.",
     "accepted_measurements": "Error metrics use non-null accepted outputs only; coverage and rejection use all 130 samples as denominator.",
     "orientation_invariant_paired": "Ground-truth-assisted offline axis-swap diagnostic, not deployable accuracy.",
-    "nonstandard_nan_values_replaced": 203
+    "nonstandard_nan_values_replaced": 203,
+    "accepted_value_representation": "accepted_warp and accepted_weft are rounded integer consensus outputs; accepted_warp_continuous and accepted_weft_continuous preserve the pre-rounding one-decimal fusion values."
   }
 }

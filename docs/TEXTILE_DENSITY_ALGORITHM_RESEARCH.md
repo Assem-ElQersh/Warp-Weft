@@ -175,3 +175,14 @@ The webpage now exposes Classical, Learned and Hybrid choices, but only Classica
 A dedicated CI runner re-executed all 130 FabricNET images using the authoritative src.fabric_analysis engine and the nominal 5 × 4 mm FOV (1280 × 1200 px/cm). The rerun exactly reproduced all candidate predictions, accepted densities and decision statuses in the committed benchmark (zero changed fields across 130 images). This establishes source/data/configuration reproducibility, not satisfaction of the client's ±2 tolerance in a smartphone/factory acquisition domain.
 
 See docs/FABRICNET_BENCHMARK_RERUN.md for the full per-weave breakdown, acceptance coverage, confidence intervals and artifact provenance.
+
+
+## 8. First vs. Second Remediation: Reproduced Comparison
+
+The first-remediation source revision (7b9b55f) and second-remediation source revision (8f55927) were separately rerun against all 130 FabricNET images using a common nominal 5 × 4 mm acquisition geometry and the same direct-axis target labels. Each rerun reproduced its own saved output records exactly.
+
+The first revision's all-image Warp/Weft MAE is 11.7385 / 10.3000. The second revision's all-image candidate-estimate MAE is 13.4318 / 11.2490, a worsening of 14.43% Warp and 9.21% Weft. The second revision accepts only 25 Warp and 32 Weft outputs. Those accepted subsets have much lower MAE, but low coverage means this is a selective prediction/abstention tradeoff, not evidence that all-sample accuracy improved.
+
+The practical lesson is to optimize risk versus coverage explicitly. A measurement engine should report the error distribution of all candidates, accepted-only accuracy, and the fraction it abstains on. A low accepted-only MAE with a high rejection rate cannot be compared to a full-coverage MAE without stating the denominator.
+
+See docs/FIRST_VS_SECOND_REMEDIATION_COMPARISON.md and results/fabricnet_first_vs_second_comparison.json.

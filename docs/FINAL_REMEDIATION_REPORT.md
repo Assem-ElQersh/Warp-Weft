@@ -106,6 +106,14 @@ Accepted-output coverage is 25/130 Warp (19.23%) and 32/130 Weft (24.62%). Accep
 
 The 2026-11-16 validation of the latest feature-branch head passed 54 Python tests, including HTTP integration tests for existing health/preset routes, Classical analysis, mode rejection, comparison execution, malformed model-registry handling, and strict comparison-flag validation. The inline JavaScript syntax check also passed, and all 130 FabricNET images were re-run successfully.
 
+### 4.4. First vs. second remediation comparison on the same 130 FabricNET images
+
+The original first-remediation revision (7b9b55f) was rerun in a detached worktree using its own historical src.fabric_analysis package. It processed all 130 samples and exactly matched its saved first-remediation JSON: zero changed Warp predictions, zero changed Weft predictions, and zero changed decision statuses. The second-remediation version (8f55927) was also rerun and exactly matched its saved benchmark across all 130 rows.
+
+Under the same direct-axis, all-130 evaluation formula, first-remediation Warp/Weft MAE was 11.7385 / 10.3000. Second-remediation full-population candidate MAE was 13.4318 / 11.2490. Thus candidate MAE worsened by 14.43% Warp and 9.21% Weft; within-±2 rates also decreased by 1.54 and 5.39 percentage points.
+
+The second version's accepted-only MAE (2.48 Warp / 2.375 Weft) is based on only 25/130 Warp outputs and 32/130 Weft outputs. It must not be interpreted as a full-population accuracy improvement. The demonstrated improvement is in abstention/false-certainty control, with a substantial coverage cost. Detailed metrics, status transitions and artifact provenance are in docs/FIRST_VS_SECOND_REMEDIATION_COMPARISON.md.
+
 ## 5. Weave Architecture & Physical Domain Boundaries
 
 The empirical findings across 130 samples isolate distinct physical failure modes and explain why weave-aware fusion is mandatory:

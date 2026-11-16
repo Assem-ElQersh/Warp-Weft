@@ -401,11 +401,15 @@ The model registry selector remains disabled when no verified inference implemen
 
 The API adds GET /api/models for method availability and registered-model metadata. POST /api/analyze accepts analysis_mode and compare_methods. Requests for unavailable Learned/Hybrid modes return HTTP 409 instead of silently executing the deterministic engine under a false label.
 
-### 10.5. Reproducible FabricNET Benchmark
+### 10.5. First vs. Second Remediation Reproduction
+
+CI reruns both historical source revisions on all 130 FabricNET images in separate source contexts. Both reproduced their own committed sample outputs/statuses exactly. Under all-image direct-axis candidate metrics, first-remediation MAE is 11.7385 Warp / 10.3000 Weft; second-remediation candidate MAE is 13.4318 / 11.2490. V2's lower accepted-only MAE is selective and covers only 19.23% Warp / 24.62% Weft. The new version is more conservative, not more accurate overall. See docs/FIRST_VS_SECOND_REMEDIATION_COMPARISON.md.
+
+### 10.6. Reproducible FabricNET Benchmark
 
 The CI workflow executes scripts/run_fabricnet_benchmark.py over all 130 committed FabricNET images and uploads a JSON/CSV rerun artifact. The latest recorded run exactly reproduced the committed candidate estimates, accepted measurements and decision statuses across all 130 rows. See docs/FABRICNET_BENCHMARK_RERUN.md and results/fabricnet_benchmark_rerun_summary.json.
 
-### 10.6. Launch Instructions
+### 10.7. Launch Instructions
 
 #### Option A: Standalone Execution (Recommended)
 Run the server directly via Python standard library on any machine:

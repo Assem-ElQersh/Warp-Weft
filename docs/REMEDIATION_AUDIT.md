@@ -273,6 +273,13 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 * Root Cause: Static presence of selectors did not prove API enforcement or preservation of existing application routes/controls.
 * Correction: HTTP tests now exercise health/presets/model catalog, unknown and unavailable mode rejection, Classical analysis, and comparison execution. UI contract tests assert the legacy upload, preset, calibration, skew, diagnostic, and report controls remain present.
 
+### Defect 2.22 — First- and Second-Remediation Benchmark Results Needed Historical Source Reproduction
+
+* Severity: High
+* Affected Files: scripts/run_first_remediation_benchmark.py, scripts/run_fabricnet_benchmark.py, .github/workflows/tests.yml.
+* Root Cause: The two published benchmark summaries came from different engine revisions and had not both been re-executed from their exact source revisions in a common CI run.
+* Correction: CI runs the first-remediation source in a detached worktree at 7b9b55f and the second-remediation source on the current authoritative package. Both process all 130 images and exactly reproduce their own saved prediction/status records. The common direct-axis comparison shows second-version candidate MAE is worse, while accepted-only MAE improves only on a small selective subset.
+
 ## 4. Remediation Plan & Architectural Single Source of Truth
 To permanently eliminate divergence, we will construct a clean, authoritative Python package `src/fabric_analysis/` containing:
 1. `calibration.py`: Independent $S_x, S_y$ physical scale object, unit conversions, pixel pitch.

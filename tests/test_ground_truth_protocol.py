@@ -1,3 +1,5 @@
+import json
+import os
 import unittest
 
 from src.fabric_analysis.ground_truth import GROUND_TRUTH_SCHEMA_VERSION, RegionMeasurement, SpecimenGroundTruth
@@ -37,6 +39,20 @@ class TestClientGroundTruthProtocol(unittest.TestCase):
         self.assertEqual(specimen.region_matched_count, 5)
         self.assertEqual(specimen.specimen_only_count, 0)
         self.assertAlmostEqual(specimen.warp_sample_std_ends_per_cm, 1.0)
+
+    def test_serialized_payload_keys_match_versioned_json_schema(self):
+        specimen = SpecimenGroundTruth("fabric-A", tuple(make_region(i, 31, 27) for i in range(1, 6)))
+        payload = specimen.to_dict()
+        schema_path = os.path.join(os.path.dirname(__file__), "..", "schemas", "client_ground_truth.schema.json")
+        with open(schema_path, "r", encoding="utf-8") as handle:
+            schema = json.load(handle)
+        self.assertTrue(set(payload).issubset(set(schema["properties"])))
+        self.assertTrue(set(schema["required"]).issubset(set(payload)))
+        region_schema = schema["$defs"]["region"]
+        for region in payload["regions"]:
+            self.assertTrue(set(region).issubset(set(region_schema["properties"])))
+            self.assertTrue(set(region_schema["required"]).issubset(set(region)))
+        self.assertEqual(payload["expected_regions"], 5)
 
     def test_specimen_average_is_not_written_back_as_region_label(self):
         specimen = SpecimenGroundTruth("fabric-A", (

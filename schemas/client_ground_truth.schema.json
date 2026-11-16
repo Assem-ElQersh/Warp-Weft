@@ -7,7 +7,11 @@
   "required": [
     "schema_version",
     "fabric_id",
-    "regions"
+    "regions",
+    "expected_regions",
+    "specimen_summary",
+    "region_matched_count",
+    "specimen_only_count"
   ],
   "properties": {
     "schema_version": {
@@ -24,7 +28,50 @@
       "maxItems": 5,
       "items": {
         "$ref": "#/$defs/region"
+      },
+      "uniqueItems": true
+    },
+    "expected_regions": {
+      "type": "integer",
+      "const": 5
+    },
+    "specimen_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "warp_mean_ends_per_cm",
+        "weft_mean_picks_per_cm",
+        "warp_sample_std_ends_per_cm",
+        "weft_sample_std_picks_per_cm"
+      ],
+      "properties": {
+        "warp_mean_ends_per_cm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "weft_mean_picks_per_cm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "warp_sample_std_ends_per_cm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "weft_sample_std_picks_per_cm": {
+          "type": "number",
+          "minimum": 0
+        }
       }
+    },
+    "region_matched_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5
+    },
+    "specimen_only_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5
     }
   },
   "$defs": {
@@ -58,7 +105,10 @@
         "weave_type",
         "lighting_type",
         "focus_quality",
-        "measurement_date"
+        "measurement_date",
+        "warp_ends_per_cm",
+        "weft_picks_per_cm",
+        "supervision_level"
       ],
       "properties": {
         "fabric_id": {
@@ -112,6 +162,21 @@
         "measurement_date": {
           "type": "string",
           "format": "date"
+        },
+        "warp_ends_per_cm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "weft_picks_per_cm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "supervision_level": {
+          "type": "string",
+          "enum": [
+            "region_matched",
+            "specimen_only"
+          ]
         }
       }
     }

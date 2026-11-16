@@ -198,7 +198,8 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 payload = json.loads(raw_body.decode("utf-8"))
 
                 # 0. Enforce requested analysis-mode availability before decoding image bytes.
-                analysis_mode = str(payload.get("analysis_mode", "classical")).strip().lower()
+                compare_methods = bool(payload.get("compare_methods", False))
+                analysis_mode = "classical" if compare_methods else str(payload.get("analysis_mode", "classical")).strip().lower()
                 mode_catalog = get_analysis_modes(WORKSPACE_ROOT)
                 mode_map = {item["id"]: item for item in mode_catalog["modes"]}
                 if analysis_mode not in mode_map:
@@ -255,7 +256,47 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     custom_roi=custom_roi
                 )
 
-                result["analysis_mode"] = "classical"
+                result["analysis_mode"] = "comparison" if compare_methods else "classical"
+                if compare_methods:
+                    comparison_methods = []
+                    unavailable_methods = []
+                    for method in mode_catalog["modes"]:
+                        if not method["available"]:
+                            unavailable_methods.append({
+                                "id": method["id"],
+                                "label": method["label"],
+                                "reason": method.get("reason"),
+                            })
+                            continue
+                        if method["id"] != "classical":
+                            # Never mark a mode available without an explicit dispatcher.
+                            unavailable_methods.append({
+                                "id": method["id"],
+                                "label": method["label"],
+                                "reason": "No inference dispatcher is registered for this method.",
+                            })
+                            continue
+                        result_values = result.get("results", {})
+                        comparison_methods.append({
+                            "id": "classical",
+                            "label": method["label"],
+                            "status": result.get("status", "success"),
+                            "decision_status": result_values.get("decision_status"),
+                            "warp_ends_per_cm": result_values.get("accepted_warp_density_ends_per_cm"),
+                            "weft_picks_per_cm": result_values.get("accepted_weft_density_picks_per_cm"),
+                            "signal_quality_index": result_values.get("signal_quality_index"),
+                            "latency_ms": result.get("latency_ms"),
+                            "candidate_measurements": result_values.get("candidate_measurements"),
+                        })
+                    result["comparison"] = {
+                        "requested": True,
+                        "methods": comparison_methods,
+                        "unavailable_methods": unavailable_methods,
+                        "note": (
+                            "Every currently available method was executed. Only Classical has a validated "
+                            "inference implementation in this checkout; Learned and Hybrid remain unavailable."
+                        ),
+                    }
                 self.send_json_response(result)
 
             except Exception as e:

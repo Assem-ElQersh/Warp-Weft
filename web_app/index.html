@@ -400,6 +400,10 @@
             line-height: 1.45;
         }
 
+        .comparison-panel {
+            margin-bottom: 16px;
+        }
+
         /* Primary Button */
         .btn-analyze {
             width: 100%;
@@ -875,6 +879,17 @@
                         <option value="hybrid">Hybrid (unavailable)</option>
                     </select>
                     <div class="analysis-mode-status" id="analysis-mode-status" role="status" aria-live="polite">Classical analysis is available. Learned and Hybrid require validated model artifacts.</div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label for="select-learned-model" id="lbl-learned-model">Registered model</label>
+                        <select class="form-control" id="select-learned-model" disabled>
+                            <option value="">No validated models registered</option>
+                        </select>
+                        <div class="analysis-mode-status" id="model-config-status">Model-specific settings appear when a versioned model registry and inference adapter are available.</div>
+                    </div>
+                    <label class="checkbox-label" style="margin-top: 10px;">
+                        <input type="checkbox" id="chk-compare-methods">
+                        <span id="txt-compare-methods">Compare all available methods on the same image</span>
+                    </label>
                 </div>
 
                 <button class="btn-analyze" id="btn-run" onclick="executeAnalysis()">
@@ -930,6 +945,22 @@
                     <div class="kpi-unit" id="kpi-mode">Status: Standby</div>
                     <div class="kpi-sub" id="kpi-latency">Latency: -- ms</div>
                 </div>
+            </div>
+
+            <div class="card comparison-panel" id="comparison-panel" style="display: none;" aria-live="polite">
+                <h3 id="comparison-title">Method Comparison</h3>
+                <p class="analysis-mode-status" id="comparison-note"></p>
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th><th>Warp (ends/cm)</th><th>Weft (picks/cm)</th><th>Status</th><th>SQI</th><th>Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparison-rows"></tbody>
+                    </table>
+                </div>
+                <div class="analysis-mode-status" id="comparison-unavailable"></div>
             </div>
 
             <!-- Diagnostic Visualization Panels -->
@@ -1073,6 +1104,11 @@
                 autoSkew: "Auto Skew Detection & Rectification",
                 runText: "Run Thread Analysis",
                 analysisMode: "Analysis Mode",
+                learnedModel: "Registered model",
+                noRegisteredModels: "No validated models registered",
+                compareMethods: "Compare all available methods on the same image",
+                comparisonTitle: "Method Comparison",
+                comparisonSkipped: "Not executed",
                 modeClassical: "Classical deterministic (available)",
                 modeLearned: "Learned models (unavailable)",
                 modeHybrid: "Hybrid (unavailable)",
@@ -1115,6 +1151,11 @@
                 autoSkew: "كشف وتصحيح الانحراف الزاوي أوتوماتيكياً",
                 runText: "بدء تحليل كثافة الخيوط",
                 analysisMode: "وضع التحليل",
+                learnedModel: "النموذج المسجل",
+                noRegisteredModels: "لا توجد نماذج معتمدة مسجلة",
+                compareMethods: "مقارنة جميع الطرق المتاحة على نفس الصورة",
+                comparisonTitle: "مقارنة طرق التحليل",
+                comparisonSkipped: "لم يتم التنفيذ",
                 modeClassical: "خوارزميات حتمية (متاح)",
                 modeLearned: "نماذج مدربة (غير متاحة)",
                 modeHybrid: "هجين (غير متاح)",
@@ -1191,6 +1232,9 @@
             document.getElementById('lbl-weave-hint').innerText = strings.lblWeaveHint;
             document.getElementById('lbl-prominence').innerText = strings.lblProminence;
             document.getElementById('lbl-analysis-mode').innerText = strings.analysisMode;
+            document.getElementById('lbl-learned-model').innerText = strings.learnedModel;
+            document.getElementById('txt-compare-methods').innerText = strings.compareMethods;
+            document.getElementById('comparison-title').innerText = strings.comparisonTitle;
             const modeSelect = document.getElementById('select-analysis-mode');
             modeSelect.options[0].text = strings.modeClassical;
             modeSelect.options[1].text = strings.modeLearned;
@@ -1227,6 +1271,24 @@
             try {
                 const response = await fetch("/api/models");
                 const catalog = await response.json();
+                const modelSelect = document.getElementById("select-learned-model");
+                modelSelect.innerHTML = "";
+                const registeredModels = Array.isArray(catalog.registered_models) ? catalog.registered_models : [];
+                if (registeredModels.length === 0) {
+                    const option = document.createElement("option");
+                    option.value = "";
+                    option.textContent = i18n[currentLanguage].noRegisteredModels;
+                    modelSelect.appendChild(option);
+                    modelSelect.disabled = true;
+                } else {
+                    registeredModels.forEach(model => {
+                        const option = document.createElement("option");
+                        option.value = model.id;
+                        option.textContent = model.display_name;
+                        modelSelect.appendChild(option);
+                    });
+                    modelSelect.disabled = true;
+                }
                 const mode = catalog.modes.find(item => item.id === selected);
                 if (!mode) {
                     status.innerText = "Unknown analysis mode.";
@@ -1413,7 +1475,8 @@
                 auto_skew: autoSkew,
                 prominence: prominence,
                 weave_hint: weaveHint,
-                analysis_mode: document.getElementById("select-analysis-mode").value
+                analysis_mode: document.getElementById("select-analysis-mode").value,
+                compare_methods: document.getElementById("chk-compare-methods").checked
             };
 
             const controller = new AbortController();
@@ -1452,7 +1515,42 @@
             }
         }
 
+        function renderComparison(comparison) {
+            const panel = document.getElementById("comparison-panel");
+            const rows = document.getElementById("comparison-rows");
+            const unavailable = document.getElementById("comparison-unavailable");
+            const note = document.getElementById("comparison-note");
+            if (!comparison || !comparison.requested) {
+                panel.style.display = "none";
+                rows.innerHTML = "";
+                return;
+            }
+            rows.innerHTML = "";
+            (comparison.methods || []).forEach(method => {
+                const row = document.createElement("tr");
+                const values = [
+                    method.label || method.id,
+                    method.warp_ends_per_cm == null ? "Not accepted" : method.warp_ends_per_cm,
+                    method.weft_picks_per_cm == null ? "Not accepted" : method.weft_picks_per_cm,
+                    method.decision_status || method.status || "Unknown",
+                    method.signal_quality_index == null ? "--" : `${method.signal_quality_index}%`,
+                    method.latency_ms == null ? "--" : `${method.latency_ms} ms`
+                ];
+                values.forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value);
+                    row.appendChild(cell);
+                });
+                rows.appendChild(row);
+            });
+            note.textContent = comparison.note || "";
+            const skipped = (comparison.unavailable_methods || []).map(item => `${item.label}: ${item.reason || i18n[currentLanguage].comparisonSkipped}`);
+            unavailable.textContent = skipped.join(" | ");
+            panel.style.display = "block";
+        }
+
         function displayResults(data) {
+            renderComparison(data.comparison);
             const r = data.results;
             const a = data.audit;
             const v = data.visuals;

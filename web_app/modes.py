@@ -15,6 +15,7 @@ def get_analysis_modes(repository_root: Optional[str] = None) -> Dict[str, Any]:
     registry = os.path.join(learned_dir, "model_registry.json")
     adapter = os.path.join(root, "web_app", "learned_inference.py")
     checkpoint_ready = False
+    registry_data = {}
     try:
         with open(registry, "r", encoding="utf-8") as handle:
             registry_data = json.load(handle)
@@ -27,9 +28,26 @@ def get_analysis_modes(repository_root: Optional[str] = None) -> Dict[str, Any]:
     except (OSError, ValueError, TypeError):
         checkpoint_ready = False
     artifacts_present = checkpoint_ready and os.path.isfile(adapter)
+    raw_models = registry_data.get("models", []) if isinstance(registry_data, dict) else []
+    registered_models = []
+    if isinstance(raw_models, list):
+        for model in raw_models:
+            if not isinstance(model, dict):
+                continue
+            model_id = model.get("id")
+            display_name = model.get("display_name") or model.get("name")
+            if isinstance(model_id, str) and model_id.strip() and isinstance(display_name, str) and display_name.strip():
+                registered_models.append({
+                    "id": model_id.strip(),
+                    "display_name": display_name.strip(),
+                    "task": str(model.get("task") or "unspecified"),
+                    "description": str(model.get("description") or ""),
+                })
 
     return {
         "default_mode": "classical",
+        "registered_models": registered_models,
+        "comparison_supported": True,
         "modes": [
             {
                 "id": "classical",

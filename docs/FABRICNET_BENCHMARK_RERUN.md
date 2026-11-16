@@ -12,9 +12,9 @@
 - Artifact files: fabricnet_benchmark_rerun.json and fabricnet_benchmark_rerun.csv
 - Dataset: all 130 FabricNET images and the committed FabricNet_parameters.xlsx workbook.
 
-The workflow completed all 130 images and uploaded both result files. It also ran the 51-test Python suite and the inline JavaScript syntax check successfully.
+The original reproduction run completed all 130 images and uploaded both result files. Its historical test count was 51; the later implementation-head verification increased coverage to 57 tests, with the current original-main baseline (22 tests) also passing retrospectively.
 
-The later validation of the hardened latest branch head also passed 54 Python tests and reran all 130 images successfully: [GitHub Actions run 43907041685](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43907041685). Its artifact (ID 14246042495) has SHA-256 e6579398ea1ebadf878b79131a74c7bfcf7a24f111411c94a776c6ebc83fbdfd. The newer artifact has the same sample predictions, accepted results, and status counts.
+The subsequent validation of the implementation head `3dd059722a8dde1d1ad53c1928b7e3837f7001c2` passed 57 Python tests, the inline JavaScript syntax check, the retrospective 22-test original-main baseline, and both 130-image reruns: [GitHub Actions run 43943493543](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43943493543). The first-remediation artifact is ID 14263776836 (SHA-256 `371215178ee611adc0a3820cd88357bdc1745595940ba1b735e5ad56a3b5d629`); the current-engine artifact is ID 14263726895 (SHA-256 `8a8032ae95269644470581b4d3ea962492236be4cc978c846888e4a83400954e`). Both reruns processed 130/130 images. The current engine exactly reproduced all saved candidate predictions, accepted densities, and statuses: zero changed fields and zero maximum numeric delta. Subsequent commits after this run only corrected documentation; no runtime code changed.
 
 ## Acquisition and calibration configuration
 

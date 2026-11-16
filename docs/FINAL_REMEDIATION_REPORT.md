@@ -6,7 +6,7 @@
 ## 1. Executive Summary
 This report documents the comprehensive remediation of the Warp & Weft AI codebase. Prior to this remediation, the project suffered from 15 confirmed architectural and mathematical defects, including hardcoded validation values on benchmark samples, an invalid square-pixel assumption that distorted anisotropic optical microscopy scales ($S_x=1280.0\text{ px/cm}, S_y=1200.0\text{ px/cm}$), undersized ROI reporting without physical coverage disclosure, naive peak detection suppressing high yarn counts, blind defaulting to 2D FFT on estimator divergence, and parallel divergent implementations across notebooks and the production web server.
 
-To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression suite. The current feature branch passes 51 Python tests and an inline JavaScript syntax check in GitHub Actions. A separate reproducibility step reruns all 130 FabricNET images and compares every candidate prediction, accepted density, and decision status against the committed benchmark.
+To establish permanent integrity, we implemented an authoritative Python package `src/fabric_analysis/` serving as the single source of truth across all components. We constructed an automated regression suite. The current feature branch passes 57 Python tests and an inline JavaScript syntax check in GitHub Actions (verified in run 43943493543). A separate reproducibility step reruns all 130 FabricNET images and compares every candidate prediction, accepted density, and decision status against the committed benchmark.
 
 ---
 
@@ -166,37 +166,31 @@ To rigorously evaluate phone-based capture robustness without fabricating valida
 
 ## 9. Automated Regression Test Suite Verification
 
-The automated regression test suite (`tests/`) contains 22 comprehensive unit tests covering all components:
+The original `main` baseline at `8f55927` contained 22 tests; GitHub Actions reran those tests retrospectively and all passed. The current feature branch contains 57 tests covering:
 
+- Calibration and density uncertainty propagation.
+- Benchmark arithmetic, artifact integrity, and deterministic engine equivalence.
+- Fusion acceptance/rejection semantics.
+- Five-region ground truth and schema-version validation.
+- Specimen-grouped splitting and cluster bootstrap metrics.
+- ROI, orientation, spectral and spatial regression.
+- Synthetic smartphone failure-mode handling.
+- Model registry availability and malformed-registry safety.
+- HTTP API compatibility, analysis-mode rejection, and comparison behavior.
+- Existing frontend controls, bilingual mode labels, and calibration uncertainty display.
+
+Latest verified run: [43943493543](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43943493543).
+
+```text
+Current feature branch: Ran 57 tests — OK
+Original main baseline: Ran 22 tests — OK
+Inline JavaScript syntax check: passed
+First-remediation rerun: 130/130 images, zero changed prediction/status fields
+Current-engine rerun: 130/130 images, zero changed candidate/accepted/status fields
 ```
-Ran 22 tests in 1.018s
-OK
-```
 
-1. `test_benchmark_report_serialization_pipeline`: Validates end-to-end JSON, CSV, and TXT report generation from injected engine predictions, verifying round-trip schema and arithmetic consistency.
-2. `test_calculated_errors_match_arithmetic_truth`: Validates absence of hardcoded benchmark error constants.
-3. `test_fabricnet_w012_end_to_end_execution`: Validates complete pipeline on real physical swatch.
-4. `test_production_engine_and_src_package_equivalence`: Validates zero divergence between web app engine and core package.
-5. `test_anisotropic_fabricnet_calibration`: Validates independent $S_x, S_y$ scale calculation.
-6. `test_isotropic_calibration`: Verifies backward compatibility for single-scale inputs.
-7. `test_dpi_calibration`: Validates metric DPI conversion.
-8. `test_invalid_scales_raise_value_error`: Ensures negative or zero scales raise exceptions.
-9. `test_concordant_estimators_yield_validated_status`: Validates dual-engine agreement logic under physical aperture quantization limits.
-10. `test_density_semantics_dimensional_correctness`: Validates threads/cm sum vs crossings/cm² product.
-11. `test_divergent_estimators_yield_needs_review_and_none_accepted_density`: Validates that accepted measurements are None on discrepancy and candidates are isolated.
-12. `test_partial_concordance_yields_consistent_with_warning`: Validates partial axis agreement.
-13. `test_rectification_improves_contrast_variance`: Validates that rotation sharpens projection profiles.
-14. `test_skew_detection_synthetic_12deg`: Validates Polar Radon recovery of $+12^\circ$ tilt within $0.5^\circ$.
-15. `test_custom_roi_bounds`: Validates custom bounding box cropping.
-16. `test_full_roi_available_on_large_image`: Validates 1.0 cm² crop on large images.
-17. `test_undersized_image_reports_actual_coverage`: Validates honest coverage disclosure on FabricNET images.
-18. `test_degraded_synthetic_fixture_yields_needs_review_and_isolates_candidates`: Validates handling of degraded phone capture fixtures.
-19. `test_high_density_peaks_not_suppressed`: Validates yarn separation up to $120\text{ threads/cm}$.
-20. `test_median_filter_removes_single_pixel_spikes`: Validates noise suppression without peak shifting.
-21. `test_parabolic_sub_bin_interpolation`: Validates quadratic peak refinement to sub-pixel accuracy.
-22. `test_synthetic_2d_sinusoid_frequency_recovery`: Validates exact frequency extraction from 2D FFT.
+Calibration uncertainty is propagated linearly into calibration-only density bounds and shown separately from SQI. These bounds are not statistical confidence intervals; the current calibration model uses one configured relative uncertainty percentage for both axes.
 
----
 
 ## 8. Web Application & Production Deployment
 

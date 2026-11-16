@@ -31,7 +31,7 @@ def axis_metrics(
         raise ValueError("targets and predictions must have the same length")
     if runtimes_ms is not None and len(runtimes_ms) != len(targets):
         raise ValueError("runtimes_ms must match targets length")
-    if not targets:
+    if len(targets) == 0:
         raise ValueError("At least one target is required")
     tol = float(tolerance)
     if not math.isfinite(tol) or tol < 0:
@@ -126,7 +126,7 @@ def evaluate_prediction_records(
     weft_manual_density, warp_predicted_density, weft_predicted_density.
     A null prediction is a rejected measurement, not an omitted sample.
     """
-    if not records:
+    if len(records) == 0:
         raise ValueError("records cannot be empty")
 
     def one_axis(items: Sequence[Mapping[str, Any]], axis: str) -> Dict[str, Any]:

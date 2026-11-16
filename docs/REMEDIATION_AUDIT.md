@@ -250,7 +250,7 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 * **Affected Files:** experiments/learned_models/ (absent at audit baseline), model reports, webpage.
 * **Root Cause:** The public tree at 8f55927 did not contain the reported learned-model notebooks, checkpoints, feature source, split manifests, or inference implementation.
 * **Impact:** The reported model results could not be independently reproduced from the public checkout.
-* **Correction:** A learned-model audit records the missing evidence. The UI exposes Classical, Learned, and Hybrid modes but only enables Classical until a complete versioned model package and inference adapter are committed.
+* **Correction:** A learned-model audit records the missing evidence. The UI exposes Classical, Learned, and Hybrid modes but only enables Classical until a complete versioned model package, inference adapter, and explicit server-side dispatcher are implemented and validated.
 
 ## 4. Remediation Plan & Architectural Single Source of Truth
 To permanently eliminate divergence, we will construct a clean, authoritative Python package `src/fabric_analysis/` containing:

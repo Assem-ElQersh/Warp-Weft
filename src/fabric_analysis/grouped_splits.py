@@ -72,15 +72,16 @@ def grouped_train_validation_test_split(
     random.Random(seed).shuffle(names)
     names.sort(key=lambda name: len(groups[name]), reverse=True)
     total_rows = len(records)
-    targets = [total_rows * train_fraction, total_rows * validation_fraction]
+    targets = [
+        total_rows * train_fraction,
+        total_rows * validation_fraction,
+        total_rows * (1.0 - train_fraction - validation_fraction),
+    ]
     split_names: List[List[str]] = [[], [], []]
     split_sizes = [0, 0, 0]
 
     for name in names:
-        remaining_targets = [
-            targets[i] - split_sizes[i] if i < 2 else total_rows - split_sizes[i]
-            for i in range(3)
-        ]
+        remaining_targets = [targets[i] - split_sizes[i] for i in range(3)]
         selected = max(range(3), key=lambda i: (remaining_targets[i], -i))
         split_names[selected].append(name)
         split_sizes[selected] += len(groups[name])

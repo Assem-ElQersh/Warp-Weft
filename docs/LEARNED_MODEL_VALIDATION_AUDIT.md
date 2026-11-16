@@ -54,4 +54,4 @@ Before learned-model accuracy is used for a decision or UI claim, publish:
 7. MAE, RMSE, median absolute error, bias, ±1/±2 rates, coverage, rejection rate, per-weave/per-specimen results, and confidence intervals.
 8. Separate FabricNET microscopy and client smartphone domain results.
 
-The web application exposes Classical, Learned, and Hybrid choices. Only Classical is available in this checkout. Learned and Hybrid remain unavailable until a verifiable model registry, model weights, and inference adapter are committed. The UI/API must not synthesize or substitute a model prediction.
+The web application exposes Classical, Learned, and Hybrid choices. Only Classical is available in this checkout. Learned and Hybrid remain unavailable until a verifiable model registry, checkpoint, inference adapter, and explicit server-side dispatch implementation are committed and validated. Merely placing a checkpoint or adapter file in the repository must not enable the mode. The UI/API must not synthesize or substitute a model prediction.

@@ -27,6 +27,9 @@ class TestGroupedSplits(unittest.TestCase):
         self.assertFalse(groups[0] & groups[2])
         self.assertFalse(groups[1] & groups[2])
         self.assertEqual(len(set.union(*groups)), 12)
+        self.assertEqual(split["train"]["n_rows"], 40)
+        self.assertEqual(split["validation"]["n_rows"], 10)
+        self.assertEqual(split["test"]["n_rows"], 10)
 
     def test_rejects_missing_group_identifier(self):
         with self.assertRaisesRegex(ValueError, "fabric_id"):

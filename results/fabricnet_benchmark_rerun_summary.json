@@ -124,5 +124,14 @@
     "CONSISTENT_WITH_WARNING": 27,
     "VALIDATED": 15
   },
-  "interpretation": "Exact deterministic reproduction of current benchmark. Not client smartphone validation or model validation. Accepted-only accuracy is selective and must be reported with coverage."
+  "interpretation": "Exact deterministic reproduction of current benchmark. Not client smartphone validation or model validation. Accepted-only accuracy is selective and must be reported with coverage.",
+  "latest_validation": {
+    "branch_head_commit": "147d27ac18adc4df036a69031b9f17ff56a002e4",
+    "workflow_run_url": "https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43907041685",
+    "python_tests": 54,
+    "javascript_syntax_check": "passed",
+    "full_130_image_rerun": "passed",
+    "artifact_id": 14246042495,
+    "artifact_sha256": "e6579398ea1ebadf878b79131a74c7bfcf7a24f111411c94a776c6ebc83fbdfd"
+  }
 }

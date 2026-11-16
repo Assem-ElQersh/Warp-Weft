@@ -14,6 +14,8 @@
 
 The workflow completed all 130 images and uploaded both result files. It also ran the 51-test Python suite and the inline JavaScript syntax check successfully.
 
+The later validation of the hardened latest branch head also passed 54 Python tests and reran all 130 images successfully: [GitHub Actions run 43907041685](https://github.com/Assem-ElQersh/Warp-Weft/actions/runs/43907041685). Its artifact (ID 14246042495) has SHA-256 e6579398ea1ebadf878b79131a74c7bfcf7a24f111411c94a776c6ebc83fbdfd. The newer artifact has the same sample predictions, accepted results, and status counts.
+
 ## Acquisition and calibration configuration
 
 | Setting | Value |

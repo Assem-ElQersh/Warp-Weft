@@ -104,7 +104,7 @@ The rerun exactly matched the committed benchmark for all 130 rows: zero changed
 
 Accepted-output coverage is 25/130 Warp (19.23%) and 32/130 Weft (24.62%). Accepted-only MAE is 2.48 ends/cm Warp and 2.375 picks/cm Weft; the 95% group-bootstrap intervals are [1.44, 3.601] and [1.71875, 3.0625], respectively. Candidate-estimate MAE remains 13.4318 Warp and 11.249 Weft. Per-weave results and methodology are recorded in docs/FABRICNET_BENCHMARK_RERUN.md.
 
-The same CI run passed 51 Python tests, including HTTP integration tests for existing health/preset routes, Classical analysis, mode rejection, and method comparison, plus the inline JavaScript syntax check.
+The 2026-11-16 validation of the latest feature-branch head passed 54 Python tests, including HTTP integration tests for existing health/preset routes, Classical analysis, mode rejection, comparison execution, malformed model-registry handling, and strict comparison-flag validation. The inline JavaScript syntax check also passed, and all 130 FabricNET images were re-run successfully.
 
 ## 5. Weave Architecture & Physical Domain Boundaries
 

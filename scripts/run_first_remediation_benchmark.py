@@ -133,7 +133,7 @@ def main() -> None:
 
     for index, row in enumerate(metadata, start=1):
         with Image.open(args.data_dir / row["image_id"]) as image_file:
-            image = image_file.convert("RGB")
+            image = image_file.copy()  # Match the historical notebook input mode exactly.
             result = analyze_fabric(
                 img_pil=image,
                 calibration=calibration,

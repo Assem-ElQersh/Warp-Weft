@@ -26,7 +26,7 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 | `data/synthetic/macro_swatch_skewed_12deg.png` | PNG image | 453.6 KB | Inspected (100%) | Synthetic test swatch ($800 \times 800$ px, $+12^\circ$ tilt) |
 | `data/synthetic/sample_plain_32x28.png` | PNG image | 132.7 KB | Inspected (100%) | Synthetic test swatch ($400 \times 400$ px, $0^\circ$ tilt) |
 | `data/synthetic/sample_skewed_15deg.png` | PNG image | 116.7 KB | Inspected (100%) | Synthetic test swatch ($400 \times 400$ px, $+15^\circ$ tilt) |
-| `results/fabricnet_benchmark.json` | JSON | 1.4 KB | Inspected (100%) | Recorded benchmark output for W012, W017, W001, W067 |
+| `results/fabricnet_benchmark.json` | JSON | ~90 KB | Inspected (100%) | 130-sample FabricNET v2 candidate/accepted metrics and per-sample statuses |
 | `results/output.json` | JSON | 1.1 KB | Inspected (100%) | Recorded end-to-end production verification metrics |
 | `results/output.txt` | Text | 767 B | Inspected (100%) | Raw benchmark execution log |
 | `results/output_skew.json` | JSON | 477 B | Inspected (100%) | Skew engine metrics |
@@ -227,6 +227,30 @@ This audit provides a comprehensive investigation of the codebase, notebooks, we
 * **Impact:** Broken external reproducibility.
 
 ---
+
+### Defect 2.16 — Candidate FFT Fallback Reported as a Direct Prediction
+
+* **Severity:** High
+* **Affected Files:** notebooks/04_real_fabric_benchmark.ipynb, results/fabricnet_benchmark.json, README benchmark tables.
+* **Root Cause:** Notebook 04 substitutes the FFT candidate when the evidence arbiter returns None for an accepted density. The resulting 13.43/11.25 MAE is a candidate-estimate metric, not accepted-output accuracy.
+* **Impact:** Candidate error and measurement coverage were conflated. A rejected candidate could be interpreted as a delivered measurement.
+* **Correction:** Benchmark artifacts now distinguish candidate estimates from accepted output, preserve nulls for rejected axes, and report accepted coverage separately.
+
+### Defect 2.17 — Benchmark Status Documentation Contradicted Serialized Sample Records
+
+* **Severity:** High
+* **Affected Files:** results/fabricnet_benchmark.json, data/README.md, docs/FINAL_REMEDIATION_REPORT.md.
+* **Root Cause:** The JSON sample records sum to 15 VALIDATED, 27 CONSISTENT_WITH_WARNING, and 88 NEEDS_REVIEW, while older documentation claimed 0 validated and 42 warning.
+* **Impact:** The published status breakdown was inconsistent with the underlying 130 rows.
+* **Correction:** Documentation and summary fields are reconciled to the sample records. Non-standard JSON NaN tokens are converted to standard JSON null.
+
+### Defect 2.18 — Learned-Model Claims Were Not Reproducible from Public Main
+
+* **Severity:** High
+* **Affected Files:** experiments/learned_models/ (absent at audit baseline), model reports, webpage.
+* **Root Cause:** The public tree at 8f55927 did not contain the reported learned-model notebooks, checkpoints, feature source, split manifests, or inference implementation.
+* **Impact:** The reported model results could not be independently reproduced from the public checkout.
+* **Correction:** A learned-model audit records the missing evidence. The UI exposes Classical, Learned, and Hybrid modes but only enables Classical until a complete versioned model package and inference adapter are committed.
 
 ## 4. Remediation Plan & Architectural Single Source of Truth
 To permanently eliminate divergence, we will construct a clean, authoritative Python package `src/fabric_analysis/` containing:

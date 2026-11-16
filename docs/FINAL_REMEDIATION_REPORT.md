@@ -84,9 +84,17 @@ The complete FabricNET dataset ($N=130$) was evaluated using the exact physical 
 | **Twill Weave Weft MAE (N=39)** | 5.90 picks/cm | **8.12 picks/cm** | Projection profiling tracks interlacing steps across diagonal ridges. |
 | **Satin Weave Warp MAE (N=41)** | 11.90 ends/cm | **12.18 ends/cm** | Long warp floats obscure interlacing nodes, lowering optical prominence. |
 | **Satin Weave Weft MAE (N=41)** | 24.15 picks/cm | **21.93 picks/cm** | Severe float harmonic error; identifies physical limit of surface reflection. |
-| **Decision Status Transparency** | 100% false "VALIDATED" | **NEEDS_REVIEW: 67.7% (88)<br>CONSISTENT_WITH_WARNING: 32.3% (42)<br>VALIDATED: 0.0% (0)** | Rejects false certainty; flags ambiguous float weaves for manual audit. |
+| **Decision Status Transparency** | 100% false "VALIDATED" | **NEEDS_REVIEW: 67.7% (88)<br>CONSISTENT_WITH_WARNING: 20.8% (27)<br>VALIDATED: 11.5% (15)** | Rejects false certainty; flags ambiguous float weaves for manual audit. |
 
 ---
+
+### 4.2. Interpretation correction: candidate errors versus accepted measurements
+
+Notebook 04 records pred_warp and pred_weft by taking the accepted fused density when available and otherwise falling back to the FFT candidate. The reported overall MAE (13.43 Warp / 11.25 Weft) is therefore a **candidate-estimate** metric, not accepted-output accuracy.
+
+The actual accepted fields in the benchmark JSON provide 25 Warp outputs (19.2% coverage; accepted-only MAE 2.48; 80.0% within ±2) and 32 Weft outputs (24.6% coverage; accepted-only MAE 2.38; 62.5% within ±2). Rejected rows remain in the coverage denominator. The sample-level decision counts are 15 VALIDATED, 27 CONSISTENT_WITH_WARNING, and 88 NEEDS_REVIEW. This corrects the earlier 0 VALIDATED / 42 WARNING documentation mismatch.
+
+The offline orientation-invariant metric selects a swap by comparing candidate errors to ground truth. It is an oracle-assisted diagnostic and must not be presented as deployable accuracy.
 
 ## 5. Weave Architecture & Physical Domain Boundaries
 

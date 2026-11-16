@@ -20,6 +20,7 @@ if WORKSPACE_ROOT not in sys.path:
     sys.path.insert(0, WORKSPACE_ROOT)
 
 from web_app.engine import run_complete_fabric_analysis, pil_to_base64_data_url
+from web_app.modes import get_analysis_modes
 
 STATIC_DIR = os.path.join(WORKSPACE_ROOT, "web_app")
 DATA_DIR = os.path.join(WORKSPACE_ROOT, "data")
@@ -73,7 +74,12 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 self.send_error(404, "index.html not found")
             return
 
-        # 2. Health Endpoint
+        # 2. Analysis mode capability endpoint
+        if url_path == "/api/models":
+            self.send_json_response(get_analysis_modes(WORKSPACE_ROOT))
+            return
+
+        # 3. Health Endpoint
         if url_path == "/api/health":
             self.send_json_response({
                 "status": "healthy",
@@ -191,6 +197,23 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 raw_body = self.rfile.read(content_length)
                 payload = json.loads(raw_body.decode("utf-8"))
 
+                # 0. Enforce requested analysis-mode availability before decoding image bytes.
+                analysis_mode = str(payload.get("analysis_mode", "classical")).strip().lower()
+                mode_catalog = get_analysis_modes(WORKSPACE_ROOT)
+                mode_map = {item["id"]: item for item in mode_catalog["modes"]}
+                if analysis_mode not in mode_map:
+                    self.send_json_response({"status": "error", "code": "unknown_analysis_mode", "error": f"Unknown analysis mode: {analysis_mode}"}, status_code=400)
+                    return
+                if not mode_map[analysis_mode]["available"]:
+                    self.send_json_response({
+                        "status": "unavailable",
+                        "code": "analysis_mode_unavailable",
+                        "analysis_mode": analysis_mode,
+                        "mode": mode_map[analysis_mode],
+                        "error": mode_map[analysis_mode]["reason"],
+                    }, status_code=409)
+                    return
+
                 # 1. Parse Image Payload
                 img_data_b64 = payload.get("image", "")
                 if not img_data_b64:
@@ -232,6 +255,7 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     custom_roi=custom_roi
                 )
 
+                result["analysis_mode"] = "classical"
                 self.send_json_response(result)
 
             except Exception as e:

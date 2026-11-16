@@ -393,6 +393,13 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .analysis-mode-status {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            line-height: 1.45;
+        }
+
         /* Primary Button */
         .btn-analyze {
             width: 100%;
@@ -860,6 +867,16 @@
                     <div class="help-box" id="help-skew"></div>
                 </div>
 
+                <div class="form-group" id="analysis-mode-group">
+                    <label id="lbl-analysis-mode" for="select-analysis-mode">Analysis Mode</label>
+                    <select class="form-control" id="select-analysis-mode" onchange="updateAnalysisModeAvailability()">
+                        <option value="classical" selected>Classical deterministic</option>
+                        <option value="learned">Learned models (unavailable)</option>
+                        <option value="hybrid">Hybrid (unavailable)</option>
+                    </select>
+                    <div class="analysis-mode-status" id="analysis-mode-status" role="status" aria-live="polite">Classical analysis is available. Learned and Hybrid require validated model artifacts.</div>
+                </div>
+
                 <button class="btn-analyze" id="btn-run" onclick="executeAnalysis()">
                     <span id="btn-run-text">Run Thread Analysis</span>
                 </button>
@@ -1055,6 +1072,10 @@
                 lblProminence: "Peak Prominence Sensitivity",
                 autoSkew: "Auto Skew Detection & Rectification",
                 runText: "Run Thread Analysis",
+                analysisMode: "Analysis Mode",
+                modeClassical: "Classical deterministic (available)",
+                modeLearned: "Learned models (unavailable)",
+                modeHybrid: "Hybrid (unavailable)",
                 kpiWarp: "Warp Density (Vertical)",
                 kpiWarpUnit: "Ends / 1.0 cm",
                 kpiWeft: "Weft Density (Horizontal)",
@@ -1093,6 +1114,10 @@
                 lblProminence: "حساسية بروز قمم الخيوط",
                 autoSkew: "كشف وتصحيح الانحراف الزاوي أوتوماتيكياً",
                 runText: "بدء تحليل كثافة الخيوط",
+                analysisMode: "وضع التحليل",
+                modeClassical: "خوارزميات حتمية (متاح)",
+                modeLearned: "نماذج مدربة (غير متاحة)",
+                modeHybrid: "هجين (غير متاح)",
                 kpiWarp: "كثافة السداء (رأسي)",
                 kpiWarpUnit: "خيط سداء / 1.0 سم",
                 kpiWeft: "كثافة اللحمة (أفقي)",
@@ -1165,6 +1190,11 @@
             document.getElementById('lbl-pixels-cm').innerText = strings.lblPixelsCm;
             document.getElementById('lbl-weave-hint').innerText = strings.lblWeaveHint;
             document.getElementById('lbl-prominence').innerText = strings.lblProminence;
+            document.getElementById('lbl-analysis-mode').innerText = strings.analysisMode;
+            const modeSelect = document.getElementById('select-analysis-mode');
+            modeSelect.options[0].text = strings.modeClassical;
+            modeSelect.options[1].text = strings.modeLearned;
+            modeSelect.options[2].text = strings.modeHybrid;
             document.getElementById('txt-auto-skew').innerText = strings.autoSkew;
             document.getElementById('btn-run-text').innerText = strings.runText;
 
@@ -1187,6 +1217,27 @@
             document.getElementById('btn-dl-ar').innerText = strings.btnDlAr;
 
             updateHelpTexts();
+        }
+
+        // The mode catalogue is authoritative. An unavailable choice remains visible
+        // for transparency, but the API will refuse to return fabricated predictions.
+        async function updateAnalysisModeAvailability() {
+            const selected = document.getElementById("select-analysis-mode").value;
+            const status = document.getElementById("analysis-mode-status");
+            try {
+                const response = await fetch("/api/models");
+                const catalog = await response.json();
+                const mode = catalog.modes.find(item => item.id === selected);
+                if (!mode) {
+                    status.innerText = "Unknown analysis mode.";
+                    return;
+                }
+                status.innerText = mode.available ? mode.description : mode.reason;
+                status.style.color = mode.available ? "var(--success)" : "var(--warning)";
+            } catch (error) {
+                status.innerText = "Model availability could not be retrieved. The API still enforces availability.";
+                status.style.color = "var(--warning)";
+            }
         }
 
         // Initialize Presets
@@ -1361,7 +1412,8 @@
                 pixels_per_cm_y: (activePreset && activePreset.pixels_per_cm_y) ? activePreset.pixels_per_cm_y : pixelsPerCm,
                 auto_skew: autoSkew,
                 prominence: prominence,
-                weave_hint: weaveHint
+                weave_hint: weaveHint,
+                analysis_mode: document.getElementById("select-analysis-mode").value
             };
 
             const controller = new AbortController();
@@ -1379,6 +1431,10 @@
 
                 if (res.status === 'success') {
                     displayResults(res);
+                } else if (res.status === 'unavailable') {
+                    const status = document.getElementById('analysis-mode-status');
+                    status.innerText = res.error || 'This analysis mode is not available.';
+                    status.style.color = 'var(--warning)';
                 } else {
                     alert('Analysis error: ' + (res.error || 'Unknown failure'));
                 }
@@ -1493,6 +1549,7 @@
         // Initialize on load
         window.onload = () => {
             updateHelpTexts();
+            updateAnalysisModeAvailability();
             loadPresets();
         };
     </script>

@@ -135,7 +135,7 @@ def compare_to_committed(
 
     old_by_id = {row.get("image_id"): row for row in committed.get("samples", [])}
     common = [row for row in rerun_records if row["image_id"] in old_by_id]
-    fields = ("pred_warp", "pred_weft", "accepted_warp", "accepted_weft", "accepted_warp_continuous", "accepted_weft_continuous", "decision_status")
+    fields = ("pred_warp", "pred_weft", "accepted_warp", "accepted_weft", "decision_status")
     differences: Dict[str, int] = {field: 0 for field in fields}
     max_abs_delta: Dict[str, Optional[float]] = {
         field: 0.0 for field in fields if field != "decision_status"
@@ -162,9 +162,10 @@ def compare_to_committed(
         "common_samples": len(common),
         "changed_sample_field_counts": differences,
         "max_absolute_numeric_delta": max_abs_delta,
+        "not_compared_fields": ["accepted_warp_continuous", "accepted_weft_continuous"],
         "interpretation": (
-            "Exact deterministic reproduction requires identical predictions/statuses for all common samples. "
-            "Any changed fields must be investigated before claiming equivalence."
+            "Exact deterministic reproduction compares all fields preserved by the historical benchmark. "
+            "Continuous accepted consensus values are newly emitted by this runner and were not stored in the historical artifact."
         ),
     }
 

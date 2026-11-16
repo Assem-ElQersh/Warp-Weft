@@ -11,6 +11,7 @@ from statistics import mean, stdev
 from typing import Any, Dict, Mapping, Optional, Sequence
 
 EXPECTED_REGIONS_PER_SPECIMEN = 5
+GROUND_TRUTH_SCHEMA_VERSION = "1.0.0"
 
 
 def _required_text(value: Any, field: str) -> str:
@@ -131,9 +132,12 @@ class SpecimenGroundTruth:
 
     fabric_id: str
     regions: tuple
+    schema_version: str = GROUND_TRUTH_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "fabric_id", _required_text(self.fabric_id, "fabric_id"))
+        if self.schema_version != GROUND_TRUTH_SCHEMA_VERSION:
+            raise ValueError(f"Unsupported ground-truth schema_version: {self.schema_version}")
         regions = tuple(self.regions)
         if len(regions) != EXPECTED_REGIONS_PER_SPECIMEN:
             raise ValueError(
@@ -152,14 +156,15 @@ class SpecimenGroundTruth:
     def from_mapping(cls, value: Mapping[str, Any]) -> "SpecimenGroundTruth":
         if not isinstance(value, Mapping):
             raise ValueError("Specimen ground truth must be an object")
-        if "fabric_id" not in value or "regions" not in value:
-            raise ValueError("Specimen record requires fabric_id and regions")
+        if "fabric_id" not in value or "regions" not in value or "schema_version" not in value:
+            raise ValueError("Specimen record requires schema_version, fabric_id and regions")
         regions_value = value["regions"]
         if not isinstance(regions_value, Sequence) or isinstance(regions_value, (str, bytes)):
             raise ValueError("regions must be an array")
         return cls(
             fabric_id=value["fabric_id"],
             regions=tuple(RegionMeasurement.from_mapping(item) for item in regions_value),
+            schema_version=value["schema_version"],
         )
 
     @property
@@ -196,6 +201,7 @@ class SpecimenGroundTruth:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
+            "schema_version": self.schema_version,
             "fabric_id": self.fabric_id,
             "expected_regions": EXPECTED_REGIONS_PER_SPECIMEN,
             "regions": [region.to_dict() for region in self.regions],

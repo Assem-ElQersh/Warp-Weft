@@ -4,43 +4,115 @@
   "title": "Warp & Weft AI five-region specimen ground truth",
   "type": "object",
   "additionalProperties": false,
-  "required": ["fabric_id", "regions"],
+  "required": [
+    "schema_version",
+    "fabric_id",
+    "regions"
+  ],
   "properties": {
-    "fabric_id": {"type": "string", "minLength": 1},
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "fabric_id": {
+      "type": "string",
+      "minLength": 1
+    },
     "regions": {
       "type": "array",
       "minItems": 5,
       "maxItems": 5,
-      "items": {"$ref": "#/$defs/region"}
+      "items": {
+        "$ref": "#/$defs/region"
+      }
     }
   },
   "$defs": {
-    "nullableText": {"type": ["string", "null"]},
-    "positiveScale": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "nullableText": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "positiveScale": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
     "region": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "fabric_id", "region_id", "image_path", "warp_manual_count",
-        "weft_manual_count", "measurement_length_cm", "camera_id",
-        "pixels_per_cm_x", "pixels_per_cm_y", "calibration_source",
-        "weave_type", "lighting_type", "focus_quality", "measurement_date"
+        "fabric_id",
+        "region_id",
+        "image_path",
+        "warp_manual_count",
+        "weft_manual_count",
+        "measurement_length_cm",
+        "camera_id",
+        "pixels_per_cm_x",
+        "pixels_per_cm_y",
+        "calibration_source",
+        "weave_type",
+        "lighting_type",
+        "focus_quality",
+        "measurement_date"
       ],
       "properties": {
-        "fabric_id": {"type": "string", "minLength": 1},
-        "region_id": {"type": "string", "minLength": 1},
-        "image_path": {"type": ["string", "null"]},
-        "warp_manual_count": {"type": "integer", "minimum": 0},
-        "weft_manual_count": {"type": "integer", "minimum": 0},
-        "measurement_length_cm": {"type": "number", "exclusiveMinimum": 0},
-        "camera_id": {"$ref": "#/$defs/nullableText"},
-        "pixels_per_cm_x": {"$ref": "#/$defs/positiveScale"},
-        "pixels_per_cm_y": {"$ref": "#/$defs/positiveScale"},
-        "calibration_source": {"$ref": "#/$defs/nullableText"},
-        "weave_type": {"type": "string", "minLength": 1},
-        "lighting_type": {"$ref": "#/$defs/nullableText"},
-        "focus_quality": {"$ref": "#/$defs/nullableText"},
-        "measurement_date": {"type": "string", "format": "date"}
+        "fabric_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "image_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "warp_manual_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "weft_manual_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "measurement_length_cm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "camera_id": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "pixels_per_cm_x": {
+          "$ref": "#/$defs/positiveScale"
+        },
+        "pixels_per_cm_y": {
+          "$ref": "#/$defs/positiveScale"
+        },
+        "calibration_source": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "weave_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lighting_type": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "focus_quality": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "measurement_date": {
+          "type": "string",
+          "format": "date"
+        }
       }
     }
   }

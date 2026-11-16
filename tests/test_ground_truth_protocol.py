@@ -1,6 +1,6 @@
 import unittest
 
-from src.fabric_analysis.ground_truth import RegionMeasurement, SpecimenGroundTruth
+from src.fabric_analysis.ground_truth import GROUND_TRUTH_SCHEMA_VERSION, RegionMeasurement, SpecimenGroundTruth
 
 
 def make_region(index, warp, weft, image=True):
@@ -31,6 +31,7 @@ class TestClientGroundTruthProtocol(unittest.TestCase):
             make_region(4, 30, 27),
             make_region(5, 32, 27),
         ))
+        self.assertEqual(specimen.to_dict()["schema_version"], GROUND_TRUTH_SCHEMA_VERSION)
         self.assertEqual(specimen.warp_mean_ends_per_cm, 31.0)
         self.assertEqual(specimen.weft_mean_picks_per_cm, 27.0)
         self.assertEqual(specimen.region_matched_count, 5)
@@ -50,6 +51,17 @@ class TestClientGroundTruthProtocol(unittest.TestCase):
         self.assertTrue(all(item["image_path"] is None for item in serialized["regions"]))
         self.assertTrue(all(item["supervision_level"] == "specimen_only" for item in serialized["regions"]))
         self.assertNotIn("specimen_mean", serialized["regions"][0])
+
+    def test_from_mapping_requires_and_checks_schema_version(self):
+        specimen = SpecimenGroundTruth("fabric-A", tuple(make_region(i, 31, 27) for i in range(1, 6)))
+        payload = specimen.to_dict()
+        self.assertEqual(SpecimenGroundTruth.from_mapping(payload).schema_version, GROUND_TRUTH_SCHEMA_VERSION)
+        payload["schema_version"] = "99.0.0"
+        with self.assertRaisesRegex(ValueError, "Unsupported ground-truth schema_version"):
+            SpecimenGroundTruth.from_mapping(payload)
+        del payload["schema_version"]
+        with self.assertRaisesRegex(ValueError, "requires schema_version"):
+            SpecimenGroundTruth.from_mapping(payload)
 
     def test_rejects_wrong_number_of_regions(self):
         with self.assertRaisesRegex(ValueError, "Exactly 5"):

@@ -21,6 +21,9 @@ if WORKSPACE_ROOT not in sys.path:
 
 from web_app.engine import run_complete_fabric_analysis, pil_to_base64_data_url
 from web_app.modes import get_analysis_modes
+from src.fabric_analysis.calibration import PhysicalCalibration
+from src.fabric_analysis.calibration_profile import list_calibration_profiles, get_calibration_profile
+from src.fabric_analysis.specimen_workflow import evaluate_five_region_specimen
 
 STATIC_DIR = os.path.join(WORKSPACE_ROOT, "web_app")
 DATA_DIR = os.path.join(WORKSPACE_ROOT, "data")
@@ -77,6 +80,15 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
         # 2. Analysis mode capability endpoint
         if url_path == "/api/models":
             self.send_json_response(get_analysis_modes(WORKSPACE_ROOT))
+            return
+
+        # 2b. Calibration profiles endpoint
+        if url_path == "/api/calibration/profiles":
+            profiles = list_calibration_profiles()
+            self.send_json_response({
+                "status": "success",
+                "profiles": profiles
+            })
             return
 
         # 3. Health Endpoint
@@ -304,6 +316,101 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                         ),
                     }
                 self.send_json_response(result)
+
+            except Exception as e:
+                self.send_json_response({"status": "error", "error": str(e)}, status_code=500)
+            return
+
+        if url_path == "/api/analyze/specimen":
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                raw_body = self.rfile.read(content_length)
+                payload = json.loads(raw_body.decode("utf-8"))
+                if not isinstance(payload, dict):
+                    self.send_json_response({"status": "error", "code": "invalid_payload", "error": "Request payload must be a JSON object."}, status_code=400)
+                    return
+
+                fabric_id = str(payload.get("fabric_id", "specimen_1")).strip()
+                profile_name = payload.get("profile_name")
+                scale_x = payload.get("scale_x") or payload.get("pixels_per_cm_x")
+                scale_y = payload.get("scale_y") or payload.get("pixels_per_cm_y")
+
+                if profile_name:
+                    prof = get_calibration_profile(profile_name)
+                    if prof:
+                        calib = prof.to_physical_calibration()
+                    else:
+                        calib = PhysicalCalibration.from_scales(float(scale_x or 263.5), float(scale_y or 208.4))
+                elif scale_x and scale_y:
+                    calib = PhysicalCalibration.from_scales(float(scale_x), float(scale_y))
+                else:
+                    calib = PhysicalCalibration.from_scales(263.5, 208.4)
+
+                target_warp = float(payload.get("target_warp", 31.0))
+                target_weft = float(payload.get("target_weft", 27.0))
+                tolerance = float(payload.get("tolerance", 2.0))
+
+                images_list = []
+                roi_boxes = payload.get("roi_boxes")
+
+                if "images" in payload and isinstance(payload["images"], list) and len(payload["images"]) >= 5:
+                    for img_b64 in payload["images"][:5]:
+                        if "," in img_b64:
+                            img_b64 = img_b64.split(",")[1]
+                        img_bytes = base64.b64decode(img_b64)
+                        images_list.append(Image.open(io.BytesIO(img_bytes)))
+                elif "image" in payload and payload["image"]:
+                    img_b64 = payload["image"]
+                    if "," in img_b64:
+                        img_b64 = img_b64.split(",")[1]
+                    img_bytes = base64.b64decode(img_b64)
+                    base_pil = Image.open(io.BytesIO(img_bytes))
+                    images_list.append(base_pil)
+                elif "preset_id" in payload:
+                    preset_id = payload["preset_id"]
+                    if preset_id == "fabricnet_w012":
+                        img_path = os.path.join(WORKSPACE_ROOT, "data/fabricnet/W012.jpg")
+                    elif preset_id == "fabricnet_w001":
+                        img_path = os.path.join(WORKSPACE_ROOT, "data/fabricnet/W001.jpg")
+                    elif preset_id == "synthetic_skewed_15":
+                        img_path = os.path.join(WORKSPACE_ROOT, "data/synthetic/sample_skewed_15deg.png")
+                    elif preset_id == "client_test":
+                        img_path = os.path.join(WORKSPACE_ROOT, "data/samples/test.png")
+                    else:
+                        img_path = os.path.join(WORKSPACE_ROOT, "data/synthetic/macro_swatch_skewed_12deg.png")
+                    images_list.append(Image.open(img_path))
+                else:
+                    self.send_json_response({"status": "error", "code": "missing_image", "error": "No image data provided for specimen analysis."}, status_code=400)
+                    return
+
+                if len(images_list) == 1 and (not roi_boxes or len(roi_boxes) != 5):
+                    w_img, h_img = images_list[0].size
+                    rw = max(60, min(int(calib.pixels_per_cm_x), int(w_img * 0.25)))
+                    rh = max(60, min(int(calib.pixels_per_cm_y), int(h_img * 0.25)))
+
+                    roi_boxes = [
+                        (int(w_img * 0.15), int(h_img * 0.15), int(w_img * 0.15) + rw, int(h_img * 0.15) + rh),
+                        (int(w_img * 0.85) - rw, int(h_img * 0.15), int(w_img * 0.85), int(h_img * 0.15) + rh),
+                        (int((w_img - rw) / 2), int((h_img - rh) / 2), int((w_img + rw) / 2), int((h_img + rh) / 2)),
+                        (int(w_img * 0.15), int(h_img * 0.85) - rh, int(w_img * 0.15) + rw, int(h_img * 0.85)),
+                        (int(w_img * 0.85) - rw, int(h_img * 0.85) - rh, int(w_img * 0.85), int(h_img * 0.85)),
+                    ]
+                elif roi_boxes and len(roi_boxes) == 5 and isinstance(roi_boxes[0], dict):
+                    roi_boxes = [(b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"]) for b in roi_boxes]
+                elif roi_boxes and len(roi_boxes) == 5 and isinstance(roi_boxes[0], (list, tuple)):
+                    roi_boxes = [tuple(b) for b in roi_boxes]
+
+                res = evaluate_five_region_specimen(
+                    fabric_id=fabric_id,
+                    images=images_list,
+                    calibration=calib,
+                    roi_boxes=roi_boxes,
+                    target_warp=target_warp,
+                    target_weft=target_weft,
+                    tolerance=tolerance
+                )
+
+                self.send_json_response({"status": "success", "specimen": res.to_dict()})
 
             except Exception as e:
                 self.send_json_response({"status": "error", "error": str(e)}, status_code=500)

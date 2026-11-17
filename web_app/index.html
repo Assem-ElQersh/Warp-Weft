@@ -820,11 +820,14 @@
                     </div>
                     <div class="help-box" id="help-scale"></div>
                     <select class="form-control" id="preset-scale-select" onchange="handleScalePresetChange()">
+                        <option value="smartphone_macro_stand_v1">Smartphone Macro Stand (263.5 px/cm X / 208.4 px/cm Y — Client Profile)</option>
+                        <option value="smartphone_pick_glass_v1">Smartphone Pick-Glass 10x (420.0 px/cm)</option>
                         <option value="1280.0">USB Digital Microscope (1280 px/cm — FabricNET Scale)</option>
                         <option value="1200.0">USB Digital Microscope (1200 px/cm — Standard Pick-Glass)</option>
                         <option value="472.44">Flatbed Scanner 1200 DPI (472.4 px/cm)</option>
                         <option value="236.22">Flatbed Scanner 600 DPI (236.2 px/cm)</option>
                         <option value="400.0" selected>Smartphone / Macro Camera (400 px/cm)</option>
+                        <option value="two_point">Ruler Two-Point Calibration Tool</option>
                         <option value="custom">Custom (Specify px/cm manually)</option>
                     </select>
                 </div>
@@ -832,6 +835,10 @@
                 <div class="form-group" id="custom-scale-group" style="display: none;">
                     <label id="lbl-pixels-cm">Pixels per Centimeter (px/cm)</label>
                     <input type="number" class="form-control" id="input-pixels-cm" value="400.0" step="1.0" min="50" max="10000">
+                    <div style="display: flex; gap: 8px; margin-top: 6px;">
+                        <input type="number" class="form-control" id="input-pixels-cm-y" placeholder="Y-scale px/cm (optional)" value="" step="1.0" min="50" max="10000">
+                        <button type="button" class="btn-report" id="btn-two-point-tool" onclick="openTwoPointModal()" style="white-space: nowrap; border-color: var(--accent); color: var(--accent);">Ruler Tool</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -971,6 +978,7 @@
                     <button class="tab-btn" onclick="switchTab('tab-proj', this)" id="tab-btn-proj">1D Projection Profiles</button>
                     <button class="tab-btn" onclick="switchTab('tab-fft', this)" id="tab-btn-fft">2D FFT Spectrum</button>
                     <button class="tab-btn" onclick="switchTab('tab-audit', this)" id="tab-btn-audit">Mathematical Audit</button>
+                    <button class="tab-btn" onclick="switchTab('tab-specimen', this)" id="tab-btn-specimen">5-Region Factory Protocol</button>
                 </div>
 
                 <!-- Tab 1: Overview & ROI -->
@@ -1067,6 +1075,82 @@
                     </div>
                 </div>
 
+                <!-- Tab 6: 5-Region Specimen Evaluation -->
+                <div class="tab-content" id="tab-specimen">
+                    <div style="padding: 16px; background: #ffffff; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                            <div>
+                                <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f2b48;" id="title-specimen-protocol">Client 5-Region Specimen Protocol (ASTM D3775)</h4>
+                                <p style="font-size: 0.82rem; color: var(--text-muted);" id="desc-specimen-protocol">Evaluates 5 independent spatial regions across the fabric specimen against factory tolerance bounds (&plusmn;2 threads/cm).</p>
+                            </div>
+                            <button type="button" class="btn-analyze" id="btn-run-specimen" onclick="executeSpecimenEvaluation()" style="width: auto; padding: 8px 18px; margin-top: 0;">
+                                <span id="btn-specimen-text">Run 5-Region Evaluation</span>
+                            </button>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                            <div>
+                                <label style="font-size: 0.78rem; font-weight: 600;" id="lbl-specimen-id">Specimen ID</label>
+                                <input type="text" id="specimen-input-id" class="form-control" value="Specimen_2">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.78rem; font-weight: 600;" id="lbl-target-warp">Target Warp (ends/cm)</label>
+                                <input type="number" id="specimen-target-warp" class="form-control" value="31.0" step="1.0">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.78rem; font-weight: 600;" id="lbl-target-weft">Target Weft (picks/cm)</label>
+                                <input type="number" id="specimen-target-weft" class="form-control" value="27.0" step="1.0">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.78rem; font-weight: 600;" id="lbl-specimen-tolerance">Tolerance (&plusmn; threads/cm)</label>
+                                <input type="number" id="specimen-tolerance" class="form-control" value="2.0" step="0.5">
+                            </div>
+                        </div>
+
+                        <!-- Specimen Summary Banner -->
+                        <div id="specimen-summary-card" style="display: none; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #cbd5e1; background: #f8fafc;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                                <div style="font-size: 1.1rem; font-weight: 800;" id="specimen-status-badge">SPECIMEN STATUS</div>
+                                <div style="font-size: 0.84rem; color: #475569;" id="specimen-regions-count">5 / 5 Regions Validated</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px;">
+                                    <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Warp Mean &plusmn; Sample Std</div>
+                                    <div style="font-size: 1.25rem; font-weight: 800; color: #1e3a8a;" id="specimen-warp-stats">-- ends/cm</div>
+                                    <div style="font-size: 0.76rem; font-weight: 700; margin-top: 4px;" id="specimen-warp-badge">PASS [29–33]</div>
+                                </div>
+                                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px;">
+                                    <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Weft Mean &plusmn; Sample Std</div>
+                                    <div style="font-size: 1.25rem; font-weight: 800; color: #047857;" id="specimen-weft-stats">-- picks/cm</div>
+                                    <div style="font-size: 0.76rem; font-weight: 700; margin-top: 4px;" id="specimen-weft-badge">PASS [25–29]</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #334155; margin-top: 10px;" id="specimen-decision-summary"></div>
+                        </div>
+
+                        <!-- 5 Regions Table -->
+                        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%;">
+                            <table class="audit-table" id="table-specimen-regions">
+                                <thead>
+                                    <tr>
+                                        <th>Region</th>
+                                        <th>Location</th>
+                                        <th>Warp Density</th>
+                                        <th>Weft Density</th>
+                                        <th>Candidate Warp</th>
+                                        <th>Candidate Weft</th>
+                                        <th>SQI</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="specimen-regions-tbody">
+                                    <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">Click 'Run 5-Region Evaluation' to compute specimen metrics across 5 physical sample locations.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Reports Download Banner -->
@@ -1078,6 +1162,49 @@
                     <a href="/reports/warp_weft_report_en.pdf" target="_blank" class="btn-report" id="btn-dl-en">Download English PDF</a>
                     <a href="/reports/warp_weft_report_ar.pdf" target="_blank" class="btn-report" id="btn-dl-ar">تحميل التقرير الفني المعتمد (PDF)</a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Two-Point Interactive Calibration -->
+    <div class="modal-backdrop" id="modal-two-point" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,23,42,0.7); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div class="modal-card" style="background: #ffffff; border-radius: 12px; max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f2b48;" id="txt-modal-two-point-title">Two-Point Physical Scale Calibration</h3>
+                <button type="button" onclick="closeTwoPointModal()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            <p style="font-size: 0.84rem; color: #475569; margin-bottom: 14px;" id="txt-modal-two-point-desc">Click two known points on the ruler or fabric surface (e.g. 10.0 mm span) to compute exact pixel-to-centimeter scale.</p>
+            <div style="position: relative; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #000; text-align: center; margin-bottom: 14px;">
+                <canvas id="canvas-two-point" style="max-width: 100%; max-height: 380px; cursor: crosshair; display: block; margin: 0 auto;"></canvas>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;" id="lbl-ruler-dist">Known Physical Distance</label>
+                    <input type="number" id="input-ruler-distance" class="form-control" value="10.0" step="0.5" min="1.0" oninput="recalcTwoPointScale()">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;" id="lbl-ruler-unit">Distance Unit</label>
+                    <select id="select-ruler-unit" class="form-control" onchange="recalcTwoPointScale()">
+                        <option value="mm" selected>Millimeters (mm)</option>
+                        <option value="cm">Centimeters (cm)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;" id="lbl-ruler-axis">Orientation / Axis</label>
+                    <select id="select-ruler-axis" class="form-control" onchange="recalcTwoPointScale()">
+                        <option value="both" selected>Both (Isotropic Scale)</option>
+                        <option value="horizontal">Horizontal (X-axis only)</option>
+                        <option value="vertical">Vertical (Y-axis only)</option>
+                    </select>
+                </div>
+            </div>
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 0.84rem;">
+                <div><strong>Measured Pixel Distance:</strong> <span id="span-pixel-dist">0.0 px</span></div>
+                <div><strong>Calculated Scale:</strong> <span id="span-calc-scale">-- px/cm</span></div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="closeTwoPointModal()" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 16px; font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="button" onclick="applyTwoPointScale()" style="background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 700; cursor: pointer;">Apply Calibration</button>
             </div>
         </div>
     </div>
@@ -1134,6 +1261,20 @@
                 tabProj: "1D Projection Profiles",
                 tabFft: "2D FFT Spectrum",
                 tabAudit: "Mathematical Audit",
+                tabSpecimen: "5-Region Factory Protocol",
+                btnRunSpecimen: "Run 5-Region Evaluation",
+                modalTwoPointTitle: "Two-Point Physical Scale Calibration",
+                modalTwoPointDesc: "Click two known points on the ruler or fabric surface (e.g. 10.0 mm span) to compute exact pixel-to-centimeter scale.",
+                lblRulerDist: "Known Physical Distance",
+                lblRulerUnit: "Distance Unit",
+                lblRulerAxis: "Orientation / Axis",
+                btnTwoPointTool: "Ruler Tool",
+                titleSpecimenProtocol: "Client 5-Region Specimen Protocol (ASTM D3775)",
+                descSpecimenProtocol: "Evaluates 5 independent spatial regions across the fabric specimen against factory tolerance bounds (±2 threads/cm).",
+                lblSpecimenId: "Specimen ID",
+                lblTargetWarp: "Target Warp (ends/cm)",
+                lblTargetWeft: "Target Weft (picks/cm)",
+                lblSpecimenTolerance: "Tolerance (± threads/cm)",
                 bannerText: "Ready to present to clients or review complete scientific derivations?",
                 btnDlEn: "Download English PDF",
                 btnDlAr: "تحميل التقرير الفني (عربي)",
@@ -1191,6 +1332,20 @@
                 tabProj: "منحنيات الإسقاط الخطي",
                 tabFft: "طيف فورييه التوافقي",
                 tabAudit: "جدول التدقيق الرياضي",
+                tabSpecimen: "بروتوكول المصنع (5 مناطق)",
+                btnRunSpecimen: "تشغيل فحص العينة (5 مناطق)",
+                modalTwoPointTitle: "المعايرة المكانية التفاعلية بنقطتين",
+                modalTwoPointDesc: "انقر على نقطتين معلومتي المسافة على المسطرة أو سطح القماش لحساب مقياس البكسل/سم بدقة.",
+                lblRulerDist: "المسافة الفيزيائية المعلومة",
+                lblRulerUnit: "وحدة القياس",
+                lblRulerAxis: "المحور / الاتجاه",
+                btnTwoPointTool: "أداة المسطرة",
+                titleSpecimenProtocol: "بروتوكول العينة المعتمد بـ 5 مناطق (ASTM D3775)",
+                descSpecimenProtocol: "يقيس 5 مناطق جغرافية مستقلة عبر عينة النسيج للتحقق من حدود التفاوت المسموح بها للمصنع (±2 خيط/سم).",
+                lblSpecimenId: "معرف العينة",
+                lblTargetWarp: "السداء المستهدف (خيط/سم)",
+                lblTargetWeft: "اللحمة المستهدفة (خيط/سم)",
+                lblSpecimenTolerance: "نسبة التفاوت المسموح (± خيط/سم)",
                 bannerText: "هل ترغب في استعراض التقرير الهندسي الكامل المعتمد للعميل؟",
                 btnDlEn: "English PDF Report",
                 btnDlAr: "تحميل التقرير الفني بالعربية (PDF)",
@@ -1283,6 +1438,20 @@
             document.getElementById('tab-btn-proj').innerText = strings.tabProj;
             document.getElementById('tab-btn-fft').innerText = strings.tabFft;
             document.getElementById('tab-btn-audit').innerText = strings.tabAudit;
+            document.getElementById('tab-btn-specimen').innerText = strings.tabSpecimen;
+            document.getElementById('btn-specimen-text').innerText = strings.btnRunSpecimen;
+            document.getElementById('txt-modal-two-point-title').innerText = strings.modalTwoPointTitle;
+            document.getElementById('txt-modal-two-point-desc').innerText = strings.modalTwoPointDesc;
+            document.getElementById('lbl-ruler-dist').innerText = strings.lblRulerDist;
+            document.getElementById('lbl-ruler-unit').innerText = strings.lblRulerUnit;
+            document.getElementById('lbl-ruler-axis').innerText = strings.lblRulerAxis;
+            document.getElementById('btn-two-point-tool').innerText = strings.btnTwoPointTool;
+            document.getElementById('title-specimen-protocol').innerText = strings.titleSpecimenProtocol;
+            document.getElementById('desc-specimen-protocol').innerText = strings.descSpecimenProtocol;
+            document.getElementById('lbl-specimen-id').innerText = strings.lblSpecimenId;
+            document.getElementById('lbl-target-warp').innerText = strings.lblTargetWarp;
+            document.getElementById('lbl-target-weft').innerText = strings.lblTargetWeft;
+            document.getElementById('lbl-specimen-tolerance').innerText = strings.lblSpecimenTolerance;
 
             document.getElementById('txt-banner-text').innerText = strings.bannerText;
             document.getElementById('btn-dl-en').innerText = strings.btnDlEn;
@@ -1371,17 +1540,28 @@
             // Update inputs
             const scaleSelect = document.getElementById('preset-scale-select');
             const customScaleInput = document.getElementById('input-pixels-cm');
+            const customScaleInputY = document.getElementById('input-pixels-cm-y');
 
-            if (preset.pixels_per_cm === 1280.0) {
+            if (preset.pixels_per_cm_x && preset.pixels_per_cm_y) {
+                scaleSelect.value = "custom";
+                document.getElementById('custom-scale-group').style.display = 'block';
+                customScaleInput.value = preset.pixels_per_cm_x;
+                customScaleInputY.value = preset.pixels_per_cm_y;
+            } else if (preset.pixels_per_cm === 1280.0) {
                 scaleSelect.value = "1280.0";
                 document.getElementById('custom-scale-group').style.display = 'none';
+                customScaleInput.value = "1280.0";
+                customScaleInputY.value = "1200.0";
             } else if (preset.pixels_per_cm === 400.0) {
                 scaleSelect.value = "400.0";
                 document.getElementById('custom-scale-group').style.display = 'none';
+                customScaleInput.value = "400.0";
+                customScaleInputY.value = "400.0";
             } else {
                 scaleSelect.value = "custom";
                 document.getElementById('custom-scale-group').style.display = 'block';
                 customScaleInput.value = preset.pixels_per_cm;
+                customScaleInputY.value = preset.pixels_per_cm;
             }
 
             document.getElementById('chk-auto-skew').checked = preset.auto_skew;
@@ -1396,11 +1576,26 @@
         function handleScalePresetChange() {
             const val = document.getElementById('preset-scale-select').value;
             const customGroup = document.getElementById('custom-scale-group');
+            const inputX = document.getElementById('input-pixels-cm');
+            const inputY = document.getElementById('input-pixels-cm-y');
+
             if (val === 'custom') {
                 customGroup.style.display = 'block';
+            } else if (val === 'two_point') {
+                customGroup.style.display = 'block';
+                openTwoPointModal();
+            } else if (val === 'smartphone_macro_stand_v1') {
+                customGroup.style.display = 'block';
+                inputX.value = '263.5';
+                inputY.value = '208.4';
+            } else if (val === 'smartphone_pick_glass_v1') {
+                customGroup.style.display = 'none';
+                inputX.value = '420.0';
+                inputY.value = '420.0';
             } else {
                 customGroup.style.display = 'none';
-                document.getElementById('input-pixels-cm').value = val;
+                inputX.value = val;
+                inputY.value = (val === '1280.0') ? '1200.0' : val;
             }
         }
 
@@ -1484,10 +1679,19 @@
             btn.disabled = true;
             btnText.innerHTML = '<span class="spinner"></span> Analyzing...';
 
-            let pixelsPerCm = parseFloat(document.getElementById('input-pixels-cm').value);
+            let pixelsPerCmX = parseFloat(document.getElementById('input-pixels-cm').value);
+            let pixelsPerCmY = parseFloat(document.getElementById('input-pixels-cm-y').value) || pixelsPerCmX;
             const scalePreset = document.getElementById('preset-scale-select').value;
-            if (scalePreset !== 'custom') {
-                pixelsPerCm = parseFloat(scalePreset);
+
+            if (scalePreset === 'smartphone_macro_stand_v1') {
+                pixelsPerCmX = 263.5;
+                pixelsPerCmY = 208.4;
+            } else if (scalePreset === 'smartphone_pick_glass_v1') {
+                pixelsPerCmX = 420.0;
+                pixelsPerCmY = 420.0;
+            } else if (scalePreset !== 'custom' && scalePreset !== 'two_point') {
+                pixelsPerCmX = parseFloat(scalePreset);
+                pixelsPerCmY = (scalePreset === '1280.0') ? 1200.0 : pixelsPerCmX;
             }
 
             const autoSkew = document.getElementById('chk-auto-skew').checked;
@@ -1497,9 +1701,9 @@
             const payload = {
                 preset_id: activePresetId,
                 image: currentImageBase64,
-                pixels_per_cm: pixelsPerCm,
-                pixels_per_cm_x: (activePreset && activePreset.pixels_per_cm_x) ? activePreset.pixels_per_cm_x : pixelsPerCm,
-                pixels_per_cm_y: (activePreset && activePreset.pixels_per_cm_y) ? activePreset.pixels_per_cm_y : pixelsPerCm,
+                pixels_per_cm: pixelsPerCmX,
+                pixels_per_cm_x: (activePreset && activePreset.pixels_per_cm_x) ? activePreset.pixels_per_cm_x : pixelsPerCmX,
+                pixels_per_cm_y: (activePreset && activePreset.pixels_per_cm_y) ? activePreset.pixels_per_cm_y : pixelsPerCmY,
                 auto_skew: autoSkew,
                 prominence: prominence,
                 weave_hint: weaveHint,
@@ -1681,11 +1885,291 @@
             document.getElementById('audit-final-quality').innerText = `${r.confidence_score}%`;
         }
 
+        // Two-Point Interactive Calibration Tool
+        let twoPointClicks = [];
+        let twoPointImage = null;
+
+        function openTwoPointModal() {
+            const modal = document.getElementById('modal-two-point');
+            modal.style.display = 'flex';
+            twoPointClicks = [];
+            document.getElementById('span-pixel-dist').innerText = '0.0 px';
+            document.getElementById('span-calc-scale').innerText = '-- px/cm';
+
+            const canvas = document.getElementById('canvas-two-point');
+            const ctx = canvas.getContext('2d');
+            twoPointImage = new Image();
+
+            twoPointImage.onload = function() {
+                canvas.width = twoPointImage.width;
+                canvas.height = twoPointImage.height;
+                ctx.drawImage(twoPointImage, 0, 0);
+            };
+
+            if (currentImageBase64) {
+                twoPointImage.src = currentImageBase64;
+            } else {
+                const roiImg = document.getElementById('img-roi-preview');
+                if (roiImg && roiImg.src && roiImg.style.display !== 'none') {
+                    twoPointImage.src = roiImg.src;
+                } else {
+                    twoPointImage.src = '/data/fabricnet/W012.jpg';
+                }
+            }
+        }
+
+        function closeTwoPointModal() {
+            document.getElementById('modal-two-point').style.display = 'none';
+        }
+
+        function drawTwoPointOverlay() {
+            const canvas = document.getElementById('canvas-two-point');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (twoPointImage) {
+                ctx.drawImage(twoPointImage, 0, 0);
+            }
+
+            twoPointClicks.forEach((pt, idx) => {
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 6, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText(`P${idx + 1}`, pt.x + 8, pt.y - 8);
+            });
+
+            if (twoPointClicks.length === 2) {
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(twoPointClicks[0].x, twoPointClicks[0].y);
+                ctx.lineTo(twoPointClicks[1].x, twoPointClicks[1].y);
+                ctx.stroke();
+            }
+        }
+
+        function handleTwoPointCanvasClick(evt) {
+            const canvas = document.getElementById('canvas-two-point');
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = evt.clientX || (evt.touches && evt.touches[0] ? evt.touches[0].clientX : 0);
+            const clientY = evt.clientY || (evt.touches && evt.touches[0] ? evt.touches[0].clientY : 0);
+            const x = (clientX - rect.left) * scaleX;
+            const y = (clientY - rect.top) * scaleY;
+
+            if (twoPointClicks.length >= 2) {
+                twoPointClicks = [{ x: Math.round(x), y: Math.round(y) }];
+            } else {
+                twoPointClicks.push({ x: Math.round(x), y: Math.round(y) });
+            }
+
+            drawTwoPointOverlay();
+
+            if (twoPointClicks.length === 2) {
+                const dx = twoPointClicks[1].x - twoPointClicks[0].x;
+                const dy = twoPointClicks[1].y - twoPointClicks[0].y;
+                const distPx = Math.hypot(dx, dy);
+                document.getElementById('span-pixel-dist').innerText = distPx.toFixed(1) + ' px';
+                recalcTwoPointScale();
+            } else {
+                document.getElementById('span-pixel-dist').innerText = '0.0 px (1 point clicked)';
+                document.getElementById('span-calc-scale').innerText = '-- px/cm';
+            }
+        }
+
+        function recalcTwoPointScale() {
+            if (twoPointClicks.length < 2) return;
+            const dx = twoPointClicks[1].x - twoPointClicks[0].x;
+            const dy = twoPointClicks[1].y - twoPointClicks[0].y;
+            const distPx = Math.hypot(dx, dy);
+
+            const distVal = parseFloat(document.getElementById('input-ruler-distance').value) || 10.0;
+            const distUnit = document.getElementById('select-ruler-unit').value;
+            const distCm = distUnit === 'mm' ? (distVal / 10.0) : distVal;
+
+            if (distCm > 0) {
+                const scale = distPx / distCm;
+                document.getElementById('span-calc-scale').innerText = scale.toFixed(1) + ' px/cm';
+            }
+        }
+
+        function applyTwoPointScale() {
+            if (twoPointClicks.length < 2) {
+                alert(currentLanguage === 'ar' ? 'يرجى النقر على نقطتين أولاً على المسطرة أو النسيج.' : 'Please click two points on the ruler or fabric image first.');
+                return;
+            }
+            const dx = twoPointClicks[1].x - twoPointClicks[0].x;
+            const dy = twoPointClicks[1].y - twoPointClicks[0].y;
+            const distPx = Math.hypot(dx, dy);
+            const distVal = parseFloat(document.getElementById('input-ruler-distance').value) || 10.0;
+            const distUnit = document.getElementById('select-ruler-unit').value;
+            const distCm = distUnit === 'mm' ? (distVal / 10.0) : distVal;
+            const scale = distPx / distCm;
+
+            const axis = document.getElementById('select-ruler-axis').value;
+            const inputX = document.getElementById('input-pixels-cm');
+            const inputY = document.getElementById('input-pixels-cm-y');
+            const scaleSelect = document.getElementById('preset-scale-select');
+            const customGroup = document.getElementById('custom-scale-group');
+
+            scaleSelect.value = 'custom';
+            customGroup.style.display = 'block';
+
+            if (axis === 'horizontal') {
+                inputX.value = scale.toFixed(1);
+            } else if (axis === 'vertical') {
+                inputY.value = scale.toFixed(1);
+            } else {
+                inputX.value = scale.toFixed(1);
+                inputY.value = scale.toFixed(1);
+            }
+
+            closeTwoPointModal();
+            executeAnalysis();
+        }
+
+        // 5-Region Specimen Evaluation Workflow
+        async function executeSpecimenEvaluation() {
+            const btn = document.getElementById('btn-run-specimen');
+            const btnText = document.getElementById('btn-specimen-text');
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Evaluating...';
+
+            const specimenId = document.getElementById('specimen-input-id').value || 'Specimen_2';
+            const targetWarp = parseFloat(document.getElementById('specimen-target-warp').value) || 31.0;
+            const targetWeft = parseFloat(document.getElementById('specimen-target-weft').value) || 27.0;
+            const tolerance = parseFloat(document.getElementById('specimen-tolerance').value) || 2.0;
+
+            let pxX = parseFloat(document.getElementById('input-pixels-cm').value);
+            let pxY = parseFloat(document.getElementById('input-pixels-cm-y').value) || pxX;
+            const scalePreset = document.getElementById('preset-scale-select').value;
+            if (scalePreset === 'smartphone_macro_stand_v1') {
+                pxX = 263.5;
+                pxY = 208.4;
+            } else if (scalePreset === 'smartphone_pick_glass_v1') {
+                pxX = 420.0;
+                pxY = 420.0;
+            } else if (scalePreset !== 'custom' && scalePreset !== 'two_point') {
+                pxX = parseFloat(scalePreset);
+                pxY = (scalePreset === '1280.0') ? 1200.0 : pxX;
+            }
+
+            const payload = {
+                fabric_id: specimenId,
+                target_warp: targetWarp,
+                target_weft: targetWeft,
+                tolerance: tolerance,
+                pixels_per_cm_x: pxX,
+                pixels_per_cm_y: pxY
+            };
+
+            if (currentImageBase64) {
+                payload.image = currentImageBase64;
+            } else if (activePresetId) {
+                payload.preset_id = activePresetId;
+            } else {
+                payload.preset_id = 'client_test';
+            }
+
+            try {
+                const response = await fetch('/api/analyze/specimen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const res = await response.json();
+                if (res.status === 'success' && res.specimen) {
+                    displaySpecimenResults(res.specimen);
+                } else {
+                    alert('Specimen analysis error: ' + (res.error || 'Evaluation failed'));
+                }
+            } catch (err) {
+                console.error("Specimen API error", err);
+                alert('Specimen evaluation failed: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = currentLanguage === 'ar' ? 'تشغيل فحص العينة (5 مناطق)' : 'Run 5-Region Evaluation';
+            }
+        }
+
+        function displaySpecimenResults(specimen) {
+            const card = document.getElementById('specimen-summary-card');
+            card.style.display = 'block';
+
+            const statusBadge = document.getElementById('specimen-status-badge');
+            if (specimen.decision_status === 'PASS') {
+                statusBadge.innerText = 'SPECIMEN ACCEPTED (PASS)';
+                statusBadge.style.color = 'var(--success)';
+            } else if (specimen.decision_status === 'FAIL') {
+                statusBadge.innerText = 'SPECIMEN REJECTED (FAIL)';
+                statusBadge.style.color = 'var(--danger)';
+            } else {
+                statusBadge.innerText = 'NEEDS FACTORY REVIEW';
+                statusBadge.style.color = 'var(--warning)';
+            }
+
+            document.getElementById('specimen-regions-count').innerText = 
+                `${specimen.validated_regions_count} / ${specimen.expected_regions} Regions Validated (${specimen.evaluated_regions_count} Evaluated)`;
+
+            const warpMean = specimen.warp_mean_ends_per_cm != null ? specimen.warp_mean_ends_per_cm : '--';
+            const warpStd = specimen.warp_sample_std_ends_per_cm != null ? specimen.warp_sample_std_ends_per_cm : '0.00';
+            document.getElementById('specimen-warp-stats').innerText = `${warpMean} ± ${warpStd} ends/cm`;
+
+            const warpBadge = document.getElementById('specimen-warp-badge');
+            warpBadge.innerText = `${specimen.warp_pass ? 'PASS' : 'FAIL'} [${(specimen.target_warp_ends_per_cm - specimen.factory_tolerance_threads_per_cm).toFixed(1)}–${(specimen.target_warp_ends_per_cm + specimen.factory_tolerance_threads_per_cm).toFixed(1)}] (Target: ${specimen.target_warp_ends_per_cm} ± ${specimen.factory_tolerance_threads_per_cm})`;
+            warpBadge.style.color = specimen.warp_pass ? 'var(--success)' : 'var(--danger)';
+
+            const weftMean = specimen.weft_mean_picks_per_cm != null ? specimen.weft_mean_picks_per_cm : '--';
+            const weftStd = specimen.weft_sample_std_picks_per_cm != null ? specimen.weft_sample_std_picks_per_cm : '0.00';
+            document.getElementById('specimen-weft-stats').innerText = `${weftMean} ± ${weftStd} picks/cm`;
+
+            const weftBadge = document.getElementById('specimen-weft-badge');
+            weftBadge.innerText = `${specimen.weft_pass ? 'PASS' : 'FAIL'} [${(specimen.target_weft_picks_per_cm - specimen.factory_tolerance_threads_per_cm).toFixed(1)}–${(specimen.target_weft_picks_per_cm + specimen.factory_tolerance_threads_per_cm).toFixed(1)}] (Target: ${specimen.target_weft_picks_per_cm} ± ${specimen.factory_tolerance_threads_per_cm})`;
+            weftBadge.style.color = specimen.weft_pass ? 'var(--success)' : 'var(--danger)';
+
+            document.getElementById('specimen-decision-summary').innerText = specimen.decision_summary || '';
+
+            const tbody = document.getElementById('specimen-regions-tbody');
+            tbody.innerHTML = '';
+            (specimen.regions || []).forEach(r => {
+                const tr = document.createElement('tr');
+                const boxStr = r.crop_box ? `[${r.crop_box[0]}, ${r.crop_box[1]}, ${r.crop_box[2]}, ${r.crop_box[3]}]` : '--';
+                const warpStr = r.warp_density_ends_per_cm != null ? `${r.warp_density_ends_per_cm} ends/cm` : '<span style="color: var(--warning);">Unvalidated</span>';
+                const weftStr = r.weft_density_picks_per_cm != null ? `${r.weft_density_picks_per_cm} picks/cm` : '<span style="color: var(--warning);">Unvalidated</span>';
+                const candWarp = r.warp_candidate_ends_per_cm != null ? `${r.warp_candidate_ends_per_cm}` : '--';
+                const candWeft = r.weft_candidate_picks_per_cm != null ? `${r.weft_candidate_picks_per_cm}` : '--';
+                const statusColor = r.decision_status === 'ACCEPTED' ? 'var(--success)' : (r.decision_status === 'NEEDS_REVIEW' ? 'var(--warning)' : 'var(--danger)');
+
+                tr.innerHTML = `
+                    <td><strong>${r.region_id}</strong></td>
+                    <td style="font-family: monospace; font-size: 0.75rem;">${boxStr}</td>
+                    <td>${warpStr}</td>
+                    <td>${weftStr}</td>
+                    <td>${candWarp}</td>
+                    <td>${candWeft}</td>
+                    <td>${r.signal_quality_index}%</td>
+                    <td><span style="font-weight: 700; color: ${statusColor};">${r.decision_status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         // Initialize on load
         window.onload = () => {
             updateHelpTexts();
             updateAnalysisModeAvailability();
             loadPresets();
+            const twoPointCanvas = document.getElementById('canvas-two-point');
+            if (twoPointCanvas) {
+                twoPointCanvas.addEventListener('click', handleTwoPointCanvasClick);
+            }
         };
     </script>
 </body>

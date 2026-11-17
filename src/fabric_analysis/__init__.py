@@ -11,6 +11,17 @@ from src.fabric_analysis.spectral import compute_spectral_density_multicandidate
 from src.fabric_analysis.spatial import compute_spatial_projection_density
 from src.fabric_analysis.fusion import evaluate_evidence_fusion
 from src.fabric_analysis.pipeline import analyze_fabric, pil_to_base64_data_url
+from src.fabric_analysis.calibration_profile import (
+    CalibrationProfile,
+    get_calibration_profile,
+    list_calibration_profiles,
+    calibrate_from_two_points,
+)
+from src.fabric_analysis.specimen_workflow import (
+    evaluate_five_region_specimen,
+    SpecimenEvaluationResult,
+    RegionResult,
+)
 
 __all__ = [
     "PhysicalCalibration",
@@ -21,5 +32,12 @@ __all__ = [
     "compute_spatial_projection_density",
     "evaluate_evidence_fusion",
     "analyze_fabric",
-    "pil_to_base64_data_url"
+    "pil_to_base64_data_url",
+    "CalibrationProfile",
+    "get_calibration_profile",
+    "list_calibration_profiles",
+    "calibrate_from_two_points",
+    "evaluate_five_region_specimen",
+    "SpecimenEvaluationResult",
+    "RegionResult",
 ]

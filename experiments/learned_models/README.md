@@ -17,12 +17,14 @@ The overarching objective is to prepare the engineering foundations for three us
 | Paradigm / Model | Underlying Architecture | Input Tensor & Resolution | Output Format | Spatial Calibration Required ($S_x, S_y$) | Training / Tuning Cost | Inference Latency | Primary Failure Modes & Boundary Conditions |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Deterministic Engine** (`src/fabric_analysis`) | 2D FFT + 1D Spatial Autocorrelation & Peak Filtering | Grayscale / RGB $(H, W)$ arbitrary resolution | Direct thread density ($T_x, T_y$ in ends/cm) | **Mandatory** ($S_x, S_y$ px/cm) | Zero (Pure mathematical inference) | ~12 ms (CPU) | Harmonic ambiguity on twill/satin long yarn floats; low optical contrast; non-periodic patterns. |
-| **FabricNET Feature Regression (Random Forest)** | GLCM (96) + LBP (54) + Gabor (96) + IFV (16) $\to$ 262-d feature vector $\to$ Regressor | Single 2D Grayscale $(480, 640)$ | Direct density ($T_x, T_y$ in ends/cm) | **Implicit** (Nominal $5\times 4\text{ mm}$ FOV: $S_x=1280.0, S_y=1200.0\text{ px/cm}$) | Low (~90s CPU feature extraction, ~2s training) | ~85 ms (CPU) | Magnification shift; camera sensor distance changes; out-of-distribution weave architectures. |
-| **FabricNET Feature Regression (XGBoost)** | 262-d structural texture vector $\to$ Gradient Boosted Trees | Single 2D Grayscale $(480, 640)$ | Direct density ($T_x, T_y$ in ends/cm) | **Implicit** (Nominal $5\times 4\text{ mm}$ FOV: $S_x=1280.0, S_y=1200.0\text{ px/cm}$) | Low (~90s feature extraction, ~1s training) | ~75 ms (CPU) | Severe sensitivity to high-frequency sensor noise and out-of-distribution optical blur. |
+| **Custom Global 262-d Regression (Random Forest)** | GLCM (96) + LBP (54) + Gabor (96) + Proj (16) $\to$ Regressor | Single 2D Grayscale $(480, 640)$ | Direct density ($T_x, T_y$ in ends/cm) | **Implicit** (Nominal $5\times 4\text{ mm}$ FOV: $S_x=1280.0, S_y=1200.0\text{ px/cm}$) | Low (~80s CPU feature extraction, ~2s training) | ~85 ms (CPU) | Magnification shift; camera sensor distance changes; out-of-distribution weave architectures. |
+| **Custom Global 262-d Regression (XGBoost)** | 262-d structural texture vector $\to$ Gradient Boosted Trees | Single 2D Grayscale $(480, 640)$ | Direct density ($T_x, T_y$ in ends/cm) | **Implicit** (Nominal $5\times 4\text{ mm}$ FOV: $S_x=1280.0, S_y=1200.0\text{ px/cm}$) | Low (~80s feature extraction, ~1s training) | ~75 ms (CPU) | Severe sensitivity to high-frequency sensor noise and out-of-distribution optical blur. |
+| **Published IFV Sliding Window (Random Forest)** | Secer & Ercan 2023 ($160\times 160$ sliding window, 4 nested frames, 56-d vector) | Single 2D Grayscale $(480, 640)$ | Direct density ($T_x, T_y$ in ends/cm) | **Implicit** (Nominal $5\times 4\text{ mm}$ FOV) | Low (~7s CPU feature extraction, ~2s training) | ~65 ms (CPU) | Magnification shift; cannot transfer across sensor resolutions. |
+| **Published IFV Sliding Window (XGBoost)** | 56-d sliding window frame vector $\to$ Gradient Boosted Trees | Single 2D Grayscale $(480, 640)$ | Direct density ($T_x, T_y$ in ends/cm) | **Implicit** (Nominal $5\times 4\text{ mm}$ FOV) | Low (~7s feature extraction, ~1s training) | ~60 ms (CPU) | Overfitting on small-N dataset; fails on variable magnification. |
 | **Roboflow Yarn Detector (`ayushiit/warp-weft-new-prod`)** | YOLOv8-based Object Detection (Roboflow 3.0 Fast) | 3-channel RGB $(640, 640)$ stretched | Discrete bounding boxes (`warp`, `weft`) | **Absent** (Predicts uncalibrated box counts in pixel crop) | Cloud hosted / proprietary | ~35 ms (Cloud API / GPU) | NMS suppresses 30-50% of adjacent parallel yarns; box count does not equal threads/cm without FOV scale. |
 | **Roboflow Float Segmenter (`cheomseongdae/fabric-lby7e`)** | Roboflow 2.0 Base Semantic Segmentation | 1-channel Grayscale $(1184, 1184)$ | Pixel masks (`warp`, `weft`, `measure`) | **Optional** (Detects physical ruler polygon) | Cloud hosted / proprietary | ~60 ms (Cloud API / GPU) | Low mIoU (35.7%) yields severe mask fragmentation; requires heuristic graph tracking to link floats into yarns. |
 | **TextileDefectDetection FCN (`weningerleon`)** | Modified U-Net (14 Conv2D + BatchNorm + LeakyReLU) | 6-channel tensor: Paired front-lit + back-lit RGB | 3-class float-point probability map | **Absent** (Requires downstream tracking + scale) | Pretrained (`net.h5`, 93.7 MB, Python 3.6 / TF 1.11) | ~40 ms (GPU) | Incompatible with standard single-exposure microscopy; plain-weave float tracking heuristic fails on twill/satin. |
-| **Hybrid Analysis (WarpWeftUNet + Spacing)** | PyTorch U-Net (1.93M params) + Morphological Skeletonization | 1-channel Grayscale $(256, 256)$ | Segmentation masks $\to$ Centerlines $\to$ Spacing | **Mandatory** ($S_x, S_y$ px/cm) | Moderate (15 epochs on synthetic swatches) | ~35 ms (GPU) / ~120 ms (CPU) | Extreme fiber fuzz bridging adjacent yarns; computational overhead on low-end edge CPUs. |
+| **Hybrid Analysis (WarpWeftUNet + Spacing)** | PyTorch U-Net (1.93M params) + Morphological Skeletonization | 1-channel Grayscale $(256, 256)$ native patch tiling | Segmentation masks $\to$ Centerlines $\to$ Spacing | **Mandatory** ($S_x, S_y$ px/cm) | Moderate (15 epochs on synthetic swatches) | ~35 ms (GPU) / ~120 ms (CPU) | Extreme fiber fuzz bridging adjacent yarns; computational overhead on low-end edge CPUs. |
 
 ---
 
@@ -98,7 +100,7 @@ The checkpoint inventory is formally maintained in `experiments/learned_models/c
       "test_pixel_accuracy": 0.9782,
       "test_miou": 0.9181,
       "direct_density_prediction": false,
-      "integration_recommendation": "Recommended for Mode 3 (Hybrid Analysis): use model output for topological skeletonization followed by calibrated spatial pitch measurement."
+      "integration_recommendation": "Synthetic domain only. Requires manual pixel-level annotations on physical fabrics before production release."
     }
   ]
 }
@@ -108,50 +110,25 @@ The checkpoint inventory is formally maintained in `experiments/learned_models/c
 
 ## 5. Empirical Experimental Findings
 
-### Approach A: FabricNET Feature Regression (Notebook 01)
-Evaluated across **26 held-out test specimens** (strictly unseen during training):
-- **Random Forest**: Warp MAE = 4.88, Weft MAE = 5.39 ($R^2 = 0.690$ warp, $R^2 = 0.787$ weft).
-- **XGBoost**: Warp MAE = 4.83, Weft MAE = 6.60 ($R^2 = 0.702$ warp, $R^2 = 0.339$ weft).
-- **MLP Regressor**: Warp MAE = 7.11, Weft MAE = 13.54 ($R^2 = 0.566$ warp, $R^2 = -0.265$ weft).
-- **Deterministic Baseline (Unvalidated direct candidates on full test split)**: Warp MAE = 13.27, Weft MAE = 13.16.
+### Table A: FabricNET Microscope Domain (26 Held-out Test Specimens)
 
-#### Weave-Specific Empirical Breakdown (MAE in threads/cm):
-| Weave Architecture | Random Forest (Warp / Weft) | XGBoost (Warp / Weft) | MLP Regressor (Warp / Weft) | Deterministic Baseline (Warp / Weft) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Plain** ($N=10$) | **3.37 / 4.75** | 3.70 / 4.62 | 5.87 / 10.67 | 8.98 / 8.05 |
-| **Satin** ($N=9$) | **3.33 / 6.89** | 3.56 / 8.11 | 3.89 / 15.09 | 6.45 / 24.18 |
-| **Twill** ($N=7$) | 8.33 / **4.69** | 7.51 / 7.56 | 11.89 / 15.58 | 25.45 / 8.54 |
+| Method / Architecture | Feature Set | Warp MAE | Warp $\le \pm 2$ (%) | Weft MAE | Weft $\le \pm 2$ (%) | Latency | Primary Failure Mode |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Deterministic Engine** | 2D FFT + 1D Spatial Autocorrelation | 13.27 | 30.8% | 13.16 | 23.1% | ~12 ms | Twill/satin float harmonics; low optical contrast |
+| **Custom Global 262-d (Random Forest)** | GLCM(96) + LBP(54) + Gabor(96) + Proj(16) | 4.88 | 34.6% | 5.39 | 19.2% | ~85 ms | Implicit fixed magnification; cannot transfer to phone |
+| **Custom Global 262-d (XGBoost)** | GLCM(96) + LBP(54) + Gabor(96) + Proj(16) | 4.83 | 46.2% | 6.60 | 34.6% | ~75 ms | Sensor noise sensitivity; implicit magnification |
+| **Published IFV (Random Forest)** | Secer & Ercan 2023 ($160\times 160$ IFV) | 7.41 | 19.2% | 6.76 | 11.5% | ~65 ms | Out-of-distribution weave textures; implicit scale |
+| **Published IFV (XGBoost)** | Secer & Ercan 2023 ($160\times 160$ IFV) | 6.67 | 38.5% | 6.71 | 23.1% | ~60 ms | Overfitting on small-N dataset; implicit scale |
 
-**Key Deduction**:
-Feature regression using Random Forest substantially outperforms unvalidated deterministic FFT on Satin weft (MAE 6.89 vs 24.18) and Twill warp (MAE 8.33 vs 25.45). This occurs because Random Forest captures non-linear statistical correlations between texture energy and yarn count, bypassing the harmonic ambiguity that plagues 2D FFT on long yarn floats. However, feature regression implicitly assumes a fixed 1.0 cm field-of-view; it does not generalize if the optical magnification changes.
+### Table B: Client Smartphone Domain (`data/samples/test.png`, Specimen 2)
+Ground Truth: Warp = 31 ends/cm (Acceptance tolerance: 29–33), Weft = 27 picks/cm (Acceptance tolerance: 25–29). Factory Tolerance = $\pm 2.0\text{ threads/cm}$.
 
-### Approach B: Roboflow Projects Audit (Notebook 02)
-- Mathematical simulation of greedy Non-Maximum Suppression (NMS) on parallel yarns (pitch $\Delta = 20$ px, yarn width $18$ px, $640 \times 640$ window):
-  - At standard detector threshold $\text{IoU} = 0.45$: 32 true yarns $\to$ 22 retained (31.3% undercounting).
-  - At $\text{IoU} = 0.30$: 32 true yarns $\to$ 16 retained (50.0% undercounting).
-- **Deduction**: Discrete bounding-box object detection is mathematically flawed for dense parallel yarn counting unless NMS is replaced by directional 1D non-maximum suppression along the orthogonal axis.
-
-### Approach C: TextileDefectDetection FCN Audit (Notebook 03)
-- Checkpoint `net.h5` verified: 14 Conv2D layers, 93.7 MB.
-- Input requires 6 channels: channel 0-2 (front-lit / reflected) and channel 3-5 (back-lit / transmitted).
-- **Deduction**: Incompatible with standard single-exposure microscopy and FabricNET images. Cannot be deployed for general fabric density counting without dedicated dual-illumination hardware.
-
-### Approach D: Modern Semantic Segmentation Baseline (Notebook 04)
-- Trained `WarpWeftUNet` (1.93M parameters) on synthetic micro-swatches with Gaussian blur and noise.
-- **Validation mIoU**: 92.58% (synthetic domain).
-- **Held-out Test Performance (Synthetic domain)**:
-  - Pixel Accuracy: **97.82%**
-  - Mean IoU: **91.81%**
-  - Background/Void IoU: 81.16%
-  - Warp Yarn Core IoU: 96.80%
-  - Weft Yarn Core IoU: 97.48%
-- **Domain Constraint & Finding**: PyTorch U-Net demonstrates excellent segmentation on synthetic micro-swatches with mathematically ground-truthed masks. However, because real FabricNET and client smartphone swatches lack manual pixel-level yarn masks, this mIoU cannot be claimed as real-world segmentation accuracy. Real-domain deployment requires manual annotation on actual physical swatches.
-
-### Approach E: Hybrid Geometric Measurement (Notebook 05)
-- Evaluated on benchmark plain swatch (`sample_plain_32x28.png`, Ground Truth: Warp = 32.0, Weft = 28.0 ends/cm, Scale = 480 px/cm):
-  - Predicted Warp Spacing $\Delta_x = 13.0$ px $\to$ Density = 36.92 ends/cm (Error = 4.92 ends/cm).
-  - Predicted Weft Spacing $\Delta_y = 14.0$ px $\to$ Density = 34.29 picks/cm (Error = 6.29 picks/cm).
-- **Deduction**: The hybrid pipeline decouples semantic pattern recognition from metric scaling. It eliminates harmonic ambiguity by explicitly locating yarn core centerlines, while honoring physical calibration ($S_x, S_y$).
+| Method / Paradigm | Warp (ends/cm) | Weft (picks/cm) | Decision Status | Factory Tolerance Check | Root Cause / Failure Mode |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Deterministic (FabricNET Preset $S_x=1280, S_y=1200$)** | 54.0 (Candidate) | 9.0 (Candidate) | **NEEDS_REVIEW** (Accepted: None) | **REJECTED** (Error +23 / -18) | 5.5x scale inflation ($1280/1200$ vs $263/208\text{ px/cm}$) + macro-stripe harmonic aliasing |
+| **Deterministic (Calibrated Phone $S_x=263.5, S_y=208.4$)** | **32.74** | **28.47** | **ACCEPTED** | **PASS** (+1.74 warp $\in [29,33]$, +1.47 weft $\in [25,29]$) | Physically calibrated pitch on uniform ground weave |
+| **FabricNET Global 262-d RF Regressor** | 52.05 | 68.55 | UNVALIDATED | **FAIL** (Error +21.05 warp, +41.55 weft) | 5x FOV disparity between microscope optics and phone camera |
+| **Hybrid WarpWeftUNet (Patch-tiled)** | 8.50 | 6.32 | UNVALIDATED | **FAIL** (Error -22.50 warp, -20.68 weft) | Synthetic-to-real domain gap; segments fiber clusters |
 
 ---
 
@@ -159,7 +136,7 @@ Feature regression using Random Forest substantially outperforms unvalidated det
 
 For the production web application, the three user-selectable operational modes are structured as follows:
 
-1. **Mode 1 — Classical Deterministic Analysis (Default & Currently Active Production Mode)**:
+1. **Mode 1 — Classical Deterministic Analysis (Default & Active Production Mode)**:
    - **Engine**: Authoritative production engine in `src/fabric_analysis/`.
    - **Status**: **Available** (`available: true`).
    - **Ideal For**: Clean, unprinted plain fabrics with uniform lighting and known spatial calibration scale ($S_x, S_y$).

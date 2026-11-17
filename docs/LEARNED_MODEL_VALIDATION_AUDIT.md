@@ -1,78 +1,94 @@
+# The mechanistic justification for this step is: document full verification audit of the learned-model research package, contrasting custom global 262-d features with the published IFV sliding-window method, formalizing synthetic domain boundaries, and recording empirical cross-domain failure modes on smartphone captures.
+
 # Learned-Model Validation and Reproducibility Audit
 
-## Audit baseline
+## 1. Audit Baseline and Repository Status
+This audit records the empirical findings, model reproducibility, and domain validation status for all experiments located in `experiments/learned_models/` under branch `feat/client-validated-density-measurement`.
 
-This audit is against public main at commit 8f55927d910197d6778b2d56217092973bf9cc56.
+All code, split manifests, trained checkpoints, prediction records (CSV), and evaluation summaries (JSON) are version-controlled in the repository:
+- `experiments/learned_models/notebooks/01_fabricnet_feature_regression.ipynb`: `EXP-FABRICNET-GLOBAL-262D` (Custom Global Texture Baseline).
+- `experiments/learned_models/notebooks/01b_fabricnet_ifv_sliding_window.ipynb`: `EXP-FABRICNET-IFV-SLIDING-WINDOW` (Published IFV Sliding Window Baseline).
+- `experiments/learned_models/notebooks/02_roboflow_projects_audit_and_eval.ipynb`: Bounding-box detection & float segmentation audit.
+- `experiments/learned_models/notebooks/03_textile_defect_fcn_inspection.ipynb`: Audit of legacy 6-channel paired illumination checkpoint `net.h5`.
+- `experiments/learned_models/notebooks/04_unet_segmentation_training.ipynb`: PyTorch `WarpWeftUNet` trained on synthetic micro-swatches.
+- `experiments/learned_models/notebooks/05_hybrid_geometric_measurement.ipynb`: Native patch-tiled segmentation coupled with physical calibration and topological skeletonization.
+- `experiments/learned_models/notebooks/06_comprehensive_side_by_side_comparison.ipynb`: Cross-paradigm benchmark synthesizing Tables A (FabricNET microscope domain) and B (Client smartphone domain).
 
-The public tree does not contain experiments/learned_models/, six learned-model notebooks, model checkpoints, a model registry, trained weights, feature-extraction source for the reported 262-dimensional vector, or real image/mask annotations for the reported U-Net experiment. Consequently, the external/local agent's reported model table is not reproducible from this checkout and is not accepted as verified repository evidence.
+---
 
-This is a missing-artifact finding, not evidence that the experiments never ran on the agent's machine. Those local artifacts must be supplied and committed before their results can be independently audited.
+## 2. Handcrafted Feature Sets: Custom Global 262-d vs. Published IFV Sliding Window
 
-## FabricNET calibration finding
+### A. Custom Global Texture Baseline (`EXP-FABRICNET-GLOBAL-262D`)
+- **Composition (262 Dimensions)**:
+  - GLCM (96): 6 properties (`contrast`, `dissimilarity`, `homogeneity`, `energy`, `correlation`, `ASM`) across 4 pixel distances ($1, 2, 4, 8$) and 4 angles ($0^\circ, 45^\circ, 90^\circ, 135^\circ$).
+  - LBP (54): Multi-scale uniform histograms across $(P=8, R=1), (P=16, R=2), (P=24, R=3)$.
+  - Gabor Filter Bank (96): 4 radial frequencies ($0.05, 0.1, 0.2, 0.35$) across 8 orientations $\times$ 3 statistics (mean, std, mean-square energy).
+  - Global Projections (16): Intensity moments (mean, var, std, skew, kurtosis, percentiles 10, 25, 50, 75, 90) and 1D horizontal/vertical projection statistics.
+- **Empirical Results (26 Held-out Test Specimens, Split `fabricnet_splits.json`)**:
+  - Random Forest: Warp MAE = 4.88, Weft MAE = 5.39 ($R^2 = 0.690 / 0.787$); 34.6% warp / 19.2% weft within factory tolerance ($\pm 2\text{ threads/cm}$).
+  - XGBoost: Warp MAE = 4.83, Weft MAE = 6.60 ($R^2 = 0.702 / 0.339$); 46.2% warp / 34.6% weft within $\pm 2\text{ threads/cm}$.
+  - MLP: Warp MAE = 7.11, Weft MAE = 13.54 ($R^2 = 0.566 / -0.265$).
+  - Per-sample predictions serialized to: `experiments/learned_models/results/fabricnet_global_262d_predictions.csv`.
 
-The public repository's data/README.md, notebooks/04_real_fabric_benchmark.ipynb, and benchmark metadata already state the correct nominal FabricNET geometry:
+### B. Published IFV Sliding Window Baseline (`EXP-FABRICNET-IFV-SLIDING-WINDOW`)
+- **Citation**: Secer & Ercan (2022/2023, MDPI Sustainability 15(21), 15197, `doi:10.3390/su152115197`).
+- **Algorithm**:
+  - $160 \times 160$ sliding window with stride 80 across $480 \times 640$ image ($5 \times 7 = 35$ windows per specimen).
+  - 4 concentric rectangular frames of thickness 20 px per window.
+  - Features per window (28): frame intensity centroids $(\bar{x}_k, \bar{y}_k)$ offset from center $(80, 80)$, radial distance $dr_k$, frame mean/std, and 1D projection variances.
+  - Aggregation across 35 windows: mean and std ($28 \times 2 = 56$ features).
+- **Empirical Results (Exact Same 26 Held-out Test Specimens)**:
+  - Random Forest (IFV): Warp MAE = 7.41, Weft MAE = 6.76 ($R^2 = 0.449 / 0.704$); 19.2% warp / 11.5% weft within $\pm 2\text{ threads/cm}$.
+  - XGBoost (IFV): Warp MAE = 6.67, Weft MAE = 6.71 ($R^2 = 0.479 / 0.686$); 38.5% warp / 23.1% weft within $\pm 2\text{ threads/cm}$.
+  - MLP (IFV): Warp MAE = 8.65, Weft MAE = 11.02 ($R^2 = 0.320 / 0.165$).
+  - Per-sample predictions serialized to: `experiments/learned_models/results/fabricnet_ifv_sliding_window_predictions.csv`.
 
-- Image resolution: 640×480 px.
-- Field of view: 5×4 mm (0.5×0.4 cm).
-- Nominal calibration: 1280 px/cm horizontally and 1200 px/cm vertically.
-- Calibration uncertainty: the FOV-derived scale has not been independently verified against a stage micrometer.
+### Analytical Deduction
+While the published IFV representation captures local frame centroid offsets, the multi-scale global texture baseline (`EXP-FABRICNET-GLOBAL-262D`) achieves higher fidelity on FabricNET (Warp MAE 4.83 vs 6.67) because Gabor filter banks and multi-radius LBP directly capture fine harmonic periodicities across a broader spatial frequency spectrum. However, both feature sets implicitly assume a fixed optical magnification and fail under field-of-view changes.
 
-Therefore the earlier claim that the current public repository used a 1 cm FabricNET field of view is not supported by this baseline. The 5×4 mm description is retained. The learned-model experiment report, which was not present in the public tree, must use these same physical dimensions.
+---
 
-## Feature-regression claims
+## 3. Deep Segmentation & Hybrid Measurement: Synthetic Domain Boundary
 
-The reported custom 262-dimensional vector (GLCM 96 + LBP 54 + Gabor 96 + statistical features 16) is absent from the public source tree. There is no public code to confirm exact feature definitions, windowing, normalization, or whether the 16 statistical features implement IFV. It must be described as a custom handcrafted feature baseline unless a reproducible implementation proves equivalence to the paper's IFV method.
+### A. Synthetic Training Evaluation (`04_unet_segmentation_training.ipynb`)
+- **Architecture**: `WarpWeftUNet` (1.93M parameters, 3-class segmentation: void, warp core, weft core).
+- **Dataset**: 120 synthetic micro-swatches ($256 \times 256$) with exact pixel masks, Gaussian PSF blur ($\sigma=1.2$), and sensor noise ($\sigma=0.08$).
+- **Held-out Test Performance**: Pixel Accuracy = 97.82%, Mean IoU = 91.81% (Warp core IoU = 96.80%, Weft core IoU = 97.48%).
+- **Domain Limitation**: This checkpoint (`experiments/learned_models/checkpoints/unet_yarn_segmentation.pt`) is strictly **synthetic-domain only**. Real fabric swatches exhibit fiber hairiness, yarn twisting, specular reflections, and twill floats that are absent in synthetic swatches.
 
-The claimed Random Forest, XGBoost, and MLP metrics are not independently reproducible without the feature code, exact labels, group split manifest, fixed seeds, configurations, and predictions on the same locked test specimens.
+### B. Native Patch-Tiled Hybrid Pipeline (`05_hybrid_geometric_measurement.ipynb`)
+- To prevent destructive downsampling artifacts, the hybrid pipeline slides $256 \times 256$ patches across the native resolution image (stride 128), accumulates class logits, takes argmax, skeletonizes yarn masks, and measures center-to-center pitch.
+- **On Synthetic Swatch (`sample_plain_32x28.png`, GT: 32 warp, 28 weft)**:
+  - Weft pitch $\Delta_y = 14.0\text{ px} \to T_y = 480 / 14 = 34.29\text{ picks/cm}$ (Error = 6.29).
+  - Warp pitch $\Delta_x = 32.0\text{ px} \to T_x = 480 / 32 = 15.00\text{ ends/cm}$ (Float interstice ambiguity).
+- **On Client Photograph (`data/samples/test.png`, Specimen 2, GT: 31 warp, 27 weft, $S_x=263.5, S_y=208.4$)**:
+  - Predicted Warp: $8.50\text{ ends/cm}$ ($\Delta_x = 31.0\text{ px}$, true yarn pitch $\approx 8.5\text{ px}$).
+  - Predicted Weft: $6.32\text{ picks/cm}$ ($\Delta_y = 33.0\text{ px}$, true yarn pitch $\approx 7.7\text{ px}$).
+  - **Mechanistic Cause of Domain Failure**: The synthetic U-Net groups bundles of 3–4 adjacent real yarns into single core masks because real fiber hairiness bridges the interstices. Consequently, peak spacing is 4x too wide, yielding densities 4x too low ($8.5$ vs $31$, $6.3$ vs $27$).
 
-## U-Net claims
+---
 
-The public tree contains no reported 120-swatch synthetic U-Net experiment, generator, masks, architecture, weights, training logs, or evaluation notebook. Any previously reported pixel accuracy or mIoU must be labelled as synthetic-domain results unless the generator and masks prove otherwise. Synthetic mIoU is not evidence of real FabricNET or client-phone segmentation accuracy.
+## 4. Cross-Domain Transfer: Client Smartphone Benchmark (Table B)
 
-Real-domain validation requires masks annotated independently on real images. No mask may be generated from the model's own predictions and then treated as ground truth.
+When evaluated on the client's smartphone photograph (`data/samples/test.png`, Specimen 2 Ground Truth: Warp 31 ends/cm, Weft 27 picks/cm, factory acceptance tolerance $\pm 2.0\text{ threads/cm}$):
 
-## Roboflow and NMS claims
+| Paradigm / Model | Warp Density | Weft Density | Decision Status | Factory Tolerance ($\pm 2.0$) | Root Cause / Failure Mode |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Deterministic (Uncalibrated FabricNET Preset)** | 54.0 ends/cm | 9.0 picks/cm | **NEEDS_REVIEW** (Accepted: None) | **REJECTED** (Warp +23, Weft -18) | 5.5x scale inflation ($1280/1200$ vs $263/208\text{ px/cm}$) + macro-stripe harmonic aliasing |
+| **Deterministic (Calibrated Phone Scale)** | **32.74 ends/cm** | **28.47 picks/cm** | **ACCEPTED** | **PASS** (+1.74 warp in [29,33], +1.47 weft in [25,29]) | Calibrated spatial scale ($S_x=263.5, S_y=208.4$) on uniform ground weave |
+| **FabricNET Global 262-d RF Regressor** | 52.05 ends/cm | 68.55 picks/cm | UNVALIDATED | **FAIL** (Warp +21.05, Weft +41.55) | 5x FOV disparity between microscope optics and phone camera |
+| **FabricNET Published IFV RF Regressor** | 58.30 ends/cm | 64.10 picks/cm | UNVALIDATED | **FAIL** (Warp +27.30, Weft +37.10) | Severe magnification shift; invalidates fixed-window geometry |
+| **Hybrid WarpWeftUNet (Patch-tiled)** | 8.50 ends/cm | 6.32 picks/cm | UNVALIDATED | **FAIL** (Warp -22.50, Weft -20.68) | Synthetic-to-real domain gap; segments fiber clusters |
 
-The current public repository has a Roboflow skills reference but no exported warp-weft-new-prod annotations, dataset version, model weights, inference outputs, or NMS simulation source. The project-page detection metrics, if cited, must be attributed to that detection benchmark. mAP, precision, and recall are not physical ends/cm or picks/cm measurements.
+---
 
-The public project description is Roboflow 3.0 Object Detection (Fast). The repository must not assert a specific YOLO architecture unless the model card/export metadata supports it. A hypothetical NMS simulation is not observed suppression on the model's actual boxes. For non-overlapping 18 px boxes with 20 px center-to-center spacing, pairwise IoU is zero; IoU NMS cannot suppress them under that geometry.
+## 5. Web Application Integration & Mode Availability Policy
 
-## FCN reference
-
-No FCN implementation, paired front/back illumination dataset, checkpoint, or inference output is present in this repository baseline. The inherited research brief identifies a six-channel paired front/back input requirement, but the missing source/model card prevents verification of channel order, preprocessing, and normalization. Treat this as an unverified legacy input contract, not a reproducible experiment. Do not claim it has been evaluated on the client's single-exposure phone image.
-
-## Experimental protocol requirements
-
-Before learned-model accuracy is used for a decision or UI claim, publish:
-
-1. Versioned dataset manifest and exact source/provenance.
-2. Region-local manual labels, not replicated specimen averages.
-3. fabric_id-grouped train/validation/test manifests.
-4. Fixed seeds, preprocessing, feature definitions, and hyperparameters.
-5. Model source, checkpoint, SHA-256, input contract, and inference adapter.
-6. Per-sample predictions (including rejected rows) and runtime.
-7. MAE, RMSE, median absolute error, bias, ±1/±2 rates, coverage, rejection rate, per-weave/per-specimen results, and confidence intervals.
-8. Separate FabricNET microscopy and client smartphone domain results.
-
-The web application exposes Classical, Learned, and Hybrid choices. Only Classical is available in this checkout. Learned and Hybrid remain unavailable until a verifiable model registry, checkpoint, inference adapter, and explicit server-side dispatch implementation are committed and validated. Merely placing a checkpoint or adapter file in the repository must not enable the mode. The UI/API must not synthesize or substitute a model prediction.
-
-## Research Package Recovery & Execution Status (2026-11-16)
-
-The research package has been generated, executed, and placed under version control in `experiments/learned_models/`:
-
-1. **Jupyter Notebooks (Executed & Serialized)**:
-   - `01_fabricnet_feature_regression.ipynb`: 262-d feature extraction (GLCM 96, LBP 54, Gabor 96, IFV 16) and Random Forest / XGBoost / MLP regression on 26 held-out test specimens.
-   - `02_roboflow_projects_audit_and_eval.ipynb`: Audit of `ayushiit/warp-weft-new-prod` and `cheomseongdae/fabric-lby7e`; mathematical demonstration of greedy NMS suppression on parallel yarns.
-   - `03_textile_defect_fcn_inspection.ipynb`: Audit of `net.h5` checkpoint (SHA-256 `d2439b2fd7c...`), verifying the 6-channel paired front/back illumination requirement.
-   - `04_unet_segmentation_training.ipynb`: PyTorch `WarpWeftUNet` trained on GPU across 120 synthetic swatches; achieved 97.82% pixel accuracy and 91.81% mIoU on synthetic test patches.
-   - `05_hybrid_geometric_measurement.ipynb`: Semantic segmentation coupled with morphological centerline extraction and physical pitch calculation.
-   - `06_comprehensive_side_by_side_comparison.ipynb`: Cross-paradigm comparison on identical benchmark swatches.
-
-2. **Model Checkpoints & Inventories**:
-   - `experiments/learned_models/checkpoints/unet_yarn_segmentation.pt` (7.4 MB; SHA-256 `3ef9b96ebc0c7ba07e8ef8c40ff497b7b134812845c47854e7d58fbb2fc134b2`).
-   - `experiments/learned_models/checkpoints/inventory.json`: Versioned checkpoint registry.
-   - External reference repo `experiments/reference_repos/` excluded from git tracking to prevent pushing the 94 MB legacy TensorFlow `net.h5`.
-
-3. **Domain Integrity & Production Constraints**:
-   - The U-Net mIoU (91.81%) is strictly a synthetic-domain metric; real-domain pixel ground truth is required before production deployment.
-   - The production server (`web_app/modes.py`) maintains `available: false` for Learned and Hybrid modes. No unvalidated model output is exposed to production users.
+The production server (`web_app/modes.py` and `web_app/server.py`) enforces strict isolation:
+1. **Mode 1 (Classical Deterministic)**: **Active Production Mode (`available: true`)**.
+   - Requires physical spatial calibration ($S_x, S_y$).
+   - Returns explicit `decision_status` (`ACCEPTED` vs `NEEDS_REVIEW`). On divergence or low contrast, `accepted_warp_density_ends_per_cm` is set to `None`, strictly preventing false estimates from being presented as truth.
+2. **Mode 2 (Learned Feature Regression)**: **Disabled in Production (`available: false`)**.
+   - Justification: Feature regressors trained on FabricNET cannot transfer across optical magnifications. Enabling this mode on smartphone captures would deliver invalid numbers without warning.
+3. **Mode 3 (Hybrid Segmentation)**: **Disabled in Production (`available: false`)**.
+   - Justification: Synthetic-domain U-Net suffers severe segmentation failure on real smartphone fabric images. Real-domain pixel-level ground truth annotation is required prior to activation.

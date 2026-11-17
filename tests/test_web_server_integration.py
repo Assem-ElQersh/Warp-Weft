@@ -137,6 +137,36 @@ class TestWebServerIntegration(unittest.TestCase):
         )
         self.assertIn("candidate_measurements", comparison["methods"][0])
 
+    def test_calibration_profiles_endpoint(self):
+        status, result, content_type = self.request("GET", "/api/calibration/profiles")
+        self.assertEqual(status, 200)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("profiles", result)
+        profile_ids = [p["profile_id"] for p in result["profiles"]]
+        self.assertIn("smartphone_macro_stand_v1", profile_ids)
+        self.assertIn("smartphone_pick_glass_v1", profile_ids)
+        self.assertIn("microscope_fabricnet_nominal", profile_ids)
+
+    def test_specimen_analysis_endpoint(self):
+        status, result, _ = self.request("POST", "/api/analyze/specimen", {
+            "fabric_id": "test_specimen_1",
+            "preset_id": "synthetic_skewed_12",
+            "scale_x": 400.0,
+            "scale_y": 400.0,
+            "target_warp": 36.0,
+            "target_weft": 30.0,
+            "tolerance": 4.0,
+        })
+        self.assertEqual(status, 200)
+        self.assertEqual(result["status"], "success")
+        self.assertIn("specimen", result)
+        spec = result["specimen"]
+        self.assertEqual(spec["expected_regions"], 5)
+        self.assertEqual(len(spec["regions"]), 5)
+        self.assertIn("decision_status", spec)
+        self.assertIn("warp_mean_ends_per_cm", spec)
+        self.assertIn("weft_mean_picks_per_cm", spec)
+
 
 if __name__ == "__main__":
     unittest.main()

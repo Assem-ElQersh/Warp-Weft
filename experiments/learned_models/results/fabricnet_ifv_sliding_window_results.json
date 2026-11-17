@@ -1,0 +1,228 @@
+{
+  "experiment_id": "EXP-FABRICNET-IFV-SLIDING-WINDOW",
+  "feature_set": "Published IFV Sliding Window (Secer & Ercan 2023, 160x160 window, stride 80, 4 nested frames)",
+  "feature_dimension": 56,
+  "test_specimen_count": 26,
+  "test_ids": [
+    1,
+    7,
+    9,
+    19,
+    22,
+    26,
+    30,
+    35,
+    42,
+    44,
+    50,
+    59,
+    60,
+    65,
+    68,
+    73,
+    74,
+    75,
+    79,
+    85,
+    91,
+    96,
+    102,
+    105,
+    109,
+    124
+  ],
+  "overall_metrics": {
+    "XGBoost (IFV)": {
+      "warp": {
+        "mae": 6.6732354164123535,
+        "rmse": 9.244691717476137,
+        "r2": 0.5418407320976257,
+        "pct_within_1": 19.230769230769234,
+        "pct_within_2": 38.46153846153847,
+        "median_ae": 4.595218658447266,
+        "signed_bias": -0.5963500142097473,
+        "mae_ci_95": [
+          4.335303199291229,
+          9.298219442367554
+        ]
+      },
+      "weft": {
+        "mae": 6.7111897468566895,
+        "rmse": 9.655869954849274,
+        "r2": 0.5911478996276855,
+        "pct_within_1": 7.6923076923076925,
+        "pct_within_2": 23.076923076923077,
+        "median_ae": 4.772412300109863,
+        "signed_bias": 1.5204676389694214,
+        "mae_ci_95": [
+          4.350414133071899,
+          9.625803565979004
+        ]
+      }
+    },
+    "RandomForest (IFV)": {
+      "warp": {
+        "mae": 7.413020858945255,
+        "rmse": 9.633752424866568,
+        "r2": 0.5024662205414053,
+        "pct_within_1": 7.6923076923076925,
+        "pct_within_2": 19.230769230769234,
+        "median_ae": 5.547866575690101,
+        "signed_bias": -0.2422669232614321,
+        "mae_ci_95": [
+          5.11702715680763,
+          9.9312052645734
+        ]
+      },
+      "weft": {
+        "mae": 6.759451608590926,
+        "rmse": 9.470138864344534,
+        "r2": 0.6067251804696582,
+        "pct_within_1": 3.8461538461538463,
+        "pct_within_2": 11.538461538461538,
+        "median_ae": 5.619193042767346,
+        "signed_bias": -0.24540776068330195,
+        "mae_ci_95": [
+          4.637039492258686,
+          9.656256357159783
+        ]
+      }
+    },
+    "MLPRegressor (IFV)": {
+      "warp": {
+        "mae": 6.830790996551514,
+        "rmse": 10.020398887263086,
+        "r2": 0.46172821521759033,
+        "pct_within_1": 19.230769230769234,
+        "pct_within_2": 34.61538461538461,
+        "median_ae": 5.220505714416504,
+        "signed_bias": 0.5555245280265808,
+        "mae_ci_95": [
+          4.266557824611664,
+          9.829971885681152
+        ]
+      },
+      "weft": {
+        "mae": 7.071152210235596,
+        "rmse": 9.55213595964806,
+        "r2": 0.5998853445053101,
+        "pct_within_1": 15.384615384615385,
+        "pct_within_2": 26.923076923076923,
+        "median_ae": 5.546453475952148,
+        "signed_bias": 1.1810277700424194,
+        "mae_ci_95": [
+          4.866028511524201,
+          9.45949454307556
+        ]
+      }
+    },
+    "Deterministic Engine": {
+      "warp": {
+        "mae": 13.270769119262695,
+        "rmse": 18.629538168800977,
+        "r2": -0.8605260848999023,
+        "pct_within_1": 19.230769230769234,
+        "pct_within_2": 30.76923076923077,
+        "median_ae": 10.604999542236328,
+        "signed_bias": -12.935384750366211,
+        "mae_ci_95": [
+          8.503932881355288,
+          18.616623640060425
+        ]
+      },
+      "weft": {
+        "mae": 13.161538124084473,
+        "rmse": 17.846081796799176,
+        "r2": -0.3965909481048584,
+        "pct_within_1": 19.230769230769234,
+        "pct_within_2": 23.076923076923077,
+        "median_ae": 9.354999542236328,
+        "signed_bias": -9.719230651855469,
+        "mae_ci_95": [
+          8.65299096107483,
+          17.92280611991882
+        ]
+      }
+    }
+  },
+  "per_weave_breakdown": {
+    "plain": {
+      "XGBoost (IFV)": {
+        "warp_mae": 5.190814018249512,
+        "warp_pct_within_2": 40.0,
+        "weft_mae": 6.2073493003845215,
+        "weft_pct_within_2": 10.0
+      },
+      "RandomForest (IFV)": {
+        "warp_mae": 6.1624434208563725,
+        "warp_pct_within_2": 10.0,
+        "weft_mae": 7.054021898254253,
+        "weft_pct_within_2": 10.0
+      },
+      "MLPRegressor (IFV)": {
+        "warp_mae": 7.768988132476807,
+        "warp_pct_within_2": 30.0,
+        "weft_mae": 5.784050464630127,
+        "weft_pct_within_2": 30.0
+      },
+      "Deterministic Engine": {
+        "warp_mae": 8.980999946594238,
+        "warp_pct_within_2": 40.0,
+        "weft_mae": 8.047999382019043,
+        "weft_pct_within_2": 20.0
+      }
+    },
+    "satin": {
+      "XGBoost (IFV)": {
+        "warp_mae": 3.0038564205169678,
+        "warp_pct_within_2": 62.5,
+        "weft_mae": 5.484677791595459,
+        "weft_pct_within_2": 50.0
+      },
+      "RandomForest (IFV)": {
+        "warp_mae": 4.02224587483092,
+        "warp_pct_within_2": 37.5,
+        "weft_mae": 7.761701969570388,
+        "weft_pct_within_2": 12.5
+      },
+      "MLPRegressor (IFV)": {
+        "warp_mae": 2.9800126552581787,
+        "warp_pct_within_2": 50.0,
+        "weft_mae": 8.072576522827148,
+        "weft_pct_within_2": 37.5
+      },
+      "Deterministic Engine": {
+        "warp_mae": 6.451250076293945,
+        "warp_pct_within_2": 50.0,
+        "weft_mae": 24.177499771118164,
+        "weft_pct_within_2": 12.5
+      }
+    },
+    "twill": {
+      "XGBoost (IFV)": {
+        "warp_mae": 12.195640563964844,
+        "warp_pct_within_2": 12.5,
+        "weft_mae": 8.567502975463867,
+        "weft_pct_within_2": 12.5
+      },
+      "RandomForest (IFV)": {
+        "warp_mae": 12.367017640670692,
+        "warp_pct_within_2": 12.5,
+        "weft_mae": 5.388988385532308,
+        "weft_pct_within_2": 12.5
+      },
+      "MLPRegressor (IFV)": {
+        "warp_mae": 9.508822441101074,
+        "warp_pct_within_2": 25.0,
+        "weft_mae": 7.678603172302246,
+        "weft_pct_within_2": 12.5
+      },
+      "Deterministic Engine": {
+        "warp_mae": 25.452499389648438,
+        "warp_pct_within_2": 0.0,
+        "weft_mae": 8.537500381469727,
+        "weft_pct_within_2": 37.5
+      }
+    }
+  }
+}

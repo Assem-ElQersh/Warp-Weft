@@ -3,23 +3,53 @@
   "benchmark_swatches": [
     {
       "swatch": "sample_plain_32x28.png",
+      "domain": "synthetic_microscopy",
       "ground_truth": {
         "warp": 32.0,
         "weft": 28.0
       },
       "hybrid_measurement": {
-        "warp": 36.92307692307692,
+        "warp": 15.0,
         "weft": 34.285714285714285
       },
       "errors": {
-        "warp_error": 4.92307692307692,
+        "warp_error": 17.0,
         "weft_error": 6.285714285714285
       },
       "spacings_px": {
-        "delta_x": 13.0,
+        "delta_x": 32.0,
         "delta_y": 14.0
       },
-      "latency_ms": 834.4151973724365
+      "yarns_detected": {
+        "warp": 12,
+        "weft": 28
+      },
+      "latency_ms": 890.3625011444092
+    },
+    {
+      "swatch": "client_specimen_2_crop.png",
+      "domain": "real_smartphone_swatch",
+      "ground_truth": {
+        "warp": 31.0,
+        "weft": 27.0
+      },
+      "hybrid_measurement": {
+        "warp": 8.5,
+        "weft": 6.315151515151515
+      },
+      "errors": {
+        "warp_error": 22.5,
+        "weft_error": 20.684848484848484
+      },
+      "spacings_px": {
+        "delta_x": 31.0,
+        "delta_y": 33.0
+      },
+      "yarns_detected": {
+        "warp": 12,
+        "weft": 11
+      },
+      "latency_ms": 105.85212707519531
     }
   ],
   "conclusions": {

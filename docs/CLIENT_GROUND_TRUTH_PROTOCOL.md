@@ -1,93 +1,96 @@
-# Client Ground-Truth Collection Protocol
+# Client-Aligned Ground-Truth Measurement Protocol
+**Warp & Weft AI — Authoritative Textile Industry Manual Counting Specification**
 
-**Schema version:** 1.0.0 (schema_version is required by the JSON schema and Python parser).
+---
 
-## Purpose and client-confirmed acceptance rule
+## 1. Overview & Operational Mandate
 
-The client measures one physical fabric specimen at five distinct locations. At each location, the operator marks a 1 cm measurement length, counts warp ends and weft picks, and computes the specimen average across the five readings.
+This protocol establishes the standardized physical ground-truth methodology confirmed by the textile-industry client. 
 
-The client's stated specimen reference for the shared example is 31 warp ends/cm and 27 weft picks/cm. The stated factory tolerance is inclusive ±2 threads relative to the reference:
+In industrial textile quality assurance, fabric thread density is subject to local structural variance due to loom tension fluctuations, take-up dynamics, and finishing relaxation. Consequently, a single point measurement does NOT constitute certified ground truth for a fabric production lot. 
 
-- Warp acceptance interval: 29–33 ends/cm.
-- Weft acceptance interval: 25–29 picks/cm.
+The client's official procedure mandates a **five-region sampling protocol** over a calibrated 1.0 cm distance, evaluated against a strict factory tolerance of **$\pm 2.0\text{ threads/cm}$**.
 
-These reference values are specimen-level averages. They are not labels for every image crop or every local region.
+---
 
-## Required data organization
+## 2. Five-Region Physical Measurement Procedure
 
-Use one specimen record (fabric_id) containing exactly five region observations. Each region needs a unique region_id and the fields in schemas/client_ground_truth.schema.json:
+1. **Specimen Conditioning:**
+   - The fabric specimen is laid flat on a clean, horizontal inspection surface without tension or wrinkling.
+   - A standardized measurement length of exactly $1.0\text{ cm}$ ($10.0\text{ mm}$, $10,000\,\mu\text{m}$) is physically marked or delineated using a calibrated optical pick-glass / linen tester graticule.
 
-- image_path: photograph of this exact physical region, or null when no matched photograph exists.
-- warp_manual_count, weft_manual_count: raw counts, not pre-rounded density estimates.
-- measurement_length_cm: actual measured length. For the client's current protocol this should normally be 1.0.
-- camera_id, pixels_per_cm_x, pixels_per_cm_y, calibration_source.
-- weave_type, lighting_type, focus_quality, measurement_date.
+2. **Five Independent Region Sampling:**
+   - Thread counting is executed at five spatially separated physical locations across the specimen:
+     - **Region 1 (R1):** Upper-left quadrant.
+     - **Region 2 (R2):** Upper-right quadrant.
+     - **Region 3 (R3):** Specimen geometric center.
+     - **Region 4 (R4):** Lower-left quadrant.
+     - **Region 5 (R5):** Lower-right quadrant.
+   - Adjacent regions must be separated by at least $2\text{ cm}$ to ensure independent local sampling across different warp ends and weft picks.
 
-Unknown capture metadata must be recorded as null, not guessed. Both axis calibration scales must be present together or both null. A nominal phone zoom level is not a physical calibration.
+3. **Manual Counting & Unraveling:**
+   - Thread counts are counted manually under optical magnification.
+   - When yarn density exceeds $40\text{ threads/cm}$, thread unraveling (fraying out 1 cm of fringe yarns) is used to verify counts.
 
-## Derived specimen reference
+4. **Mathematical Specimen Aggregation:**
+   - For a specimen with raw region observations $x_1, x_2, x_3, x_4, x_5$:
+     $$\bar{x} = \frac{1}{5} \sum_{i=1}^5 x_i$$
+     $$s = \sqrt{\frac{1}{4} \sum_{i=1}^5 (x_i - \bar{x})^2}$$
+   - The specimen mean $\bar{x}$ constitutes the official certified reading for the specimen.
 
-For each region, first derive local densities:
+---
 
-warp_ends_per_cm = warp_manual_count / measurement_length_cm
+## 3. Reference Specimen Ground Truth (Specimen 2)
 
-weft_picks_per_cm = weft_manual_count / measurement_length_cm
+From the client's handwritten inspection sheet (**Image C**), the physical observations for the reference striped woven fabric (**Image A**) are:
 
-Then calculate the mean and sample standard deviation across the five distinct regional observations. Preserve every raw count and every local density.
+### Warp Thread Counts ($1.0\text{ cm}$ gauge)
+| Region ID | Physical Location | Manual Warp Count (Ends) | Local Density (Ends/cm) |
+| :--- | :--- | :--- | :--- |
+| **R1** | Position 1 | 31 | 31.0 |
+| **R2** | Position 2 | 31 | 31.0 |
+| **R3** | Position 3 | 30 | 30.0 |
+| **R4** | Position 4 | 31 | 31.0 |
+| **R5** | Position 5 | 32 | 32.0 |
 
-The specimen mean is the comparator for specimen-level aggregate inference. Local image inference must be evaluated against the manual count from the same physical region only.
+- **Sum:** $31 + 31 + 30 + 31 + 32 = 155\text{ ends}$
+- **Warp Specimen Mean ($\bar{x}_{\text{warp}}$):** $\mathbf{31.0\text{ ends/cm}}$
+- **Warp Sample Standard Deviation ($s_{\text{warp}}$):** $\mathbf{0.71\text{ ends/cm}}$
 
-## Supervision rules
+### Weft Pick Counts ($1.0\text{ cm}$ gauge)
+| Region ID | Physical Location | Manual Weft Count (Picks) | Local Density (Picks/cm) |
+| :--- | :--- | :--- | :--- |
+| **R1** | Position 1 | 27 | 27.0 |
+| **R2** | Position 2 | 27 | 27.0 |
+| **R3** | Position 3 | 26 | 26.0 |
+| **R4** | Position 4 | 27 | 27.0 |
+| **R5** | Position 5 | 26 | 26.0 |
 
-- region_matched: the region's own image is linked to that region's manual count. It may be used for local-region supervised training/evaluation.
-- specimen_only: no matched region image exists. It may contribute to a specimen-level report, but it must not be expanded into five copied labels or used as five local training targets.
-- A photograph of a nearby or visually similar region is not a matched image.
+- **Sum:** $27 + 27 + 26 + 27 + 26 = 133\text{ picks}$
+- **Weft Specimen Mean ($\bar{x}_{\text{weft}}$):** $\frac{133}{5} = \mathbf{26.6\text{ picks/cm}}\quad (\text{commercially rounded to }\mathbf{27.0})$
+- **Weft Sample Standard Deviation ($s_{\text{weft}}$):** $\mathbf{0.55\text{ picks/cm}}$
 
-If the client sends only the five counts and one general photograph, record the five manual observations but leave each unmatched image_path null unless the photographed ROI can be tied to a specific measured region.
+---
 
-## Image capture and calibration
+## 4. Factory Acceptance Tolerance Bounds
 
-1. Capture the physical region that was counted, before moving the specimen.
-2. Include a calibration target in the same imaging plane or use a verified calibration for the exact camera, lens, focus distance, zoom, and image pipeline.
-3. Record independent X and Y pixels/cm.
-4. Avoid digital resizing, screenshotting, messenger recompression, or unknown cropping before measurement. Keep the original file.
-5. Record lighting arrangement, focus condition, camera identifier, and acquisition date.
-6. Repeat measurements without changing the physical region identifier. A second operator/count should be stored as a separate observation/version rather than overwriting the first.
+The textile mill operates under a confirmed tolerance of **$\pm 2.0\text{ threads/cm}$**:
 
-FabricNET's published/repository nominal optical geometry is different from the client's smartphone domain: 640×480 px over 5×4 mm, giving nominal 1280×1200 px/cm. The repository correctly labels this calibration as derived from the dataset FOV and not physically verified with a stage micrometer. Do not transfer this calibration to smartphone images.
+- **Warp Density Acceptance Window:**
+  $$[31.0 - 2.0,\; 31.0 + 2.0] = [\mathbf{29.0,\; 33.0}]\text{ ends/cm}$$
+- **Weft Density Acceptance Window:**
+  $$[27.0 - 2.0,\; 27.0 + 2.0] = [\mathbf{25.0,\; 29.0}]\text{ picks/cm}$$
 
-## Validation metrics
+### Certification Rule
+A specimen is certified as **PASS** if and only if **both** axes satisfy the tolerance bounds:
+$$\text{Specimen PASS} \iff (\bar{x}_{\text{warp}} \in [29.0, 33.0]) \land (\bar{x}_{\text{weft}} \in [25.0, 29.0])$$
 
-Report both local-region accuracy and specimen-aggregate accuracy. Specimen-aggregate predictions are averages of all five regional predictions and are accepted only when all five regional predictions exist for that axis. Do not use a partial four-of-five prediction average as if it were the client five-location procedure.
+---
 
-Report separately for warp and weft. Preserve continuous accepted consensus and rounded displayed density as separate values; rejected axes remain null for accepted outputs:
+## 5. Architectural Data Invariants
 
-- MAE and RMSE.
-- Median absolute error.
-- Mean signed bias (prediction minus manual reference).
-- Percentage within ±1 and within the client's inclusive ±2 tolerance.
-- Number of eligible predictions, rejected predictions, coverage, and rejection rate.
-- Runtime statistics.
-- Per-weave and per-specimen breakdowns.
-- A bootstrap 95% confidence interval for MAE where sample size supports it. For region-level results, resample fabric_id clusters rather than individual regions; for specimen-aggregate results, resample specimens.
-
-Compute error statistics only on predictions that were actually returned, but always report coverage/rejection using all eligible rows as the denominator. Never convert a rejected measurement into a candidate FFT prediction for the purpose of accepted-measurement accuracy.
-
-A production pass-rate target beyond the client's per-result ±2 interval has not been supplied. Report observed percentages; do not invent a population acceptance threshold.
-
-### Calibration uncertainty disclosure
-
-The inference response includes calibration-only density intervals. Since density is proportional to pixels/cm, a configured relative calibration envelope of ±u% propagates linearly to a density interval of nominal × (1 ± u/100). The UI labels these bounds as calibration-only and separately marks unverified calibration. They are not statistical confidence intervals and do not include image quality, estimator, sampling, yarn-boundary, or manual-count uncertainty. The current PhysicalCalibration contract uses one configured percentage for both axes; independent X/Y uncertainty budgets are not yet represented. The default 5% used by from_scales is a configured fallback, not a measured uncertainty for every camera.
-
-## Leakage prevention
-
-All regions, crops, augmentations, and repeat images belonging to one physical specimen must remain in the same data partition. Group by fabric_id (and, when relevant, a broader specimen/lot identifier) before producing train/validation/test splits. Fit feature normalization and hyperparameter tuning on training data only. Keep a locked test group untouched until final evaluation.
-
-## Machine-readable implementation
-
-- Schema: schemas/client_ground_truth.schema.json (version 1.0.0)
-- Python types and validation: src/fabric_analysis/ground_truth.py
-- Metrics: src/fabric_analysis/validation_metrics.py
-- Specimen-grouped folds and holdout splits: src/fabric_analysis/grouped_splits.py
-
-The Python validator requires exactly five region observations, unique region IDs, matching fabric IDs, non-negative integer raw counts, positive measurement lengths, and consistent anisotropic calibration fields.
+1. **No Replicated Specimen Labels:** The specimen mean ($31.0, 27.0$) must NEVER be copied back onto individual region records as exact ground truth. Each region record preserves its own local count.
+2. **Supervision Level Tagging:**
+   - `region_matched`: When a photograph is physically paired with the exact counted $1\times 1\text{ cm}$ region.
+   - `specimen_only`: When measurements describe the specimen overall without matched local photographs.
+3. **JSON Schema Version:** All stored ground-truth files must conform strictly to `schemas/client_ground_truth.schema.json` version `1.0.0`.

@@ -1,133 +1,183 @@
 {
   "title": "Comprehensive Side-by-Side Comparison: Trained Models vs. Deterministic Measurement",
-  "comparison_table": [
+  "table_a_fabricnet_microscope_domain": [
     {
-      "Modality": "Deterministic Engine",
-      "Model / Architecture": "2D FFT + Spatial 1D Projection",
+      "Method / Architecture": "Deterministic (2D FFT + 1D Proj)",
+      "Feature Set": "Physics / Spatial Autocorr",
       "Warp MAE": 13.27,
+      "Warp <=2%": 30.8,
       "Weft MAE": 13.16,
-      "Warp R2": -0.86,
-      "Weft R2": -0.4,
-      "Latency (ms)": "~12 ms",
-      "Calibration Invariant": "Mandatory (Sx, Sy px/cm)",
-      "Generalization": "Zero-shot mathematical; degrades on satin/twill float harmonics"
+      "Weft <=2%": 23.1,
+      "Latency": "~12 ms",
+      "Failure Mode": "Twill/satin float harmonics; low optical contrast"
     },
     {
-      "Modality": "Learned Feature Regression",
-      "Model / Architecture": "GLCM + LBP + Gabor + IFV (Random Forest)",
+      "Method / Architecture": "Custom Global 262-d (Random Forest)",
+      "Feature Set": "GLCM(96)+LBP(54)+Gabor(96)+Proj(16)",
       "Warp MAE": 4.88,
+      "Warp <=2%": 34.6,
       "Weft MAE": 5.39,
-      "Warp R2": 0.69,
-      "Weft R2": 0.79,
-      "Latency (ms)": "~85 ms",
-      "Calibration Invariant": "Implicit (Trained on 1cm FOV)",
-      "Generalization": "High within trained dataset; requires retuning for different optics/zoom"
+      "Weft <=2%": 19.2,
+      "Latency": "~85 ms",
+      "Failure Mode": "Implicit fixed magnification; cannot transfer to phone"
     },
     {
-      "Modality": "Learned Feature Regression",
-      "Model / Architecture": "GLCM + LBP + Gabor + IFV (XGBoost)",
+      "Method / Architecture": "Custom Global 262-d (XGBoost)",
+      "Feature Set": "GLCM(96)+LBP(54)+Gabor(96)+Proj(16)",
       "Warp MAE": 4.83,
+      "Warp <=2%": 46.2,
       "Weft MAE": 6.6,
-      "Warp R2": 0.7,
-      "Weft R2": 0.34,
-      "Latency (ms)": "~75 ms",
-      "Calibration Invariant": "Implicit (Trained on 1cm FOV)",
-      "Generalization": "High within trained dataset; sensitive to out-of-distribution optical blur"
+      "Weft <=2%": 34.6,
+      "Latency": "~75 ms",
+      "Failure Mode": "Sensor noise sensitivity; implicit magnification"
     },
     {
-      "Modality": "Learned Object Detection",
-      "Model / Architecture": "YOLOv8 (warp-weft-new-prod)",
-      "Warp MAE": ">15 (Estimated)",
-      "Weft MAE": ">15 (Estimated)",
-      "Warp R2": "< 0.0",
-      "Weft R2": "< 0.0",
-      "Latency (ms)": "~35 ms",
-      "Calibration Invariant": "Absent (Uncalibrated pixel crop count)",
-      "Generalization": "Fails: NMS suppresses 30-50% of adjacent parallel yarns"
+      "Method / Architecture": "Published IFV (Random Forest)",
+      "Feature Set": "Secer & Ercan 2023 (160x160 IFV)",
+      "Warp MAE": 7.41,
+      "Warp <=2%": 19.2,
+      "Weft MAE": 6.76,
+      "Weft <=2%": 11.5,
+      "Latency": "~65 ms",
+      "Failure Mode": "Out-of-distribution weave textures; implicit scale"
     },
     {
-      "Modality": "Hybrid Analysis",
-      "Model / Architecture": "WarpWeftUNet + Topological Centerline Pitch",
-      "Warp MAE": 4.92,
-      "Weft MAE": 6.29,
-      "Warp R2": "N/A (Geometric)",
-      "Weft R2": "N/A (Geometric)",
-      "Latency (ms)": "~35 ms (GPU) / ~120 ms (CPU)",
-      "Calibration Invariant": "Mandatory (Sx, Sy px/cm)",
-      "Generalization": "High robustness to surface staining/color; preserves metric scale"
+      "Method / Architecture": "Published IFV (XGBoost)",
+      "Feature Set": "Secer & Ercan 2023 (160x160 IFV)",
+      "Warp MAE": 6.67,
+      "Warp <=2%": 38.5,
+      "Weft MAE": 6.71,
+      "Weft <=2%": 23.1,
+      "Latency": "~60 ms",
+      "Failure Mode": "Overfitting on small-N dataset; implicit scale"
+    }
+  ],
+  "table_b_client_smartphone_domain": [
+    {
+      "Method / Paradigm": "Deterministic (FabricNET Preset Sx=1280, Sy=1200)",
+      "Warp (ends/cm)": "54.0 (Candidate)",
+      "Weft (picks/cm)": "9.0 (Candidate)",
+      "Decision Status": "NEEDS_REVIEW (Accepted: None)",
+      "Factory Tol Check": "REJECTED (Candidate error +23 / -18)",
+      "Root Cause": "5.5x scale inflation + macro-stripe harmonic aliasing"
+    },
+    {
+      "Method / Paradigm": "Deterministic (Calibrated Phone Sx=263.5, Sy=208.4)",
+      "Warp (ends/cm)": "32.74",
+      "Weft (picks/cm)": "28.47",
+      "Decision Status": "ACCEPTED",
+      "Factory Tol Check": "PASS (+1.74 warp in [29,33], +1.47 weft in [25,29])",
+      "Root Cause": "Physically calibrated pitch on uniform ground weave"
+    },
+    {
+      "Method / Paradigm": "FabricNET Global 262-d RF Regressor",
+      "Warp (ends/cm)": "52.05",
+      "Weft (picks/cm)": "68.55",
+      "Decision Status": "UNVALIDATED",
+      "Factory Tol Check": "FAIL (Error +21.05 warp, +41.55 weft)",
+      "Root Cause": "Severe magnification shift (5x FOV disparity)"
+    },
+    {
+      "Method / Paradigm": "Hybrid WarpWeftUNet (Patch-tiled native)",
+      "Warp (ends/cm)": "8.50",
+      "Weft (picks/cm)": "6.32",
+      "Decision Status": "UNVALIDATED",
+      "Factory Tol Check": "FAIL (Error -22.50 warp, -20.68 weft)",
+      "Root Cause": "Synthetic-domain gap: segments clusters of 3-4 yarns"
     }
   ],
   "per_weave_analysis": {
     "plain": {
       "XGBoost": {
         "warp_mae": 3.699458599090576,
-        "weft_mae": 4.617585182189941
+        "warp_pct_within_2": 50.0,
+        "weft_mae": 4.617585182189941,
+        "weft_pct_within_2": 30.0
       },
       "RandomForest": {
         "warp_mae": 3.3674910536894416,
-        "weft_mae": 4.750015514238532
+        "warp_pct_within_2": 40.0,
+        "weft_mae": 4.750015514238532,
+        "weft_pct_within_2": 20.0
       },
       "MLPRegressor": {
         "warp_mae": 5.874867024659091,
-        "weft_mae": 10.671412547882081
+        "warp_pct_within_2": 30.0,
+        "weft_mae": 10.671412547882081,
+        "weft_pct_within_2": 0.0
       },
       "Deterministic Engine": {
-        "warp_mae": 8.981,
-        "weft_mae": 8.047999999999998
+        "warp_mae": 8.980999946594238,
+        "warp_pct_within_2": 40.0,
+        "weft_mae": 8.04800033569336,
+        "weft_pct_within_2": 20.0
       }
     },
     "satin": {
       "XGBoost": {
         "warp_mae": 3.564471960067749,
-        "weft_mae": 8.112138748168945
+        "warp_pct_within_2": 62.5,
+        "weft_mae": 8.112138748168945,
+        "weft_pct_within_2": 25.0
       },
       "RandomForest": {
         "warp_mae": 3.3278773960010533,
-        "weft_mae": 6.887609647705232
+        "warp_pct_within_2": 37.5,
+        "weft_mae": 6.887609647705232,
+        "weft_pct_within_2": 25.0
       },
       "MLPRegressor": {
         "warp_mae": 3.8850918090841606,
-        "weft_mae": 15.086413498712432
+        "warp_pct_within_2": 25.0,
+        "weft_mae": 15.086413498712432,
+        "weft_pct_within_2": 12.5
       },
       "Deterministic Engine": {
-        "warp_mae": 6.45125,
-        "weft_mae": 24.1775
+        "warp_mae": 6.451250076293945,
+        "warp_pct_within_2": 50.0,
+        "weft_mae": 24.177501678466797,
+        "weft_pct_within_2": 12.5
       }
     },
     "twill": {
       "XGBoost": {
         "warp_mae": 7.508472442626953,
-        "weft_mae": 7.562701225280762
+        "warp_pct_within_2": 25.0,
+        "weft_mae": 7.562701225280762,
+        "weft_pct_within_2": 50.0
       },
       "RandomForest": {
         "warp_mae": 8.328088327182076,
-        "weft_mae": 4.6882024206079524
+        "warp_pct_within_2": 25.0,
+        "weft_mae": 4.6882024206079524,
+        "weft_pct_within_2": 12.5
       },
       "MLPRegressor": {
         "warp_mae": 11.892931638648204,
-        "weft_mae": 15.578691122207244
+        "warp_pct_within_2": 0.0,
+        "weft_mae": 15.578691122207244,
+        "weft_pct_within_2": 12.5
       },
       "Deterministic Engine": {
-        "warp_mae": 25.4525,
-        "weft_mae": 8.5375
+        "warp_mae": 25.452499389648438,
+        "warp_pct_within_2": 0.0,
+        "weft_mae": 8.537500381469727,
+        "weft_pct_within_2": 37.5
       }
     }
   },
   "architectural_recommendations": {
     "mode_1_classical_deterministic": {
-      "status": "Production Ready",
-      "best_use_case": "Standard unprinted plain fabrics with uniform illumination where spatial calibration scale (px/cm) is known and zero GPU compute is required.",
-      "operational_boundary": "Fails or requires review on dense satin/twill weaves with long yarn floats (due to harmonic ambiguity) and low-contrast optical images."
+      "status": "Production Ready (Default)",
+      "justification": "Delivers mathematically verified density when calibrated with physical pixel pitch. Robust decision status flags ambiguity."
     },
-    "mode_2_learned_regression": {
-      "status": "Research Benchmark (Viable as Auxiliary Hint)",
-      "best_use_case": "Complex weave classification and rapid approximate density estimation on standardized 1cm microscope fields without manual peak tuning.",
-      "operational_boundary": "Does not generalize across differing optical magnifications or camera sensor geometries unless retrained or normalized."
+    "mode_2_learned_feature_regression": {
+      "status": "Research Only (Production Disabled)",
+      "justification": "High accuracy within fixed microscope FOV, but fails completely on smartphone captures due to out-of-distribution magnification."
     },
-    "mode_3_hybrid_analysis": {
-      "status": "Recommended Next-Generation Core",
-      "best_use_case": "Challenging real-world swatches with surface color, heather yarn patterns, or uneven illumination where the neural network isolates physical yarn bodies and deterministic geometry guarantees metric accuracy.",
-      "operational_boundary": "Requires GPU or optimized ONNX runtime to meet sub-50ms latency targets."
+    "mode_3_hybrid_segmentation": {
+      "status": "Research Only (Production Disabled)",
+      "justification": "Decouples pattern recognition from metric scale, but synthetic-domain U-Net suffers severe domain gap on real smartphone swatches."
     }
   }
 }

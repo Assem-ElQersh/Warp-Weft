@@ -833,7 +833,11 @@
                 </div>
 
                 <div class="form-group" id="custom-scale-group" style="display: none;">
-                    <label id="lbl-pixels-cm">Pixels per Centimeter (px/cm)</label>
+                    <div class="field-header">
+                        <label id="lbl-pixels-cm" style="margin-bottom: 0;">Pixels per Centimeter (px/cm)</label>
+                        <button type="button" class="info-btn" id="btn-info-pixels-cm" aria-expanded="false" aria-label="More information about Pixels per Centimeter" onclick="toggleHelp('help-pixels-cm', this)">i</button>
+                    </div>
+                    <div class="help-box" id="help-pixels-cm"></div>
                     <input type="number" class="form-control" id="input-pixels-cm" value="400.0" step="1.0" min="50" max="10000">
                     <div style="display: flex; gap: 8px; margin-top: 6px;">
                         <input type="number" class="form-control" id="input-pixels-cm-y" placeholder="Y-scale px/cm (optional)" value="" step="1.0" min="50" max="10000">
@@ -1279,6 +1283,7 @@
                 btnDlEn: "Download English PDF",
                 btnDlAr: "تحميل التقرير الفني (عربي)",
                 helpScale: "Relates pixels to physical distance. The listed scales are presets, not guarantees. Smartphone magnification varies; calibrate with a known reference in the same plane, lens, focus, and zoom. FabricNET's 1280 × 1200 px/cm is specific to its 5 × 4 mm microscopy field of view.",
+                helpPixelsCm: "Defines the exact spatial conversion factor: Scale (px/cm) = Image Pixels / Physical Distance (cm). For example, if a 1.0 cm span on a physical ruler measures 400 pixels across the image sensor, enter 400.0. The first box sets horizontal X-scale (Warp pitch) and the second box optionally sets vertical Y-scale (Weft pitch) for anisotropic camera lenses. If you do not know the exact number, click the 'Ruler Tool' button to measure a known distance directly on your image.",
                 helpWeave: "The weave label is currently passed as metadata only. The current spectral selector and evidence-fusion arbiter do not branch on it, so changing this control does not currently change the density estimate. Do not treat it as a validated model or weighting option.",
                 helpProminence: "Minimum altitude drop for a spatial projection peak to qualify as a real yarn crown. Lower values (0.006–0.010) capture subtle fine yarns in poplin/satin; higher values (0.016–0.025) filter out fiber hairiness in fuzzy fabrics. Default 0.012 is balanced for standard weaves.",
                 helpSkew: "Automatically detects fabric placement tilt between -45° and +45° via 2D FFT Polar Radon integration and rotates the swatch before spatial projection, preventing profile contrast collapse.",
@@ -1350,6 +1355,7 @@
                 btnDlEn: "English PDF Report",
                 btnDlAr: "تحميل التقرير الفني بالعربية (PDF)",
                 helpScale: "يربط البكسلات بالمسافة الفعلية. القيم المعروضة إعدادات مسبقة وليست ضماناً للمعايرة. يختلف تكبير الهاتف؛ يجب المعايرة باستخدام مرجع معلوم في نفس المستوى والعدسة والتركيز والتكبير. قيمة FabricNET ‏1280 × 1200 بكسل/سم خاصة بمجال تصوير مجهري 5 × 4 مم.",
+                helpPixelsCm: "يحدد معامل التحويل المكاني الدقيق: المقياس (بكسل/سم) = عدد بكسلات الصورة / المسافة الفيزيائية الفعلية (سم). على سبيل المثال، إذا كانت مسافة 1.0 سم على مسطرة حقيقية تعادل 400 بكسل في الصورة، اكتب 400.0. المربع الأول يحدد مقياس المحور الأفقي X (لكثافة السداء) والمربع الثاني يحدد اختيارياً مقياس المحور الرأسي Y (لكثافة اللحمة) لعدسات الكاميرا ذات الأبعاد غير المتطابقة. إذا لم تكن تعرف الرقم بدقة، اضغط على زر 'أداة المسطرة' (Ruler Tool) لتحديد مسافة معلومة مباشرة على صورتك وحسابها تلقائياً.",
                 helpWeave: "يُمرر نوع النسيج حالياً كبيانات وصفية فقط. لا يغيّر محرك اختيار الترددات أو دمج الأدلة طريقة الحساب بناءً عليه؛ لذلك لا يؤدي تغيير هذا الخيار حالياً إلى تغيير التقدير. لا تعتبره إعداداً معتمداً للنموذج أو أوزان المحركات.",
                 helpProminence: "الارتفاع الأدنى لقمة الإسقاط لاعتبارها خيطاً فعلياً. القيم المنخفضة (0.006–0.010) تلتقط الخيوط الدقيقة الناعمة في الأطلس والبوبلين، بينما القيم المرتفعة (0.016–0.025) تتجاهل الشعيرات السطحية والوبر. القيمة الافتراضية 0.012 متوازنة للأقمشة القياسية.",
                 helpSkew: "يكتشف ميلان القماش تلقائياً عبر فحص طاقة الترددات في مجال فورييه بين -45° و+45°، ثم يعدل دوران العينة لحماية تباين الإسقاط الخطي من الانهيار.",
@@ -1370,6 +1376,7 @@
         function updateHelpTexts() {
             const strings = i18n[currentLanguage];
             document.getElementById('help-scale').innerText = strings.helpScale;
+            document.getElementById('help-pixels-cm').innerText = strings.helpPixelsCm;
             document.getElementById('help-weave').innerText = strings.helpWeave;
             document.getElementById('help-prominence').innerText = strings.helpProminence;
             document.getElementById('help-skew').innerText = strings.helpSkew;

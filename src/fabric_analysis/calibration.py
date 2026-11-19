@@ -64,11 +64,12 @@ class PhysicalCalibration:
                  fov_width_cm: float,
                  fov_height_cm: float,
                  source: str = "optical_fov_hardware",
-                 is_verified: bool = True,
+                 is_verified: bool = False,
                  uncertainty_pct: float = 1.0) -> "PhysicalCalibration":
         """
         The mechanistic justification for this step is: compute exact anisotropic
-        calibration scales from known optical sensor resolution and physical field of view.
+        calibration scales from known optical sensor resolution and physical field of view,
+        defaulting to unverified unless physically authenticated.
         """
         if image_width_px <= 0 or image_height_px <= 0:
             raise ValueError(f"Invalid pixel dimensions: {image_width_px}x{image_height_px}")

@@ -1,0 +1,74 @@
+{
+  "dataset_id": "synthetic_micro_swatches",
+  "split": "test",
+  "n_samples": 1,
+  "timestamp": "2026-11-19 15:07:15",
+  "models": {
+    "deterministic_dual_engine": {
+      "warp": {
+        "n_samples": 1,
+        "mae": 1.0,
+        "rmse": 1.0,
+        "mbe": -1.0,
+        "max_error": 1.0,
+        "pct_within_1": 100.0,
+        "pct_within_2": 100.0,
+        "bland_altman_mean_diff": -1.0,
+        "bland_altman_std_diff": 0.0,
+        "bland_altman_loa_lower": -1.0,
+        "bland_altman_loa_upper": -1.0
+      },
+      "weft": {
+        "n_samples": 1,
+        "mae": 0.0,
+        "rmse": 0.0,
+        "mbe": 0.0,
+        "max_error": 0.0,
+        "pct_within_1": 100.0,
+        "pct_within_2": 100.0,
+        "bland_altman_mean_diff": 0.0,
+        "bland_altman_std_diff": 0.0,
+        "bland_altman_loa_lower": 0.0,
+        "bland_altman_loa_upper": 0.0
+      },
+      "composite": {
+        "mean_mae": 0.5,
+        "pct_both_within_2": 100.0
+      },
+      "mean_latency_ms": 136.22
+    },
+    "hybrid_unet_skeleton_pitch": {
+      "warp": {
+        "n_samples": 1,
+        "mae": 25.14,
+        "rmse": 25.14,
+        "mbe": 25.14,
+        "max_error": 25.14,
+        "pct_within_1": 0.0,
+        "pct_within_2": 0.0,
+        "bland_altman_mean_diff": 25.14,
+        "bland_altman_std_diff": 0.0,
+        "bland_altman_loa_lower": 25.14,
+        "bland_altman_loa_upper": 25.14
+      },
+      "weft": {
+        "n_samples": 1,
+        "mae": 22.0,
+        "rmse": 22.0,
+        "mbe": 22.0,
+        "max_error": 22.0,
+        "pct_within_1": 0.0,
+        "pct_within_2": 0.0,
+        "bland_altman_mean_diff": 22.0,
+        "bland_altman_std_diff": 0.0,
+        "bland_altman_loa_lower": 22.0,
+        "bland_altman_loa_upper": 22.0
+      },
+      "composite": {
+        "mean_mae": 23.57,
+        "pct_both_within_2": 0.0
+      },
+      "mean_latency_ms": 701.52
+    }
+  }
+}

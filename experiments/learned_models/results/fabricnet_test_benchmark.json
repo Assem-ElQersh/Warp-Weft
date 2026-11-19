@@ -1,0 +1,41 @@
+{
+  "dataset_id": "fabricnet",
+  "split": "test",
+  "n_samples": 130,
+  "timestamp": "2026-11-19 04:28:17",
+  "models": {
+    "deterministic_dual_engine": {
+      "warp": {
+        "n_samples": 130,
+        "mae": 13.4274,
+        "rmse": 18.6718,
+        "mbe": -12.8206,
+        "max_error": 45.9,
+        "pct_within_1": 15.38,
+        "pct_within_2": 26.15,
+        "bland_altman_mean_diff": -12.8206,
+        "bland_altman_std_diff": 13.627,
+        "bland_altman_loa_lower": -39.5295,
+        "bland_altman_loa_upper": 13.8883
+      },
+      "weft": {
+        "n_samples": 130,
+        "mae": 11.2622,
+        "rmse": 15.9139,
+        "mbe": -10.32,
+        "max_error": 39.87,
+        "pct_within_1": 16.92,
+        "pct_within_2": 27.69,
+        "bland_altman_mean_diff": -10.32,
+        "bland_altman_std_diff": 12.1608,
+        "bland_altman_loa_lower": -34.1552,
+        "bland_altman_loa_upper": 13.5152
+      },
+      "composite": {
+        "mean_mae": 12.3448,
+        "pct_both_within_2": 6.15
+      },
+      "mean_latency_ms": 219.43
+    }
+  }
+}

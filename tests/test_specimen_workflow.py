@@ -24,7 +24,11 @@ class TestSpecimenWorkflowAndCalibrationProfiles(unittest.TestCase):
         phone_profile = get_calibration_profile("smartphone_macro_stand_v1")
         self.assertIsNotNone(phone_profile)
         self.assertEqual(phone_profile.profile_id, "smartphone_macro_stand_v1")
-        self.assertTrue(phone_profile.is_verified)
+        self.assertFalse(phone_profile.is_verified)
+
+        pick_glass = get_calibration_profile("smartphone_pick_glass_v1")
+        self.assertIsNotNone(pick_glass)
+        self.assertTrue(pick_glass.is_verified)
 
         phys_cal = phone_profile.to_physical_calibration()
         self.assertIsInstance(phys_cal, PhysicalCalibration)

@@ -168,5 +168,39 @@ class TestWebServerIntegration(unittest.TestCase):
         self.assertIn("weft_mean_picks_per_cm", spec)
 
 
+    def test_specimen_analysis_endpoint_rejects_missing_calibration(self):
+        # The mechanistic justification for this step is: verify that /api/analyze/specimen
+        # explicitly rejects requests lacking calibration profile or scales with HTTP 400.
+        status, result, _ = self.request("POST", "/api/analyze/specimen", {
+            "fabric_id": "uncalibrated_specimen",
+            "preset_id": "synthetic_skewed_12",
+        })
+        self.assertEqual(status, 400)
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["code"], "missing_calibration")
+
+
+    def test_uncalibrated_image_analysis_returns_uncalibrated_status(self):
+        # The mechanistic justification for this step is: verify that uploading an arbitrary
+        # image without calibration parameters via HTTP returns UNCALIBRATED decision status
+        # and suppresses accepted physical densities.
+        import io, base64
+        from PIL import Image
+        buf = io.BytesIO()
+        Image.new("RGB", (200, 200), (128, 128, 128)).save(buf, format="PNG")
+        b64_img = base64.b64encode(buf.getvalue()).decode("utf-8")
+
+        status, result, _ = self.request("POST", "/api/analyze", {
+            "image": b64_img,
+        })
+        self.assertEqual(status, 200)
+        self.assertEqual(result["status"], "success")
+        res = result["results"]
+        self.assertEqual(res["decision_status"], "UNCALIBRATED")
+        self.assertIsNone(res["accepted_warp_density_ends_per_cm"])
+        self.assertIsNone(res["accepted_weft_density_picks_per_cm"])
+        self.assertFalse(result["calibration"]["is_verified"])
+
+
 if __name__ == "__main__":
     unittest.main()

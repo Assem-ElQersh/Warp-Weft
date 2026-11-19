@@ -1,0 +1,293 @@
+{
+  "schema_version": "1.0.0",
+  "registry_name": "Warp & Weft AI Master Model Registry",
+  "last_updated": "2026-11-19",
+  "paradigms": {
+    "deterministic": "Classical zero-training signal processing and spatial analysis",
+    "feature_regression": "Statistical texture feature extraction mapped to thread count via shallow regressor",
+    "deep_segmentation": "Pixel-level semantic or instance segmentation of yarn bodies and floats",
+    "foundation_backbone": "Pretrained self-supervised vision representations for transfer learning",
+    "density_counting": "Continuous spatial density map estimation",
+    "hybrid_metrology": "Learned yarn segmentation coupled with topological skeletonization and calibrated pitch measurement"
+  },
+  "models": [
+    {
+      "model_id": "deterministic_dual_engine",
+      "official_name": "Dual-Engine Spectral & Spatial Deterministic Fabric Analyzer",
+      "paradigm": "deterministic",
+      "architecture": "2D Fast Fourier Transform (rfft2) + 1D Spatial Autocorrelation & Prominence Peak Detection",
+      "source_repository": "src/fabric_analysis/pipeline.py",
+      "parameter_count": 0,
+      "checkpoint_size_bytes": 0,
+      "framework": "NumPy / PyTorch (CPU & CUDA)",
+      "license": "Internal Project IP (MIT / Apache 2.0)",
+      "input_requirements": {
+        "channels": 1,
+        "format": "Grayscale float32 normalized [0, 1]",
+        "resolution": "Arbitrary (ROI >= 200x200 recommended)",
+        "spatial_calibration_required": true,
+        "scale_units": "px/cm (Sx, Sy)"
+      },
+      "output_format": {
+        "warp_density": "float (ends/cm)",
+        "weft_density": "float (picks/cm)",
+        "confidence_score": "float [0, 1]",
+        "decision_status": "ACCEPTED | CONSISTENT_WITH_WARNING | NEEDS_REVIEW",
+        "diagnostic_spectra": "2D Power spectrum and 1D marginal projection profiles"
+      },
+      "memory_footprint_mb": 15.0,
+      "inference_latency_ms": 12.0,
+      "quantization_onnx_support": "Not applicable (Pure analytical operations)",
+      "hosted_api_available": false,
+      "suitability_rating": "5/5 (Authoritative Production Baseline for Plain Weaves with Known Scale)",
+      "failure_modes_and_boundary_conditions": "Harmonic ambiguity on twill/satin float weaves; low optical contrast; non-periodic patterns; macro-stripe surface interference."
+    },
+    {
+      "model_id": "custom_global_262d_rf",
+      "official_name": "FabricNET Global 262-d Texture Feature Random Forest Regressor",
+      "paradigm": "feature_regression",
+      "architecture": "GLCM (96) + LBP (54) + Gabor Filter Bank (96) + Spatial Projection (16) -> Scikit-learn RandomForestRegressor",
+      "source_repository": "experiments/learned_models/notebooks/01_fabricnet_feature_regression.ipynb",
+      "parameter_count": 1245000,
+      "checkpoint_size_bytes": 8420000,
+      "framework": "Scikit-Learn 1.4+ / NumPy",
+      "license": "Internal MIT",
+      "input_requirements": {
+        "channels": 1,
+        "format": "Grayscale uint8 / float32 (480, 640)",
+        "resolution": "Fixed 640x480 (assumes nominal 5x4 mm FOV: Sx=1280, Sy=1200 px/cm)",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "warp_density": "float (ends/cm)",
+        "weft_density": "float (picks/cm)"
+      },
+      "memory_footprint_mb": 45.0,
+      "inference_latency_ms": 85.0,
+      "quantization_onnx_support": "ONNX (via skl2onnx)",
+      "hosted_api_available": false,
+      "suitability_rating": "3/5 (Effective on fixed microscope FOV; completely fails on variable smartphone distance)",
+      "failure_modes_and_boundary_conditions": "Implicit optical scale dependency; failure under magnification changes; optical blur."
+    },
+    {
+      "model_id": "custom_global_262d_xgboost",
+      "official_name": "FabricNET Global 262-d Texture Feature XGBoost Regressor",
+      "paradigm": "feature_regression",
+      "architecture": "262-d Statistical Texture Vector -> Gradient Boosted Decision Trees (XGBRegressor)",
+      "source_repository": "experiments/learned_models/notebooks/01_fabricnet_feature_regression.ipynb",
+      "parameter_count": 860000,
+      "checkpoint_size_bytes": 3150000,
+      "framework": "XGBoost 2.0+ / NumPy",
+      "license": "Internal MIT",
+      "input_requirements": {
+        "channels": 1,
+        "format": "Grayscale (480, 640)",
+        "resolution": "Fixed 640x480",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "warp_density": "float (ends/cm)",
+        "weft_density": "float (picks/cm)"
+      },
+      "memory_footprint_mb": 35.0,
+      "inference_latency_ms": 75.0,
+      "quantization_onnx_support": "ONNX (via onnxmltools)",
+      "hosted_api_available": false,
+      "suitability_rating": "3/5 (High fixed-FOV accuracy; fails on smartphone domain transfer)",
+      "failure_modes_and_boundary_conditions": "Severe sensitivity to high-frequency sensor noise and out-of-distribution blur."
+    },
+    {
+      "model_id": "warp_weft_unet_v1",
+      "official_name": "WarpWeftUNet: Deep Semantic Yarn Core Segmenter",
+      "paradigm": "deep_segmentation",
+      "architecture": "Lightweight PyTorch U-Net (4 downsampling stages, DoubleConv blocks, skip connections, bilinear upsampling)",
+      "source_repository": "experiments/learned_models/checkpoints/unet_yarn_segmentation.pt",
+      "parameter_count": 1931843,
+      "checkpoint_size_bytes": 7718915,
+      "framework": "PyTorch 2.x",
+      "license": "Internal MIT",
+      "input_requirements": {
+        "channels": 1,
+        "format": "Grayscale float32 tensor [B, 1, 256, 256] normalized [0, 1]",
+        "resolution": "256x256 (supports arbitrary size via overlapping patch tiling)",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "segmentation_logits": "Float32 tensor [B, 3, 256, 256]",
+        "classes": ["0: interstice_void", "1: longitudinal_warp_yarn_core", "2: transverse_weft_yarn_core"],
+        "class_probabilities": "Softmax over channel dimension"
+      },
+      "memory_footprint_mb": 48.0,
+      "inference_latency_ms": 35.0,
+      "quantization_onnx_support": "TorchScript, ONNX, TensorRT, INT8 Quantization supported",
+      "hosted_api_available": false,
+      "suitability_rating": "4/5 (Clean yarn core segmentation; pairs with topological thinning for metrology)",
+      "failure_modes_and_boundary_conditions": "Currently trained on synthetic microscope swatches; requires fine-tuning on real smartphone masks to bridge fiber fuzz."
+    },
+    {
+      "model_id": "segformer_b0",
+      "official_name": "SegFormer B0: Efficient Transformer Semantic Yarn Segmenter",
+      "paradigm": "deep_segmentation",
+      "architecture": "Hierarchical Mix Vision Transformer (MiT-B0) + All-MLP Decoder Head",
+      "source_repository": "https://huggingface.co/nvidia/segformer-b0-finetuned-ade-512-512",
+      "parameter_count": 3714947,
+      "checkpoint_size_bytes": 14850000,
+      "framework": "PyTorch 2.x / HuggingFace Transformers",
+      "license": "Apache 2.0",
+      "input_requirements": {
+        "channels": 3,
+        "format": "RGB float32 tensor [B, 3, 512, 512] ImageNet normalized",
+        "resolution": "512x512",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "segmentation_masks": "Float32 tensor [B, num_classes, 512, 512]"
+      },
+      "memory_footprint_mb": 75.0,
+      "inference_latency_ms": 18.0,
+      "quantization_onnx_support": "ONNX, OpenVINO, INT8 supported",
+      "hosted_api_available": true,
+      "suitability_rating": "4/5 (Strong self-attention over periodic grid patterns; lightweight footprint)",
+      "failure_modes_and_boundary_conditions": "Needs fine-tuning on textile masks; requires patch-based tiling for multi-megapixel smartphone images."
+    },
+    {
+      "model_id": "sam_2_1_tiny",
+      "official_name": "SAM 2.1 Tiny (Segment Anything Model 2.1 Hiera Tiny)",
+      "paradigm": "deep_segmentation",
+      "architecture": "Hiera Vision Transformer + Memory Bank + Lightweight Promptable Mask Decoder",
+      "source_repository": "https://github.com/facebookresearch/sam2",
+      "parameter_count": 38900000,
+      "checkpoint_size_bytes": 155600000,
+      "framework": "PyTorch 2.3+",
+      "license": "Apache 2.0",
+      "input_requirements": {
+        "channels": 3,
+        "format": "RGB float32 tensor [B, 3, 1024, 1024]",
+        "resolution": "1024x1024",
+        "prompts_required": "Point coordinates or bounding boxes (prompt-driven)",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "binary_masks": "Boolean / float32 mask [B, 1, 1024, 1024]",
+        "iou_predictions": "Confidence score per mask"
+      },
+      "memory_footprint_mb": 420.0,
+      "inference_latency_ms": 55.0,
+      "quantization_onnx_support": "ONNX exportable via sam2 API",
+      "hosted_api_available": true,
+      "suitability_rating": "3/5 (Excellent for interactive ROI segmentation; does NOT automatically count threads)",
+      "failure_modes_and_boundary_conditions": "Prompt-dependent; cannot enumerate hundreds of dense parallel yarns without automatic dense grid prompting."
+    },
+    {
+      "model_id": "dinov2_vits14",
+      "official_name": "DINOv2 ViT-S/14 Self-Supervised Vision Transformer",
+      "paradigm": "foundation_backbone",
+      "architecture": "Vision Transformer (Patch 14x14, 384 embedding dim, 6 heads, 12 layers)",
+      "source_repository": "https://github.com/facebookresearch/dinov2",
+      "parameter_count": 22058112,
+      "checkpoint_size_bytes": 88232448,
+      "framework": "PyTorch 2.x",
+      "license": "Apache 2.0",
+      "input_requirements": {
+        "channels": 3,
+        "format": "RGB float32 tensor [B, 3, H, W] where H, W are multiples of 14",
+        "resolution": "224x224 or 448x448",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "patch_tokens": "Dense token feature tensor [B, (H/14)*(W/14), 384]",
+        "cls_token": "Global context vector [B, 384]"
+      },
+      "memory_footprint_mb": 110.0,
+      "inference_latency_ms": 25.0,
+      "quantization_onnx_support": "ONNX, TorchScript supported",
+      "hosted_api_available": true,
+      "suitability_rating": "4/5 (Dense patch features preserve spatial phase of periodic weave grids; ideal for linear probe regression)",
+      "failure_modes_and_boundary_conditions": "Requires custom downstream regression or segmentation head; scale-unaware without external calibration."
+    },
+    {
+      "model_id": "yolov8_nano_seg",
+      "official_name": "YOLOv8 Nano Segmentation (Ultralytics)",
+      "paradigm": "deep_segmentation",
+      "architecture": "CSPDarknet53 Backbone + PANet Neck + ProtoNet Mask Decoder",
+      "source_repository": "https://github.com/ultralytics/ultralytics",
+      "parameter_count": 3400000,
+      "checkpoint_size_bytes": 6800000,
+      "framework": "PyTorch / Ultralytics",
+      "license": "AGPL-3.0",
+      "input_requirements": {
+        "channels": 3,
+        "format": "RGB [B, 3, 640, 640]",
+        "resolution": "640x640",
+        "spatial_calibration_required": false
+      },
+      "output_format": {
+        "bounding_boxes": "Tensor [N, 4] (x1, y1, x2, y2)",
+        "instance_masks": "Binary mask tensor [N, 160, 160]"
+      },
+      "memory_footprint_mb": 50.0,
+      "inference_latency_ms": 22.0,
+      "quantization_onnx_support": "ONNX, CoreML, TFLite supported",
+      "hosted_api_available": true,
+      "suitability_rating": "3/5 (Requires 1D directional NMS; isotropic NMS suppresses 31-50% of dense yarns)",
+      "failure_modes_and_boundary_conditions": "Severe NMS suppression on adjacent parallel yarns; integer box counts do not yield threads/cm without metric scale."
+    },
+    {
+      "model_id": "countr_density",
+      "official_name": "CounTR: Transformer-Based Generalized Density Counter",
+      "paradigm": "density_counting",
+      "architecture": "Vision Transformer Encoder-Decoder with Cross-Attention between Exemplar and Image",
+      "source_repository": "https://github.com/Verg-Avesta/CounTR",
+      "parameter_count": 86000000,
+      "checkpoint_size_bytes": 344000000,
+      "framework": "PyTorch 2.x",
+      "license": "MIT",
+      "input_requirements": {
+        "channels": 3,
+        "format": "RGB [B, 3, 384, 384] + exemplar yarn crop [B, 3, 64, 64]",
+        "resolution": "384x384",
+        "spatial_calibration_required": true
+      },
+      "output_format": {
+        "density_map": "Continuous 2D float32 density map [B, 1, 384, 384] where sum(map) = object count"
+      },
+      "memory_footprint_mb": 650.0,
+      "inference_latency_ms": 120.0,
+      "quantization_onnx_support": "TorchScript",
+      "hosted_api_available": false,
+      "suitability_rating": "3/5 (Continuous density map solves discrete NMS suppression; requires exemplar patch)",
+      "failure_modes_and_boundary_conditions": "Exemplar patch quality sensitivity; high GPU memory footprint; non-trivial conversion to directional warp vs weft."
+    },
+    {
+      "model_id": "hybrid_unet_skeleton_pitch",
+      "official_name": "Hybrid WarpWeftUNet + Topological Thinning + Calibrated Pitch Profiler",
+      "paradigm": "hybrid_metrology",
+      "architecture": "WarpWeftUNet (1.93M) -> Morphological Centerline Thinning -> 1D Pitch Histogram -> Calibrated Density (D = S / Delta)",
+      "source_repository": "experiments/learned_models/notebooks/05_hybrid_geometric_measurement.ipynb",
+      "parameter_count": 1931843,
+      "checkpoint_size_bytes": 7718915,
+      "framework": "PyTorch 2.x + SciPy / scikit-image",
+      "license": "Internal MIT",
+      "input_requirements": {
+        "channels": 1,
+        "format": "Grayscale float32 tensor [B, 1, H, W]",
+        "resolution": "Native patch-tiling (arbitrary megapixel input)",
+        "spatial_calibration_required": true,
+        "scale_units": "px/cm (Sx, Sy)"
+      },
+      "output_format": {
+        "warp_density": "float (ends/cm)",
+        "weft_density": "float (picks/cm)",
+        "warp_pitch_px": "float (inter-yarn spacing in px)",
+        "weft_pitch_px": "float (inter-yarn spacing in px)",
+        "centerline_overlay": "Visual verification image showing exact detected yarn spines"
+      },
+      "memory_footprint_mb": 65.0,
+      "inference_latency_ms": 45.0,
+      "quantization_onnx_support": "TorchScript / ONNX for U-Net; native CPU for thinning",
+      "hosted_api_available": false,
+      "suitability_rating": "5/5 (Physical Metrology Architecture: Transparent Pitch Measurement with Visual Evidence)",
+      "failure_modes_and_boundary_conditions": "Severe fiber fuzz bridging adjacent yarns on rough denim; requires human-verified masks for fine-tuning."
+    }
+  ]
+}

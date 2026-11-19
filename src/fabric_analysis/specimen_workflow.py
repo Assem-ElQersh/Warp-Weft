@@ -112,14 +112,13 @@ def evaluate_five_region_specimen(
         is_val = results.get("is_validated", False)
         sqi = float(results.get("signal_quality_index", 0.0))
 
-        # Use accepted density for specimen averaging if validated, otherwise record candidate for review
-        effective_warp = accepted_warp if accepted_warp is not None else cand_warp
-        effective_weft = accepted_weft if accepted_weft is not None else cand_weft
-
-        if effective_warp is not None and math.isfinite(effective_warp) and effective_warp > 0:
-            warp_values.append(float(effective_warp))
-        if effective_weft is not None and math.isfinite(effective_weft) and effective_weft > 0:
-            weft_values.append(float(effective_weft))
+        # The mechanistic justification for this step is: ensure only consensus-validated,
+        # accepted densities are incorporated into specimen-level statistics, strictly
+        # excluding rejected or unvalidated candidate estimates from certified means.
+        if is_val and accepted_warp is not None and math.isfinite(accepted_warp) and accepted_warp > 0:
+            warp_values.append(float(accepted_warp))
+        if is_val and accepted_weft is not None and math.isfinite(accepted_weft) and accepted_weft > 0:
+            weft_values.append(float(accepted_weft))
 
         region_results.append(
             RegionResult(
@@ -139,21 +138,32 @@ def evaluate_five_region_specimen(
 
     validated_count = sum(r.is_validated for r in region_results)
 
-    warp_mean = mean(warp_values) if len(warp_values) >= REQUIRED_REGIONS_COUNT else None
-    weft_mean = mean(weft_values) if len(weft_values) >= REQUIRED_REGIONS_COUNT else None
-    warp_std = stdev(warp_values) if len(warp_values) >= 2 else 0.0
-    weft_std = stdev(weft_values) if len(weft_values) >= 2 else 0.0
+    # A certified specimen mean strictly requires all 5 regions to be validated
+    all_regions_validated = (
+        validated_count == REQUIRED_REGIONS_COUNT
+        and len(warp_values) == REQUIRED_REGIONS_COUNT
+        and len(weft_values) == REQUIRED_REGIONS_COUNT
+    )
+    calibration_verified = bool(calibration and getattr(calibration, "is_verified", False))
+
+    if all_regions_validated:
+        warp_mean = mean(warp_values)
+        weft_mean = mean(weft_values)
+        warp_std = stdev(warp_values) if len(warp_values) >= 2 else 0.0
+        weft_std = stdev(weft_values) if len(weft_values) >= 2 else 0.0
+    else:
+        warp_mean = None
+        weft_mean = None
+        warp_std = None
+        weft_std = None
 
     warp_pass = None
     weft_pass = None
     specimen_pass = None
 
-    if warp_mean is not None:
+    if all_regions_validated and calibration_verified:
         warp_pass = abs(warp_mean - target_warp) <= tolerance
-    if weft_mean is not None:
         weft_pass = abs(weft_mean - target_weft) <= tolerance
-
-    if warp_pass is not None and weft_pass is not None:
         specimen_pass = warp_pass and weft_pass
         if specimen_pass:
             decision_status = "PASS"
@@ -169,6 +179,16 @@ def evaluate_five_region_specimen(
                 f"Warp={warp_mean:.1f} ({'PASS' if warp_pass else 'FAIL'}), "
                 f"Weft={weft_mean:.1f} ({'PASS' if weft_pass else 'FAIL'})."
             )
+    elif all_regions_validated and not calibration_verified:
+        warp_pass = abs(warp_mean - target_warp) <= tolerance
+        weft_pass = abs(weft_mean - target_weft) <= tolerance
+        specimen_pass = False
+        decision_status = "UNVERIFIED_CALIBRATION"
+        decision_summary = (
+            f"Specimen {fabric_id} has {REQUIRED_REGIONS_COUNT} validated regions but UNVERIFIED calibration "
+            f"({calibration.calibration_source if calibration else 'none'}). "
+            f"Certified factory pass requires verified physical calibration."
+        )
     else:
         decision_status = "NEEDS_REVIEW"
         decision_summary = (
@@ -184,8 +204,8 @@ def evaluate_five_region_specimen(
         regions=region_results,
         warp_mean_ends_per_cm=round(warp_mean, 2) if warp_mean is not None else None,
         weft_mean_picks_per_cm=round(weft_mean, 2) if weft_mean is not None else None,
-        warp_sample_std_ends_per_cm=round(warp_std, 2) if warp_mean is not None else None,
-        weft_sample_std_picks_per_cm=round(weft_std, 2) if weft_mean is not None else None,
+        warp_sample_std_ends_per_cm=round(warp_std, 2) if warp_std is not None else None,
+        weft_sample_std_picks_per_cm=round(weft_std, 2) if weft_std is not None else None,
         warp_pass=warp_pass,
         weft_pass=weft_pass,
         specimen_pass=specimen_pass,

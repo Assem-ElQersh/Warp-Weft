@@ -151,3 +151,46 @@ For the production web application, the three user-selectable operational modes 
    - **Engine**: Lightweight PyTorch U-Net (`unet_yarn_segmentation.pt`) coupled with topological skeletonization and calibrated pitch calculation.
    - **Status**: **Research Package Committed; Production Flag Disabled** (`available: false`).
    - **Reason**: Pretrained checkpoint is synthetic-domain; real-domain pixel ground truth is required before production deployment.
+
+---
+
+## 7. Master Registries & Reproducible Research Engine
+
+### 7.1. Master Registries
+1. **Master Dataset Registry** (`experiments/datasets/registry.json` & `experiments/datasets/README.md`):
+   - Indexes 17 candidate textile datasets across 7 functional metrology categories (A: Physical Density Labels, B: Yarn-Level Segmentation, C: Textile Appearance, D: Defect Disruption, E: Statistical Microtexture, F: Synthetic Simulation, G: Auxiliary Tabular).
+   - Codifies physical calibration specifications ($S_x, S_y$), optical field of view, Nyquist-Shannon resolution bounds, and licensing governance.
+   - Strictly enforces the rule: defect masks must never be conflated with periodic thread density ground truth.
+
+2. **Master Model Registry** (`experiments/models/registry.json` & `experiments/models/README.md`):
+   - Catalogs 10 model candidates across classical deterministic, statistical feature regression, deep semantic segmentation, promptable foundation models, foundation feature backbones, and hybrid metrology.
+   - Details exact parameter counts, input/output tensors, memory footprints, and inference latency.
+   - Mandates explicit physical scale grounding ($D = S / \Delta$) for physical metrology.
+
+### 7.2. Reproducible Research Code Engine (`experiments/learned_models/`)
+The modular Python engine provides dedicated CLI and programmatic entry points:
+- `data_registry.py`: CLI and API to query, filter, and validate dataset metadata.
+- `download_datasets.py`: Checksum-verified downloader respecting licensing and academic access boundaries.
+- `verify_datasets.py`: Automated dataset integrity verifier checking image readability, dimensions, and label coverage.
+- `dataset_adapters.py`: Polymorphic data ingestion layer standardizing disparate datasets into `SampleRecord` objects.
+- `annotations.py`: Mathematical transformations for polygons, masks, skeletons, and continuous density maps.
+- `preprocessing.py`: Optical CLAHE normalization and sliding-window patch tiling with smooth Hanning reconstruction.
+- `splits.py`: Specimen-grouped disjoint partitioning guaranteeing zero data leakage across train, val, and test splits.
+- `augmentation.py`: Physically grounded textile augmentations (90° orthogonal rotation with axis swap, scale jitter with synchronous calibration update, blur, noise, and shading gradients).
+- `calibration.py`: Physical metrology conversions ($D = S / \Delta$), homography rectification, and partial derivative error propagation ($\sigma_D$).
+- `metrics.py`: Dual-level evaluation metrics: CV metrics (IoU, Dice, Pixel Accuracy) and metrology metrics (MAE, RMSE, MBE, max error, % within ±1 and ±2 threads/cm, Bland-Altman LoA).
+- `model_registry.py`: Model loader, checkpoint SHA-256 verifier, and hardware-aware instantiation factory.
+- `inference.py`: Full-frame and patch-based inference runners for deterministic, U-Net, and hybrid pipelines.
+- `visualization.py`: Publication-grade Bland-Altman plots, agreement corridors, and centerline overlays.
+- `benchmark.py`: Unified comparative benchmarking CLI executing evaluations across held-out splits.
+
+### 7.3. Research Notebook Suite
+All experimental workflows are maintained as reproducible `.ipynb` files:
+- `01_fabricnet_feature_regression.ipynb`: Global 262-d Random Forest and XGBoost regression.
+- `01b_fabricnet_ifv_sliding_window.ipynb`: Concentric IFV sliding-window feature regression.
+- `02_roboflow_projects_audit_and_eval.ipynb`: Bounding box NMS suppression and float segmentation audit.
+- `03_textile_defect_fcn_inspection.ipynb`: 6-channel dual-illumination FCN inspection.
+- `04_unet_segmentation_training.ipynb`: PyTorch WarpWeftUNet training on synthetic swatches.
+- `05_hybrid_geometric_measurement.ipynb`: Native patch-tiled hybrid segmentation and pitch measurement.
+- `06_comprehensive_side_by_side_comparison.ipynb`: Multi-model side-by-side empirical comparison.
+- `07_comprehensive_textile_research_engine.ipynb`: Master research pipeline demonstrating end-to-end dataset registration, verification, calibration uncertainty, and benchmarking.

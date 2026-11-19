@@ -255,9 +255,37 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     pil_img = Image.open(io.BytesIO(img_bytes))
 
                 # 2. Extract Calibration & Algorithmic Parameters
-                raw_scale = payload.get("pixels_per_cm", 400.0)
-                pixels_per_cm_x = float(payload.get("pixels_per_cm_x", raw_scale))
-                pixels_per_cm_y = float(payload.get("pixels_per_cm_y", pixels_per_cm_x))
+                # The mechanistic justification for this step is: extract explicit calibration scale
+                # or named calibration profile without falling back to a silent default 400.0 px/cm,
+                # ensuring that uncalibrated requests are explicitly flagged as UNCALIBRATED.
+                preset_id = payload.get("preset_id", "") if not img_data_b64 else ""
+                raw_scale = payload.get("pixels_per_cm")
+                raw_scale_x = payload.get("pixels_per_cm_x")
+                raw_scale_y = payload.get("pixels_per_cm_y")
+                profile_name = payload.get("profile_name")
+
+                # If a preset was used and no explicit scale was passed, use the preset ground-truth scale
+                if not img_data_b64 and preset_id and raw_scale is None and raw_scale_x is None:
+                    if preset_id in ("fabricnet_w012", "fabricnet_w001"):
+                        raw_scale_x = 1280.0
+                        raw_scale_y = 1200.0
+                    elif preset_id in ("synthetic_skewed_15", "synthetic_skewed_12"):
+                        raw_scale_x = 400.0
+                        raw_scale_y = 400.0
+
+                calibration = None
+                if profile_name:
+                    prof = get_calibration_profile(profile_name)
+                    if prof:
+                        calibration = prof.to_physical_calibration()
+
+                pixels_per_cm_x = None
+                pixels_per_cm_y = None
+                if calibration is None:
+                    if raw_scale_x is not None or raw_scale is not None:
+                        pixels_per_cm_x = float(raw_scale_x if raw_scale_x is not None else raw_scale)
+                        pixels_per_cm_y = float(raw_scale_y if raw_scale_y is not None else pixels_per_cm_x)
+
                 auto_skew = bool(payload.get("auto_skew", True))
                 prominence = float(payload.get("prominence", 0.012))
                 weave_hint = str(payload.get("weave_hint", "auto")).lower()
@@ -271,7 +299,8 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                     auto_skew=auto_skew,
                     prominence=prominence,
                     weave_hint=weave_hint,
-                    custom_roi=custom_roi
+                    custom_roi=custom_roi,
+                    calibration=calibration
                 )
 
                 result["analysis_mode"] = "comparison" if compare_methods else "classical"
@@ -335,16 +364,31 @@ class FabricAnalysisHandler(BaseHTTPRequestHandler):
                 scale_x = payload.get("scale_x") or payload.get("pixels_per_cm_x")
                 scale_y = payload.get("scale_y") or payload.get("pixels_per_cm_y")
 
+                # The mechanistic justification for this step is: require an explicit calibration
+                # profile or explicit non-zero spatial scales (scale_x, scale_y) for specimen analysis,
+                # rejecting uncalibrated specimen analysis requests with HTTP 400.
                 if profile_name:
                     prof = get_calibration_profile(profile_name)
                     if prof:
                         calib = prof.to_physical_calibration()
+                    elif scale_x and scale_y:
+                        calib = PhysicalCalibration.from_scales(float(scale_x), float(scale_y), source=f"unknown_profile_{profile_name}")
                     else:
-                        calib = PhysicalCalibration.from_scales(float(scale_x or 263.5), float(scale_y or 208.4))
+                        self.send_json_response({
+                            "status": "error",
+                            "code": "unknown_profile",
+                            "error": f"Unknown calibration profile: {profile_name}"
+                        }, status_code=400)
+                        return
                 elif scale_x and scale_y:
-                    calib = PhysicalCalibration.from_scales(float(scale_x), float(scale_y))
+                    calib = PhysicalCalibration.from_scales(float(scale_x), float(scale_y), source="api_specimen_scales")
                 else:
-                    calib = PhysicalCalibration.from_scales(263.5, 208.4)
+                    self.send_json_response({
+                        "status": "error",
+                        "code": "missing_calibration",
+                        "error": "Specimen analysis requires a valid profile_name or explicit scale_x and scale_y parameters."
+                    }, status_code=400)
+                    return
 
                 target_warp = float(payload.get("target_warp", 31.0))
                 target_weft = float(payload.get("target_weft", 27.0))

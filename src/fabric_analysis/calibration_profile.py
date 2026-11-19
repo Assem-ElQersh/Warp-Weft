@@ -64,14 +64,20 @@ def calibrate_from_two_points(
     pt2: Tuple[float, float],
     known_distance_cm: float,
     axis: str = "both",
-) -> Tuple[float, float]:
+    assume_square_pixels: bool = False,
+) -> Tuple[Optional[float], Optional[float]]:
     """Calculate pixels/cm from two pixel coordinates spanning a known physical distance.
+
+    The mechanistic justification for this step is: prevent ungrounded cross-axis scale
+    assignment when measuring a 1D ruler, allowing callers to explicitly require or forgo
+    an isotropic square-pixel assumption.
 
     Parameters:
         pt1: (x1, y1) in image pixel coordinates
         pt2: (x2, y2) in image pixel coordinates
         known_distance_cm: physical distance in centimeters (> 0)
         axis: "horizontal" (uses dx), "vertical" (uses dy), or "both" (euclidean distance)
+        assume_square_pixels: whether a 1D axis measurement may be applied to both axes
     Returns:
         (pixels_per_cm_x, pixels_per_cm_y)
     """
@@ -80,22 +86,50 @@ def calibrate_from_two_points(
     dx = abs(pt2[0] - pt1[0])
     dy = abs(pt2[1] - pt1[1])
 
+    valid_axes = ("horizontal", "vertical", "both", "diagonal")
+    if axis not in valid_axes:
+        raise ValueError(f"Unsupported calibration axis: '{axis}'. Supported: 'horizontal', 'vertical', 'both', 'diagonal'")
+
     if axis == "horizontal":
         if dx < 1.0:
             raise ValueError("Horizontal pixel distance too small for calibration")
         scale = dx / known_distance_cm
-        return (round(scale, 4), round(scale, 4))
+        sx = round(scale, 4)
+        sy = round(scale, 4) if assume_square_pixels else None
+        return (sx, sy)
     elif axis == "vertical":
         if dy < 1.0:
             raise ValueError("Vertical pixel distance too small for calibration")
         scale = dy / known_distance_cm
-        return (round(scale, 4), round(scale, 4))
-    else:
+        sy = round(scale, 4)
+        sx = round(scale, 4) if assume_square_pixels else None
+        return (sx, sy)
+    elif axis in ("both", "diagonal"):
+        if not assume_square_pixels:
+            raise ValueError(
+                "Diagonal/2D distance cannot calibrate independent X and Y scales without assume_square_pixels=True"
+            )
         euclidean_dist = math.hypot(dx, dy)
         if euclidean_dist < 1.0:
             raise ValueError("Pixel distance too small for calibration")
         scale = euclidean_dist / known_distance_cm
         return (round(scale, 4), round(scale, 4))
+
+
+def calibrate_anisotropic_from_two_rulers(
+    h_pt1: Tuple[float, float],
+    h_pt2: Tuple[float, float],
+    h_known_distance_cm: float,
+    v_pt1: Tuple[float, float],
+    v_pt2: Tuple[float, float],
+    v_known_distance_cm: float,
+) -> Tuple[float, float]:
+    """Calculate anisotropic (Sx, Sy) from independent horizontal and vertical ruler measurements."""
+    sx, _ = calibrate_from_two_points(h_pt1, h_pt2, h_known_distance_cm, axis="horizontal", assume_square_pixels=False)
+    _, sy = calibrate_from_two_points(v_pt1, v_pt2, v_known_distance_cm, axis="vertical", assume_square_pixels=False)
+    if sx is None or sy is None:
+        raise ValueError("Failed to calibrate anisotropic scales from two rulers")
+    return (sx, sy)
 
 
 # Authoritative Standard Profile Library
@@ -110,9 +144,9 @@ STANDARD_PROFILES: Dict[str, CalibrationProfile] = {
         pixels_per_cm_y=208.4,
         uncertainty_pct=3.0,
         calibration_date="2026-11-17",
-        calibration_source="factory_ruler_1cm_optical_graticule",
-        is_verified=True,
-        notes="Calibrated specifically for client fabric specimen photography under fixed orthogonal stand.",
+        calibration_source="back_calculated_client_specimen_reference",
+        is_verified=False,
+        notes="Scale empirically back-calculated from client specimen reference pitch; not an in-scene certified optical graticule.",
     ),
     "smartphone_pick_glass_v1": CalibrationProfile(
         profile_id="smartphone_pick_glass_v1",

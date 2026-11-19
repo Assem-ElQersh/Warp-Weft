@@ -238,9 +238,11 @@ def analyze_fabric(
         crop_h_cm=crop_h_cm
     )
 
-    # The mechanistic justification for this step is: if the input image is uncalibrated,
-    # physical spatial densities (ends/cm, picks/cm) cannot be physically known and must be
-    # suppressed to prevent false metrological assertions.
+    # The mechanistic justification for this step is: distinguish authenticated physical calibration
+    # from uncalibrated inputs and unverified calibration profiles. An uncalibrated image has no spatial
+    # scale; an unverified calibration has an uncertified scale. Neither may produce accepted physical
+    # density measurements or false VALIDATED status. Uncalibrated inputs suppress candidate estimates,
+    # whereas unverified calibrations preserve candidate estimates as unverified diagnostics.
     if is_uncalibrated:
         fusion_res["accepted_warp_density_ends_per_cm"] = None
         fusion_res["accepted_weft_density_picks_per_cm"] = None
@@ -258,6 +260,39 @@ def analyze_fabric(
             "Image is uncalibrated; physical density requires known pixel scale (pixels/cm)."
         )
         fusion_res["candidate_measurements"] = {}
+    elif not calibration.is_verified:
+        is_concordant = (
+            fusion_res["decision_status"] in ("VALIDATED", "CONSISTENT_WITH_WARNING")
+            or fusion_res.get("is_validated", False)
+        )
+        if fusion_res["accepted_warp_density_ends_per_cm"] is not None:
+            fusion_res["candidate_measurements"]["unverified_warp_consensus"] = fusion_res["accepted_warp_density_ends_per_cm"]
+        if fusion_res["accepted_weft_density_picks_per_cm"] is not None:
+            fusion_res["candidate_measurements"]["unverified_weft_consensus"] = fusion_res["accepted_weft_density_picks_per_cm"]
+
+        fusion_res["accepted_warp_density_ends_per_cm"] = None
+        fusion_res["accepted_weft_density_picks_per_cm"] = None
+        fusion_res["warp_density_ends_per_cm"] = None
+        fusion_res["weft_density_picks_per_cm"] = None
+        fusion_res["warp_density_continuous"] = None
+        fusion_res["weft_density_continuous"] = None
+        fusion_res["linear_density_sum_per_cm"] = None
+        fusion_res["areal_intersection_density_per_cm2"] = None
+        fusion_res["pitch_warp_um"] = None
+        fusion_res["pitch_weft_um"] = None
+        fusion_res["is_validated"] = False
+        if is_concordant:
+            fusion_res["decision_status"] = "UNVERIFIED_CALIBRATION"
+            fusion_res["decision_rationale"] = (
+                f"Calibration is unverified ({calibration.calibration_source}); physical density requires "
+                "certified in-plane calibration target. Candidate estimates preserved for diagnostic review."
+            )
+        else:
+            fusion_res["decision_status"] = "NEEDS_REVIEW"
+            fusion_res["decision_rationale"] = (
+                f"Calibration is unverified ({calibration.calibration_source}) and estimators diverged: "
+                f"{fusion_res.get('decision_rationale', '')}"
+            )
 
     latency_ms = (time.perf_counter() - t_start) * 1000.0
 

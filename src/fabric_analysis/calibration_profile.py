@@ -86,6 +86,10 @@ def calibrate_from_two_points(
     dx = abs(pt2[0] - pt1[0])
     dy = abs(pt2[1] - pt1[1])
 
+    valid_axes = ("horizontal", "vertical", "both", "diagonal")
+    if axis not in valid_axes:
+        raise ValueError(f"Unsupported calibration axis: '{axis}'. Supported: 'horizontal', 'vertical', 'both', 'diagonal'")
+
     if axis == "horizontal":
         if dx < 1.0:
             raise ValueError("Horizontal pixel distance too small for calibration")
@@ -100,7 +104,11 @@ def calibrate_from_two_points(
         sy = round(scale, 4)
         sx = round(scale, 4) if assume_square_pixels else None
         return (sx, sy)
-    else:
+    elif axis in ("both", "diagonal"):
+        if not assume_square_pixels:
+            raise ValueError(
+                "Diagonal/2D distance cannot calibrate independent X and Y scales without assume_square_pixels=True"
+            )
         euclidean_dist = math.hypot(dx, dy)
         if euclidean_dist < 1.0:
             raise ValueError("Pixel distance too small for calibration")

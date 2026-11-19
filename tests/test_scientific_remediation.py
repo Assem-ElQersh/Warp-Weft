@@ -124,21 +124,55 @@ class TestScientificRemediation(unittest.TestCase):
 
     def test_specimen_workflow_rejects_pass_when_calibration_unverified(self):
         """
-        Mechanistic Test: If calibration is unverified, the specimen evaluation
-        must not declare an ungrounded certified factory PASS.
+        Mechanistic Test: If calibration is unverified, even when all 5 regions
+        achieve concordant algorithmic validation (is_validated=True), the specimen
+        workflow must strictly reject factory certification (specimen_pass=False)
+        and set decision_status="UNVERIFIED_CALIBRATION".
         """
+        from unittest.mock import patch
+
+        mock_validated_region = {
+            "results": {
+                "accepted_warp_density_ends_per_cm": 31.0,
+                "accepted_weft_density_picks_per_cm": 27.0,
+                "warp_density_ends_per_cm": 31.0,
+                "weft_density_picks_per_cm": 27.0,
+                "warp_density_continuous": 31.2,
+                "weft_density_continuous": 27.1,
+                "decision_status": "VALIDATED",
+                "is_validated": True,
+                "signal_quality_index": 85.0,
+                "decision_rationale": "Multi-estimator consensus confirmed.",
+                "candidate_measurements": {"warp_fft": 31.2, "weft_fft": 27.1},
+            },
+            "audit": {"proj_warp": 31.0, "proj_weft": 27.0},
+            "calibration": {"is_verified": False},
+        }
+
         test_images = [Image.new("RGB", (200, 200), color=(128, 128, 128)) for _ in range(5)]
         unverified_cal = PhysicalCalibration.from_scales(263.5, 208.4, is_verified=False)
 
-        result = evaluate_five_region_specimen(
-            fabric_id="unverified_cal_specimen",
-            images=test_images,
-            calibration=unverified_cal,
-            target_warp=31.0,
-            target_weft=27.0,
-            tolerance=2.0,
+        with patch("src.fabric_analysis.specimen_workflow.analyze_fabric", return_value=mock_validated_region):
+            result = evaluate_five_region_specimen(
+                fabric_id="unverified_cal_specimen",
+                images=test_images,
+                calibration=unverified_cal,
+                target_warp=31.0,
+                target_weft=27.0,
+                tolerance=2.0,
+            )
+
+        self.assertEqual(result.validated_regions_count, 5)
+        self.assertFalse(
+            result.specimen_pass,
+            "Specimen must NOT pass when calibration is unverified, despite region consensus",
         )
-        self.assertFalse(result.specimen_pass is True)
+        self.assertEqual(
+            result.decision_status,
+            "UNVERIFIED_CALIBRATION",
+            "Decision status must be UNVERIFIED_CALIBRATION when calibration is unverified",
+        )
+        self.assertIn("UNVERIFIED calibration", result.decision_summary)
 
     def test_horizontal_ruler_only_calibrates_horizontal_scale(self):
         """
@@ -206,6 +240,118 @@ class TestScientificRemediation(unittest.TestCase):
             "Back-calculated smartphone scale must not be marked is_verified=True",
         )
 
+    def test_unverified_calibration_object_cannot_produce_accepted_density(self):
+        """
+        Mechanistic Test: An unverified calibration object (is_verified=False) must NEVER
+        produce accepted physical densities and must NEVER produce VALIDATED status,
+        even when estimators achieve perfect harmonic concordance on periodic fabric.
+        """
+        import numpy as np
+        # 400x400 periodic fabric with 36 ends/cm and 30 picks/cm at 400 px/cm
+        y, x = np.mgrid[0:400, 0:400]
+        fabric = 0.5 + 0.25 * np.sin(2 * np.pi * 36.0 / 400.0 * x) + 0.25 * np.sin(2 * np.pi * 30.0 / 400.0 * y)
+        img = Image.fromarray((np.clip(fabric, 0, 1) * 255).astype(np.uint8)).convert("RGB")
+
+        unverified_cal = PhysicalCalibration.from_scales(400.0, 400.0, is_verified=False)
+        res = analyze_fabric(img_pil=img, calibration=unverified_cal, auto_skew=False)
+
+        results = res["results"]
+        self.assertIsNone(
+            results.get("accepted_warp_density_ends_per_cm"),
+            "Unverified calibration must not produce accepted warp density",
+        )
+        self.assertIsNone(
+            results.get("accepted_weft_density_picks_per_cm"),
+            "Unverified calibration must not produce accepted weft density",
+        )
+        self.assertFalse(
+            results.get("is_validated", True),
+            "Unverified calibration must not have is_validated=True",
+        )
+        self.assertEqual(
+            results.get("decision_status"),
+            "UNVERIFIED_CALIBRATION",
+            "Concordant estimators with unverified calibration must yield UNVERIFIED_CALIBRATION",
+        )
+
+    def test_smartphone_macro_stand_profile_cannot_produce_accepted_density(self):
+        """
+        Mechanistic Test: Analyzing with the smartphone_macro_stand_v1 profile
+        (which is unverified) must NOT produce accepted physical densities or VALIDATED status.
+        """
+        img = Image.new("RGB", (300, 300), color=(200, 200, 200))
+        profile = get_calibration_profile("smartphone_macro_stand_v1")
+        cal = profile.to_physical_calibration()
+        self.assertFalse(cal.is_verified)
+
+        res = analyze_fabric(img_pil=img, calibration=cal)
+        results = res["results"]
+        self.assertIsNone(results.get("accepted_warp_density_ends_per_cm"))
+        self.assertIsNone(results.get("accepted_weft_density_picks_per_cm"))
+        self.assertFalse(results.get("is_validated", True))
+        self.assertNotEqual(results.get("decision_status"), "VALIDATED")
+
+    def test_diagonal_ruler_rejects_without_square_pixel_assumption(self):
+        """
+        Mechanistic Test: Diagonal ruler calibration spanning both X and Y
+        must raise ValueError unless assume_square_pixels=True is explicitly passed.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            calibrate_from_two_points(
+                pt1=(0, 0),
+                pt2=(300, 400),
+                known_distance_cm=2.5,
+                axis="both",
+                assume_square_pixels=False,
+            )
+        self.assertIn("assume_square_pixels=True", str(ctx.exception))
+
+        with self.assertRaises(ValueError) as ctx:
+            calibrate_from_two_points(
+                pt1=(0, 0),
+                pt2=(300, 400),
+                known_distance_cm=2.5,
+                axis="diagonal",
+                assume_square_pixels=False,
+            )
+        self.assertIn("assume_square_pixels=True", str(ctx.exception))
+
+    def test_ruler_rejects_invalid_axis(self):
+        """
+        Mechanistic Test: Unsupported axis strings must raise ValueError.
+        """
+        with self.assertRaises(ValueError) as ctx:
+            calibrate_from_two_points(
+                pt1=(0, 0),
+                pt2=(100, 100),
+                known_distance_cm=1.0,
+                axis="arbitrary_unsupported_axis",
+            )
+        self.assertIn("Unsupported calibration axis", str(ctx.exception))
+
+    def test_from_fov_defaults_to_unverified(self):
+        """
+        Mechanistic Test: PhysicalCalibration.from_fov must default to is_verified=False
+        unless is_verified=True is explicitly supplied.
+        """
+        cal_default = PhysicalCalibration.from_fov(
+            image_width_px=640,
+            image_height_px=480,
+            fov_width_cm=0.50,
+            fov_height_cm=0.40,
+        )
+        self.assertFalse(cal_default.is_verified, "from_fov must default to is_verified=False")
+
+        cal_verified = PhysicalCalibration.from_fov(
+            image_width_px=640,
+            image_height_px=480,
+            fov_width_cm=0.50,
+            fov_height_cm=0.40,
+            is_verified=True,
+        )
+        self.assertTrue(cal_verified.is_verified, "from_fov must accept explicit is_verified=True")
+
 
 if __name__ == "__main__":
     unittest.main()
+

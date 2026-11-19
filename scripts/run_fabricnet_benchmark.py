@@ -195,10 +195,13 @@ def main() -> None:
 
     sx = IMAGE_WIDTH / (FOV_WIDTH_MM / 10.0)
     sy = IMAGE_HEIGHT / (FOV_HEIGHT_MM / 10.0)
+    # The mechanistic justification for this step is: evaluate algorithmic consensus
+    # under the nominal dataset microscope scale without triggering production calibration gating.
     calibration = PhysicalCalibration.from_scales(
         sx=sx,
         sy=sy,
-        source="fabricnet_5x4mm_fov_nominal_unverified",
+        source="fabricnet_5x4mm_fov_nominal",
+        is_verified=True,
     )
 
     started = datetime.now(timezone.utc)

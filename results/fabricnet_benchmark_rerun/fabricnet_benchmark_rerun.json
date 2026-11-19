@@ -1,7 +1,7 @@
 {
   "schema_version": "2.2.0",
-  "created_at_utc": "2026-11-19T20:44:21.074548+00:00",
-  "completed_at_utc": "2026-11-19T20:44:50.217530+00:00",
+  "created_at_utc": "2026-11-19T21:46:55.627849+00:00",
+  "completed_at_utc": "2026-11-19T21:47:24.099855+00:00",
   "dataset": "acseckn/fabricnet",
   "total_samples": 130,
   "benchmark_configuration": {
@@ -44,10 +44,10 @@
         "within_1_pct": 16.15,
         "within_2_pct": 26.92,
         "within_tolerance_pct": 26.92,
-        "runtime_mean_ms": 55.533,
-        "runtime_median_ms": 55.96,
+        "runtime_mean_ms": 58.754,
+        "runtime_median_ms": 51.86,
         "runtime_observations": 130,
-        "runtime_all_mean_ms": 55.533,
+        "runtime_all_mean_ms": 58.754,
         "mae_bootstrap_95_ci": {
           "lower": 11.188246,
           "upper": 15.589315,
@@ -71,10 +71,10 @@
         "within_1_pct": 17.69,
         "within_2_pct": 27.69,
         "within_tolerance_pct": 27.69,
-        "runtime_mean_ms": 55.533,
-        "runtime_median_ms": 55.96,
+        "runtime_mean_ms": 58.754,
+        "runtime_median_ms": 51.86,
         "runtime_observations": 130,
-        "runtime_all_mean_ms": 55.533,
+        "runtime_all_mean_ms": 58.754,
         "mae_bootstrap_95_ci": {
           "lower": 9.384467,
           "upper": 13.139015,
@@ -100,10 +100,10 @@
         "within_1_pct": 48.0,
         "within_2_pct": 80.0,
         "within_tolerance_pct": 80.0,
-        "runtime_mean_ms": 49.307,
-        "runtime_median_ms": 49.1,
+        "runtime_mean_ms": 52.473,
+        "runtime_median_ms": 47.19,
         "runtime_observations": 25,
-        "runtime_all_mean_ms": 55.533,
+        "runtime_all_mean_ms": 58.754,
         "mae_bootstrap_95_ci": {
           "lower": 1.44,
           "upper": 3.601,
@@ -127,10 +127,10 @@
         "within_1_pct": 40.62,
         "within_2_pct": 62.5,
         "within_tolerance_pct": 62.5,
-        "runtime_mean_ms": 52.093,
-        "runtime_median_ms": 52.825,
+        "runtime_mean_ms": 57.426,
+        "runtime_median_ms": 48.685,
         "runtime_observations": 32,
-        "runtime_all_mean_ms": 55.533,
+        "runtime_all_mean_ms": 58.754,
         "mae_bootstrap_95_ci": {
           "lower": 1.71875,
           "upper": 3.0625,
@@ -170,10 +170,10 @@
             "within_1_pct": 30.0,
             "within_2_pct": 42.0,
             "within_tolerance_pct": 42.0,
-            "runtime_mean_ms": 52.763,
-            "runtime_median_ms": 54.175,
+            "runtime_mean_ms": 59.39,
+            "runtime_median_ms": 53.1,
             "runtime_observations": 50,
-            "runtime_all_mean_ms": 52.763,
+            "runtime_all_mean_ms": 59.39,
             "mae_bootstrap_95_ci": {
               "lower": 5.921975,
               "upper": 9.68003,
@@ -197,10 +197,10 @@
             "within_1_pct": 20.0,
             "within_2_pct": 40.0,
             "within_tolerance_pct": 40.0,
-            "runtime_mean_ms": 52.763,
-            "runtime_median_ms": 54.175,
+            "runtime_mean_ms": 59.39,
+            "runtime_median_ms": 53.1,
             "runtime_observations": 50,
-            "runtime_all_mean_ms": 52.763,
+            "runtime_all_mean_ms": 59.39,
             "mae_bootstrap_95_ci": {
               "lower": 3.556805,
               "upper": 6.45122,
@@ -226,10 +226,10 @@
             "within_1_pct": 55.0,
             "within_2_pct": 75.0,
             "within_tolerance_pct": 75.0,
-            "runtime_mean_ms": 48.702,
-            "runtime_median_ms": 49.495,
+            "runtime_mean_ms": 55.749,
+            "runtime_median_ms": 48.685,
             "runtime_observations": 20,
-            "runtime_all_mean_ms": 52.763,
+            "runtime_all_mean_ms": 59.39,
             "mae_bootstrap_95_ci": {
               "lower": 1.35,
               "upper": 4.1,
@@ -253,10 +253,10 @@
             "within_1_pct": 22.22,
             "within_2_pct": 61.11,
             "within_tolerance_pct": 61.11,
-            "runtime_mean_ms": 52.414,
-            "runtime_median_ms": 52.825,
+            "runtime_mean_ms": 58.841,
+            "runtime_median_ms": 51.78,
             "runtime_observations": 18,
-            "runtime_all_mean_ms": 52.763,
+            "runtime_all_mean_ms": 59.39,
             "mae_bootstrap_95_ci": {
               "lower": 1.833333,
               "upper": 3.277778,
@@ -285,10 +285,10 @@
             "within_1_pct": 14.63,
             "within_2_pct": 31.71,
             "within_tolerance_pct": 31.71,
-            "runtime_mean_ms": 54.988,
-            "runtime_median_ms": 55.61,
+            "runtime_mean_ms": 52.05,
+            "runtime_median_ms": 48.93,
             "runtime_observations": 41,
-            "runtime_all_mean_ms": 54.988,
+            "runtime_all_mean_ms": 52.05,
             "mae_bootstrap_95_ci": {
               "lower": 8.466024,
               "upper": 16.151415,
@@ -312,10 +312,10 @@
             "within_1_pct": 12.2,
             "within_2_pct": 12.2,
             "within_tolerance_pct": 12.2,
-            "runtime_mean_ms": 54.988,
-            "runtime_median_ms": 55.61,
+            "runtime_mean_ms": 52.05,
+            "runtime_median_ms": 48.93,
             "runtime_observations": 41,
-            "runtime_all_mean_ms": 54.988,
+            "runtime_all_mean_ms": 52.05,
             "mae_bootstrap_95_ci": {
               "lower": 18.153537,
               "upper": 25.39172,
@@ -341,10 +341,10 @@
             "within_1_pct": 20.0,
             "within_2_pct": 100.0,
             "within_tolerance_pct": 100.0,
-            "runtime_mean_ms": 51.728,
-            "runtime_median_ms": 48.23,
+            "runtime_mean_ms": 39.368,
+            "runtime_median_ms": 36.99,
             "runtime_observations": 5,
-            "runtime_all_mean_ms": 54.988,
+            "runtime_all_mean_ms": 52.05,
             "mae_bootstrap_95_ci": {
               "lower": 1.4,
               "upper": 2.0,
@@ -368,10 +368,10 @@
             "within_1_pct": 83.33,
             "within_2_pct": 83.33,
             "within_tolerance_pct": 83.33,
-            "runtime_mean_ms": 47.858,
-            "runtime_median_ms": 46.705,
+            "runtime_mean_ms": 35.883,
+            "runtime_median_ms": 36.23,
             "runtime_observations": 6,
-            "runtime_all_mean_ms": 54.988,
+            "runtime_all_mean_ms": 52.05,
             "mae_bootstrap_95_ci": {
               "lower": 0.333333,
               "upper": 1.833333,
@@ -400,10 +400,10 @@
             "within_1_pct": 0.0,
             "within_2_pct": 2.56,
             "within_tolerance_pct": 2.56,
-            "runtime_mean_ms": 59.658,
-            "runtime_median_ms": 57.51,
+            "runtime_mean_ms": 64.987,
+            "runtime_median_ms": 60.76,
             "runtime_observations": 39,
-            "runtime_all_mean_ms": 59.658,
+            "runtime_all_mean_ms": 64.987,
             "mae_bootstrap_95_ci": {
               "lower": 17.994731,
               "upper": 26.504019,
@@ -427,10 +427,10 @@
             "within_1_pct": 20.51,
             "within_2_pct": 28.21,
             "within_tolerance_pct": 28.21,
-            "runtime_mean_ms": 59.658,
-            "runtime_median_ms": 57.51,
+            "runtime_mean_ms": 64.987,
+            "runtime_median_ms": 60.76,
             "runtime_observations": 39,
-            "runtime_all_mean_ms": 59.658,
+            "runtime_all_mean_ms": 64.987,
             "mae_bootstrap_95_ci": {
               "lower": 5.584609,
               "upper": 10.874718,
@@ -459,7 +459,7 @@
             "runtime_mean_ms": null,
             "runtime_median_ms": null,
             "runtime_observations": 0,
-            "runtime_all_mean_ms": 59.658,
+            "runtime_all_mean_ms": 64.987,
             "mae_bootstrap_95_ci": null
           },
           "weft": {
@@ -476,10 +476,10 @@
             "within_1_pct": 50.0,
             "within_2_pct": 50.0,
             "within_tolerance_pct": 50.0,
-            "runtime_mean_ms": 54.549,
-            "runtime_median_ms": 56.76,
+            "runtime_mean_ms": 70.401,
+            "runtime_median_ms": 73.075,
             "runtime_observations": 8,
-            "runtime_all_mean_ms": 59.658,
+            "runtime_all_mean_ms": 64.987,
             "mae_bootstrap_95_ci": {
               "lower": 1.5,
               "upper": 5.25,
@@ -548,7 +548,7 @@
       "is_validated": false,
       "signal_quality_index": 17.0,
       "skew_deg": 1.0,
-      "latency_ms": 67.18
+      "latency_ms": 72.87
     },
     {
       "sample_num": 2,
@@ -580,7 +580,7 @@
       "is_validated": false,
       "signal_quality_index": 17.2,
       "skew_deg": 2.0,
-      "latency_ms": 50.2
+      "latency_ms": 48.97
     },
     {
       "sample_num": 3,
@@ -612,7 +612,7 @@
       "is_validated": false,
       "signal_quality_index": 14.1,
       "skew_deg": -1.0,
-      "latency_ms": 56.41
+      "latency_ms": 48.74
     },
     {
       "sample_num": 4,
@@ -644,7 +644,7 @@
       "is_validated": false,
       "signal_quality_index": 13.6,
       "skew_deg": -1.5,
-      "latency_ms": 55.79
+      "latency_ms": 51.28
     },
     {
       "sample_num": 5,
@@ -676,7 +676,7 @@
       "is_validated": false,
       "signal_quality_index": 13.9,
       "skew_deg": -0.5,
-      "latency_ms": 66.44
+      "latency_ms": 70.09
     },
     {
       "sample_num": 6,
@@ -708,7 +708,7 @@
       "is_validated": false,
       "signal_quality_index": 20.5,
       "skew_deg": 1.0,
-      "latency_ms": 58.59
+      "latency_ms": 116.2
     },
     {
       "sample_num": 7,
@@ -740,7 +740,7 @@
       "is_validated": false,
       "signal_quality_index": 28.1,
       "skew_deg": 1.0,
-      "latency_ms": 86.24
+      "latency_ms": 55.47
     },
     {
       "sample_num": 8,
@@ -772,7 +772,7 @@
       "is_validated": false,
       "signal_quality_index": 22.7,
       "skew_deg": 2.0,
-      "latency_ms": 70.54
+      "latency_ms": 98.29
     },
     {
       "sample_num": 9,
@@ -804,7 +804,7 @@
       "is_validated": false,
       "signal_quality_index": 16.3,
       "skew_deg": 1.0,
-      "latency_ms": 56.39
+      "latency_ms": 60.76
     },
     {
       "sample_num": 10,
@@ -836,7 +836,7 @@
       "is_validated": false,
       "signal_quality_index": 15.5,
       "skew_deg": -1.5,
-      "latency_ms": 55.22
+      "latency_ms": 75.21
     },
     {
       "sample_num": 11,
@@ -868,7 +868,7 @@
       "is_validated": false,
       "signal_quality_index": 28.5,
       "skew_deg": 0.0,
-      "latency_ms": 35.12
+      "latency_ms": 62.22
     },
     {
       "sample_num": 12,
@@ -900,7 +900,7 @@
       "is_validated": true,
       "signal_quality_index": 72.2,
       "skew_deg": 1.0,
-      "latency_ms": 51.97
+      "latency_ms": 100.47
     },
     {
       "sample_num": 13,
@@ -932,7 +932,7 @@
       "is_validated": true,
       "signal_quality_index": 66.5,
       "skew_deg": -1.0,
-      "latency_ms": 54.9
+      "latency_ms": 94.27
     },
     {
       "sample_num": 14,
@@ -964,7 +964,7 @@
       "is_validated": true,
       "signal_quality_index": 70.5,
       "skew_deg": -2.5,
-      "latency_ms": 54.68
+      "latency_ms": 76.72
     },
     {
       "sample_num": 15,
@@ -996,7 +996,7 @@
       "is_validated": true,
       "signal_quality_index": 69.4,
       "skew_deg": 0.0,
-      "latency_ms": 36.15
+      "latency_ms": 50.49
     },
     {
       "sample_num": 16,
@@ -1028,7 +1028,7 @@
       "is_validated": true,
       "signal_quality_index": 67.5,
       "skew_deg": 0.0,
-      "latency_ms": 38.63
+      "latency_ms": 92.14
     },
     {
       "sample_num": 17,
@@ -1060,7 +1060,7 @@
       "is_validated": false,
       "signal_quality_index": 31.9,
       "skew_deg": 0.0,
-      "latency_ms": 37.71
+      "latency_ms": 46.62
     },
     {
       "sample_num": 18,
@@ -1092,7 +1092,7 @@
       "is_validated": false,
       "signal_quality_index": 44.9,
       "skew_deg": 0.0,
-      "latency_ms": 37.17
+      "latency_ms": 54.31
     },
     {
       "sample_num": 19,
@@ -1124,7 +1124,7 @@
       "is_validated": false,
       "signal_quality_index": 43.9,
       "skew_deg": 0.0,
-      "latency_ms": 37.97
+      "latency_ms": 38.62
     },
     {
       "sample_num": 20,
@@ -1156,7 +1156,7 @@
       "is_validated": false,
       "signal_quality_index": 43.6,
       "skew_deg": 0.0,
-      "latency_ms": 37.83
+      "latency_ms": 40.89
     },
     {
       "sample_num": 21,
@@ -1188,7 +1188,7 @@
       "is_validated": false,
       "signal_quality_index": 28.7,
       "skew_deg": 0.0,
-      "latency_ms": 37.26
+      "latency_ms": 46.23
     },
     {
       "sample_num": 22,
@@ -1220,7 +1220,7 @@
       "is_validated": false,
       "signal_quality_index": 39.5,
       "skew_deg": 0.0,
-      "latency_ms": 35.49
+      "latency_ms": 34.65
     },
     {
       "sample_num": 23,
@@ -1252,7 +1252,7 @@
       "is_validated": false,
       "signal_quality_index": 36.1,
       "skew_deg": 0.5,
-      "latency_ms": 52.26
+      "latency_ms": 51.17
     },
     {
       "sample_num": 24,
@@ -1284,7 +1284,7 @@
       "is_validated": false,
       "signal_quality_index": 36.8,
       "skew_deg": 0.5,
-      "latency_ms": 52.79
+      "latency_ms": 53.91
     },
     {
       "sample_num": 25,
@@ -1316,7 +1316,7 @@
       "is_validated": false,
       "signal_quality_index": 41.8,
       "skew_deg": -0.5,
-      "latency_ms": 56.17
+      "latency_ms": 47.86
     },
     {
       "sample_num": 26,
@@ -1348,7 +1348,7 @@
       "is_validated": false,
       "signal_quality_index": 41.6,
       "skew_deg": -0.5,
-      "latency_ms": 58.01
+      "latency_ms": 49.83
     },
     {
       "sample_num": 27,
@@ -1380,7 +1380,7 @@
       "is_validated": false,
       "signal_quality_index": 32.4,
       "skew_deg": 1.5,
-      "latency_ms": 76.77
+      "latency_ms": 68.0
     },
     {
       "sample_num": 28,
@@ -1412,7 +1412,7 @@
       "is_validated": false,
       "signal_quality_index": 39.8,
       "skew_deg": 0.0,
-      "latency_ms": 43.5
+      "latency_ms": 34.08
     },
     {
       "sample_num": 29,
@@ -1444,7 +1444,7 @@
       "is_validated": false,
       "signal_quality_index": 40.2,
       "skew_deg": -1.0,
-      "latency_ms": 56.4
+      "latency_ms": 62.73
     },
     {
       "sample_num": 30,
@@ -1476,7 +1476,7 @@
       "is_validated": false,
       "signal_quality_index": 33.9,
       "skew_deg": 0.0,
-      "latency_ms": 38.87
+      "latency_ms": 33.21
     },
     {
       "sample_num": 31,
@@ -1508,7 +1508,7 @@
       "is_validated": false,
       "signal_quality_index": 36.3,
       "skew_deg": -0.5,
-      "latency_ms": 56.96
+      "latency_ms": 50.69
     },
     {
       "sample_num": 32,
@@ -1540,7 +1540,7 @@
       "is_validated": false,
       "signal_quality_index": 23.4,
       "skew_deg": -0.5,
-      "latency_ms": 58.05
+      "latency_ms": 53.05
     },
     {
       "sample_num": 33,
@@ -1572,7 +1572,7 @@
       "is_validated": false,
       "signal_quality_index": 12.6,
       "skew_deg": 4.5,
-      "latency_ms": 80.86
+      "latency_ms": 47.68
     },
     {
       "sample_num": 34,
@@ -1604,7 +1604,7 @@
       "is_validated": false,
       "signal_quality_index": 37.3,
       "skew_deg": 0.0,
-      "latency_ms": 41.31
+      "latency_ms": 33.01
     },
     {
       "sample_num": 35,
@@ -1636,7 +1636,7 @@
       "is_validated": false,
       "signal_quality_index": 11.8,
       "skew_deg": 0.0,
-      "latency_ms": 68.06
+      "latency_ms": 37.36
     },
     {
       "sample_num": 36,
@@ -1668,7 +1668,7 @@
       "is_validated": false,
       "signal_quality_index": 29.6,
       "skew_deg": 0.0,
-      "latency_ms": 51.75
+      "latency_ms": 32.3
     },
     {
       "sample_num": 37,
@@ -1700,7 +1700,7 @@
       "is_validated": false,
       "signal_quality_index": 37.0,
       "skew_deg": -1.0,
-      "latency_ms": 62.52
+      "latency_ms": 57.18
     },
     {
       "sample_num": 38,
@@ -1732,7 +1732,7 @@
       "is_validated": false,
       "signal_quality_index": 38.4,
       "skew_deg": -3.5,
-      "latency_ms": 75.03
+      "latency_ms": 90.37
     },
     {
       "sample_num": 39,
@@ -1764,7 +1764,7 @@
       "is_validated": false,
       "signal_quality_index": 38.2,
       "skew_deg": -2.0,
-      "latency_ms": 64.48
+      "latency_ms": 84.95
     },
     {
       "sample_num": 40,
@@ -1796,7 +1796,7 @@
       "is_validated": false,
       "signal_quality_index": 37.8,
       "skew_deg": -1.5,
-      "latency_ms": 56.12
+      "latency_ms": 89.71
     },
     {
       "sample_num": 41,
@@ -1828,7 +1828,7 @@
       "is_validated": false,
       "signal_quality_index": 22.5,
       "skew_deg": -1.0,
-      "latency_ms": 71.8
+      "latency_ms": 86.85
     },
     {
       "sample_num": 42,
@@ -1860,7 +1860,7 @@
       "is_validated": false,
       "signal_quality_index": 30.7,
       "skew_deg": 0.0,
-      "latency_ms": 58.6
+      "latency_ms": 62.0
     },
     {
       "sample_num": 43,
@@ -1892,7 +1892,7 @@
       "is_validated": false,
       "signal_quality_index": 30.1,
       "skew_deg": 13.5,
-      "latency_ms": 66.94
+      "latency_ms": 99.01
     },
     {
       "sample_num": 44,
@@ -1924,7 +1924,7 @@
       "is_validated": false,
       "signal_quality_index": 30.2,
       "skew_deg": 13.0,
-      "latency_ms": 58.55
+      "latency_ms": 51.22
     },
     {
       "sample_num": 45,
@@ -1956,7 +1956,7 @@
       "is_validated": false,
       "signal_quality_index": 30.4,
       "skew_deg": 2.0,
-      "latency_ms": 92.19
+      "latency_ms": 50.52
     },
     {
       "sample_num": 46,
@@ -1988,7 +1988,7 @@
       "is_validated": false,
       "signal_quality_index": 30.4,
       "skew_deg": 13.0,
-      "latency_ms": 64.2
+      "latency_ms": 58.1
     },
     {
       "sample_num": 47,
@@ -2020,7 +2020,7 @@
       "is_validated": true,
       "signal_quality_index": 57.3,
       "skew_deg": 0.0,
-      "latency_ms": 57.21
+      "latency_ms": 48.65
     },
     {
       "sample_num": 48,
@@ -2052,7 +2052,7 @@
       "is_validated": false,
       "signal_quality_index": 18.2,
       "skew_deg": 22.0,
-      "latency_ms": 53.34
+      "latency_ms": 60.62
     },
     {
       "sample_num": 49,
@@ -2084,7 +2084,7 @@
       "is_validated": true,
       "signal_quality_index": 52.5,
       "skew_deg": 0.0,
-      "latency_ms": 49.89
+      "latency_ms": 42.13
     },
     {
       "sample_num": 50,
@@ -2116,7 +2116,7 @@
       "is_validated": false,
       "signal_quality_index": 18.7,
       "skew_deg": 22.0,
-      "latency_ms": 57.38
+      "latency_ms": 90.15
     },
     {
       "sample_num": 51,
@@ -2148,7 +2148,7 @@
       "is_validated": false,
       "signal_quality_index": 21.6,
       "skew_deg": 22.0,
-      "latency_ms": 60.37
+      "latency_ms": 74.8
     },
     {
       "sample_num": 52,
@@ -2180,7 +2180,7 @@
       "is_validated": false,
       "signal_quality_index": 35.8,
       "skew_deg": -0.5,
-      "latency_ms": 68.34
+      "latency_ms": 55.17
     },
     {
       "sample_num": 53,
@@ -2212,7 +2212,7 @@
       "is_validated": true,
       "signal_quality_index": 67.1,
       "skew_deg": -1.0,
-      "latency_ms": 66.05
+      "latency_ms": 80.8
     },
     {
       "sample_num": 54,
@@ -2244,7 +2244,7 @@
       "is_validated": false,
       "signal_quality_index": 38.8,
       "skew_deg": 0.0,
-      "latency_ms": 44.4
+      "latency_ms": 53.07
     },
     {
       "sample_num": 55,
@@ -2276,7 +2276,7 @@
       "is_validated": true,
       "signal_quality_index": 61.7,
       "skew_deg": -0.5,
-      "latency_ms": 58.05
+      "latency_ms": 58.06
     },
     {
       "sample_num": 56,
@@ -2308,7 +2308,7 @@
       "is_validated": false,
       "signal_quality_index": 56.4,
       "skew_deg": -0.5,
-      "latency_ms": 70.7
+      "latency_ms": 53.13
     },
     {
       "sample_num": 57,
@@ -2340,7 +2340,7 @@
       "is_validated": false,
       "signal_quality_index": 27.2,
       "skew_deg": 22.5,
-      "latency_ms": 55.23
+      "latency_ms": 49.72
     },
     {
       "sample_num": 58,
@@ -2372,7 +2372,7 @@
       "is_validated": false,
       "signal_quality_index": 28.8,
       "skew_deg": -1.5,
-      "latency_ms": 57.47
+      "latency_ms": 83.93
     },
     {
       "sample_num": 59,
@@ -2404,7 +2404,7 @@
       "is_validated": false,
       "signal_quality_index": 25.7,
       "skew_deg": 23.5,
-      "latency_ms": 53.14
+      "latency_ms": 104.02
     },
     {
       "sample_num": 60,
@@ -2436,7 +2436,7 @@
       "is_validated": false,
       "signal_quality_index": 29.4,
       "skew_deg": -1.5,
-      "latency_ms": 56.05
+      "latency_ms": 109.5
     },
     {
       "sample_num": 61,
@@ -2468,7 +2468,7 @@
       "is_validated": false,
       "signal_quality_index": 28.0,
       "skew_deg": -4.5,
-      "latency_ms": 57.51
+      "latency_ms": 86.11
     },
     {
       "sample_num": 62,
@@ -2500,7 +2500,7 @@
       "is_validated": false,
       "signal_quality_index": 29.5,
       "skew_deg": 13.0,
-      "latency_ms": 59.25
+      "latency_ms": 79.11
     },
     {
       "sample_num": 63,
@@ -2532,7 +2532,7 @@
       "is_validated": false,
       "signal_quality_index": 31.0,
       "skew_deg": 0.0,
-      "latency_ms": 41.16
+      "latency_ms": 99.36
     },
     {
       "sample_num": 64,
@@ -2564,7 +2564,7 @@
       "is_validated": false,
       "signal_quality_index": 30.1,
       "skew_deg": 13.0,
-      "latency_ms": 55.87
+      "latency_ms": 92.04
     },
     {
       "sample_num": 65,
@@ -2596,7 +2596,7 @@
       "is_validated": false,
       "signal_quality_index": 30.1,
       "skew_deg": 13.0,
-      "latency_ms": 54.49
+      "latency_ms": 68.23
     },
     {
       "sample_num": 66,
@@ -2628,7 +2628,7 @@
       "is_validated": false,
       "signal_quality_index": 30.1,
       "skew_deg": 13.0,
-      "latency_ms": 55.26
+      "latency_ms": 100.05
     },
     {
       "sample_num": 67,
@@ -2660,7 +2660,7 @@
       "is_validated": false,
       "signal_quality_index": 16.5,
       "skew_deg": 43.5,
-      "latency_ms": 54.86
+      "latency_ms": 116.24
     },
     {
       "sample_num": 68,
@@ -2692,7 +2692,7 @@
       "is_validated": false,
       "signal_quality_index": 11.2,
       "skew_deg": 44.0,
-      "latency_ms": 47.15
+      "latency_ms": 74.15
     },
     {
       "sample_num": 69,
@@ -2724,7 +2724,7 @@
       "is_validated": false,
       "signal_quality_index": 12.3,
       "skew_deg": 45.0,
-      "latency_ms": 67.89
+      "latency_ms": 55.6
     },
     {
       "sample_num": 70,
@@ -2756,7 +2756,7 @@
       "is_validated": false,
       "signal_quality_index": 11.2,
       "skew_deg": 41.5,
-      "latency_ms": 56.6
+      "latency_ms": 74.72
     },
     {
       "sample_num": 71,
@@ -2788,7 +2788,7 @@
       "is_validated": false,
       "signal_quality_index": 11.5,
       "skew_deg": 44.5,
-      "latency_ms": 59.01
+      "latency_ms": 56.59
     },
     {
       "sample_num": 72,
@@ -2820,7 +2820,7 @@
       "is_validated": false,
       "signal_quality_index": 15.5,
       "skew_deg": -2.0,
-      "latency_ms": 59.11
+      "latency_ms": 62.98
     },
     {
       "sample_num": 73,
@@ -2852,7 +2852,7 @@
       "is_validated": false,
       "signal_quality_index": 15.2,
       "skew_deg": -2.0,
-      "latency_ms": 62.77
+      "latency_ms": 50.85
     },
     {
       "sample_num": 74,
@@ -2884,7 +2884,7 @@
       "is_validated": false,
       "signal_quality_index": 15.1,
       "skew_deg": -0.5,
-      "latency_ms": 54.56
+      "latency_ms": 50.8
     },
     {
       "sample_num": 75,
@@ -2916,7 +2916,7 @@
       "is_validated": false,
       "signal_quality_index": 19.1,
       "skew_deg": 0.0,
-      "latency_ms": 40.68
+      "latency_ms": 54.98
     },
     {
       "sample_num": 76,
@@ -2948,7 +2948,7 @@
       "is_validated": false,
       "signal_quality_index": 22.2,
       "skew_deg": 0.0,
-      "latency_ms": 44.85
+      "latency_ms": 30.4
     },
     {
       "sample_num": 77,
@@ -2980,7 +2980,7 @@
       "is_validated": true,
       "signal_quality_index": 75.5,
       "skew_deg": 0.0,
-      "latency_ms": 41.86
+      "latency_ms": 37.64
     },
     {
       "sample_num": 78,
@@ -3012,7 +3012,7 @@
       "is_validated": true,
       "signal_quality_index": 68.8,
       "skew_deg": 0.0,
-      "latency_ms": 44.05
+      "latency_ms": 47.19
     },
     {
       "sample_num": 79,
@@ -3044,7 +3044,7 @@
       "is_validated": true,
       "signal_quality_index": 73.6,
       "skew_deg": 0.0,
-      "latency_ms": 49.1
+      "latency_ms": 35.62
     },
     {
       "sample_num": 80,
@@ -3076,7 +3076,7 @@
       "is_validated": true,
       "signal_quality_index": 72.5,
       "skew_deg": 0.0,
-      "latency_ms": 53.68
+      "latency_ms": 38.24
     },
     {
       "sample_num": 81,
@@ -3108,7 +3108,7 @@
       "is_validated": true,
       "signal_quality_index": 69.4,
       "skew_deg": -1.0,
-      "latency_ms": 66.08
+      "latency_ms": 48.72
     },
     {
       "sample_num": 82,
@@ -3140,7 +3140,7 @@
       "is_validated": false,
       "signal_quality_index": 18.8,
       "skew_deg": 0.0,
-      "latency_ms": 46.54
+      "latency_ms": 34.49
     },
     {
       "sample_num": 83,
@@ -3172,7 +3172,7 @@
       "is_validated": false,
       "signal_quality_index": 11.4,
       "skew_deg": 0.0,
-      "latency_ms": 42.75
+      "latency_ms": 37.56
     },
     {
       "sample_num": 84,
@@ -3204,7 +3204,7 @@
       "is_validated": false,
       "signal_quality_index": 17.5,
       "skew_deg": 0.0,
-      "latency_ms": 55.61
+      "latency_ms": 37.27
     },
     {
       "sample_num": 85,
@@ -3236,7 +3236,7 @@
       "is_validated": false,
       "signal_quality_index": 24.6,
       "skew_deg": 0.0,
-      "latency_ms": 51.91
+      "latency_ms": 36.45
     },
     {
       "sample_num": 86,
@@ -3268,7 +3268,7 @@
       "is_validated": false,
       "signal_quality_index": 14.8,
       "skew_deg": 0.0,
-      "latency_ms": 43.47
+      "latency_ms": 33.52
     },
     {
       "sample_num": 87,
@@ -3300,7 +3300,7 @@
       "is_validated": false,
       "signal_quality_index": 36.3,
       "skew_deg": 0.0,
-      "latency_ms": 48.23
+      "latency_ms": 39.58
     },
     {
       "sample_num": 88,
@@ -3332,7 +3332,7 @@
       "is_validated": false,
       "signal_quality_index": 32.9,
       "skew_deg": 0.0,
-      "latency_ms": 52.0
+      "latency_ms": 35.33
     },
     {
       "sample_num": 89,
@@ -3364,7 +3364,7 @@
       "is_validated": false,
       "signal_quality_index": 36.5,
       "skew_deg": 0.0,
-      "latency_ms": 45.75
+      "latency_ms": 36.99
     },
     {
       "sample_num": 90,
@@ -3396,7 +3396,7 @@
       "is_validated": true,
       "signal_quality_index": 57.9,
       "skew_deg": 0.0,
-      "latency_ms": 46.87
+      "latency_ms": 36.01
     },
     {
       "sample_num": 91,
@@ -3428,7 +3428,7 @@
       "is_validated": false,
       "signal_quality_index": 42.9,
       "skew_deg": 0.0,
-      "latency_ms": 65.79
+      "latency_ms": 48.93
     },
     {
       "sample_num": 92,
@@ -3460,7 +3460,7 @@
       "is_validated": false,
       "signal_quality_index": 30.3,
       "skew_deg": 0.0,
-      "latency_ms": 43.89
+      "latency_ms": 42.94
     },
     {
       "sample_num": 93,
@@ -3492,7 +3492,7 @@
       "is_validated": false,
       "signal_quality_index": 30.2,
       "skew_deg": 0.0,
-      "latency_ms": 40.46
+      "latency_ms": 34.89
     },
     {
       "sample_num": 94,
@@ -3524,7 +3524,7 @@
       "is_validated": false,
       "signal_quality_index": 30.3,
       "skew_deg": 0.0,
-      "latency_ms": 43.4
+      "latency_ms": 50.01
     },
     {
       "sample_num": 95,
@@ -3556,7 +3556,7 @@
       "is_validated": false,
       "signal_quality_index": 31.1,
       "skew_deg": -2.5,
-      "latency_ms": 53.86
+      "latency_ms": 55.29
     },
     {
       "sample_num": 96,
@@ -3588,7 +3588,7 @@
       "is_validated": false,
       "signal_quality_index": 31.2,
       "skew_deg": -1.0,
-      "latency_ms": 58.03
+      "latency_ms": 75.87
     },
     {
       "sample_num": 97,
@@ -3620,7 +3620,7 @@
       "is_validated": false,
       "signal_quality_index": 28.7,
       "skew_deg": 39.0,
-      "latency_ms": 56.35
+      "latency_ms": 60.03
     },
     {
       "sample_num": 98,
@@ -3652,7 +3652,7 @@
       "is_validated": false,
       "signal_quality_index": 26.7,
       "skew_deg": 39.0,
-      "latency_ms": 54.8
+      "latency_ms": 56.38
     },
     {
       "sample_num": 99,
@@ -3684,7 +3684,7 @@
       "is_validated": false,
       "signal_quality_index": 30.0,
       "skew_deg": 39.0,
-      "latency_ms": 55.01
+      "latency_ms": 62.99
     },
     {
       "sample_num": 100,
@@ -3716,7 +3716,7 @@
       "is_validated": false,
       "signal_quality_index": 31.6,
       "skew_deg": 39.0,
-      "latency_ms": 51.58
+      "latency_ms": 51.93
     },
     {
       "sample_num": 101,
@@ -3748,7 +3748,7 @@
       "is_validated": false,
       "signal_quality_index": 25.6,
       "skew_deg": 39.0,
-      "latency_ms": 59.34
+      "latency_ms": 51.79
     },
     {
       "sample_num": 102,
@@ -3780,7 +3780,7 @@
       "is_validated": false,
       "signal_quality_index": 27.6,
       "skew_deg": 39.0,
-      "latency_ms": 58.51
+      "latency_ms": 51.75
     },
     {
       "sample_num": 103,
@@ -3812,7 +3812,7 @@
       "is_validated": false,
       "signal_quality_index": 18.7,
       "skew_deg": 2.0,
-      "latency_ms": 62.99
+      "latency_ms": 93.19
     },
     {
       "sample_num": 104,
@@ -3844,7 +3844,7 @@
       "is_validated": false,
       "signal_quality_index": 20.0,
       "skew_deg": 1.0,
-      "latency_ms": 56.69
+      "latency_ms": 92.35
     },
     {
       "sample_num": 105,
@@ -3876,7 +3876,7 @@
       "is_validated": false,
       "signal_quality_index": 27.1,
       "skew_deg": -1.5,
-      "latency_ms": 59.63
+      "latency_ms": 71.66
     },
     {
       "sample_num": 106,
@@ -3908,7 +3908,7 @@
       "is_validated": false,
       "signal_quality_index": 27.7,
       "skew_deg": 2.5,
-      "latency_ms": 62.75
+      "latency_ms": 61.55
     },
     {
       "sample_num": 107,
@@ -3940,7 +3940,7 @@
       "is_validated": false,
       "signal_quality_index": 23.6,
       "skew_deg": 1.0,
-      "latency_ms": 55.52
+      "latency_ms": 46.55
     },
     {
       "sample_num": 108,
@@ -3972,7 +3972,7 @@
       "is_validated": false,
       "signal_quality_index": 20.5,
       "skew_deg": -33.5,
-      "latency_ms": 56.54
+      "latency_ms": 44.89
     },
     {
       "sample_num": 109,
@@ -4004,7 +4004,7 @@
       "is_validated": false,
       "signal_quality_index": 30.5,
       "skew_deg": -39.5,
-      "latency_ms": 59.76
+      "latency_ms": 44.68
     },
     {
       "sample_num": 110,
@@ -4036,7 +4036,7 @@
       "is_validated": false,
       "signal_quality_index": 20.9,
       "skew_deg": -33.5,
-      "latency_ms": 59.93
+      "latency_ms": 87.37
     },
     {
       "sample_num": 111,
@@ -4068,7 +4068,7 @@
       "is_validated": false,
       "signal_quality_index": 27.7,
       "skew_deg": -28.0,
-      "latency_ms": 58.55
+      "latency_ms": 52.26
     },
     {
       "sample_num": 112,
@@ -4100,7 +4100,7 @@
       "is_validated": false,
       "signal_quality_index": 17.4,
       "skew_deg": -36.0,
-      "latency_ms": 57.82
+      "latency_ms": 74.54
     },
     {
       "sample_num": 113,
@@ -4132,7 +4132,7 @@
       "is_validated": false,
       "signal_quality_index": 30.6,
       "skew_deg": 0.0,
-      "latency_ms": 39.85
+      "latency_ms": 31.34
     },
     {
       "sample_num": 114,
@@ -4164,7 +4164,7 @@
       "is_validated": false,
       "signal_quality_index": 33.9,
       "skew_deg": 41.5,
-      "latency_ms": 54.57
+      "latency_ms": 44.65
     },
     {
       "sample_num": 115,
@@ -4196,7 +4196,7 @@
       "is_validated": false,
       "signal_quality_index": 24.2,
       "skew_deg": 12.5,
-      "latency_ms": 54.49
+      "latency_ms": 45.28
     },
     {
       "sample_num": 116,
@@ -4228,7 +4228,7 @@
       "is_validated": false,
       "signal_quality_index": 23.3,
       "skew_deg": 13.0,
-      "latency_ms": 63.9
+      "latency_ms": 44.87
     },
     {
       "sample_num": 117,
@@ -4260,7 +4260,7 @@
       "is_validated": false,
       "signal_quality_index": 25.4,
       "skew_deg": -10.5,
-      "latency_ms": 53.05
+      "latency_ms": 46.53
     },
     {
       "sample_num": 118,
@@ -4292,7 +4292,7 @@
       "is_validated": false,
       "signal_quality_index": 16.4,
       "skew_deg": 43.0,
-      "latency_ms": 47.66
+      "latency_ms": 47.91
     },
     {
       "sample_num": 119,
@@ -4324,7 +4324,7 @@
       "is_validated": false,
       "signal_quality_index": 15.3,
       "skew_deg": 45.0,
-      "latency_ms": 51.48
+      "latency_ms": 45.92
     },
     {
       "sample_num": 120,
@@ -4356,7 +4356,7 @@
       "is_validated": false,
       "signal_quality_index": 14.6,
       "skew_deg": 45.0,
-      "latency_ms": 47.76
+      "latency_ms": 43.92
     },
     {
       "sample_num": 121,
@@ -4388,7 +4388,7 @@
       "is_validated": false,
       "signal_quality_index": 13.0,
       "skew_deg": 43.5,
-      "latency_ms": 57.58
+      "latency_ms": 52.92
     },
     {
       "sample_num": 122,
@@ -4420,7 +4420,7 @@
       "is_validated": false,
       "signal_quality_index": 16.0,
       "skew_deg": 44.5,
-      "latency_ms": 55.76
+      "latency_ms": 44.16
     },
     {
       "sample_num": 123,
@@ -4452,7 +4452,7 @@
       "is_validated": false,
       "signal_quality_index": 25.3,
       "skew_deg": -37.0,
-      "latency_ms": 68.39
+      "latency_ms": 66.6
     },
     {
       "sample_num": 124,
@@ -4484,7 +4484,7 @@
       "is_validated": false,
       "signal_quality_index": 25.1,
       "skew_deg": -35.0,
-      "latency_ms": 60.71
+      "latency_ms": 47.86
     },
     {
       "sample_num": 125,
@@ -4516,7 +4516,7 @@
       "is_validated": false,
       "signal_quality_index": 20.7,
       "skew_deg": 0.0,
-      "latency_ms": 55.7
+      "latency_ms": 32.77
     },
     {
       "sample_num": 126,
@@ -4548,7 +4548,7 @@
       "is_validated": false,
       "signal_quality_index": 22.1,
       "skew_deg": 9.5,
-      "latency_ms": 65.5
+      "latency_ms": 48.1
     },
     {
       "sample_num": 127,
@@ -4580,7 +4580,7 @@
       "is_validated": false,
       "signal_quality_index": 21.1,
       "skew_deg": 3.0,
-      "latency_ms": 68.55
+      "latency_ms": 44.9
     },
     {
       "sample_num": 128,
@@ -4612,7 +4612,7 @@
       "is_validated": false,
       "signal_quality_index": 13.8,
       "skew_deg": 2.5,
-      "latency_ms": 75.26
+      "latency_ms": 71.09
     },
     {
       "sample_num": 129,
@@ -4644,7 +4644,7 @@
       "is_validated": false,
       "signal_quality_index": 23.6,
       "skew_deg": 1.5,
-      "latency_ms": 61.92
+      "latency_ms": 47.73
     },
     {
       "sample_num": 130,
@@ -4676,7 +4676,7 @@
       "is_validated": false,
       "signal_quality_index": 28.5,
       "skew_deg": -1.5,
-      "latency_ms": 59.37
+      "latency_ms": 48.81
     }
   ]
 }

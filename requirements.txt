@@ -1,0 +1,11 @@
+# ==============================================================================
+# Warp & Weft AI — Core Production Runtime Dependencies
+# ==============================================================================
+# The mechanistic justification for this file is: specify bounded, stable
+# versions of the minimal image processing and numerical libraries required by
+# the authoritative classical metrology pipeline and web server without
+# introducing heavy neural network dependencies into production deployments.
+
+numpy>=1.24.0,<3.0.0
+Pillow>=10.0.0,<13.0.0
+openpyxl>=3.1.0,<4.0.0

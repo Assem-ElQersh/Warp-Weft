@@ -92,11 +92,13 @@ class PhysicalCalibration:
                  dpi_x: float,
                  dpi_y: Optional[float] = None,
                  source: str = "scanner_hardware_dpi",
-                 is_verified: bool = True,
+                 is_verified: bool = False,
                  uncertainty_pct: float = 0.5) -> "PhysicalCalibration":
         """
         The mechanistic justification for this step is: map scanner dots-per-inch (DPI)
-        to metric pixels-per-centimeter using the exact international inch constant (2.54 cm).
+        to metric pixels-per-centimeter using the exact international inch constant (2.54 cm),
+        defaulting is_verified to False so that unverified scanner metadata cannot bypass
+        empirical stage-micrometer verification gates.
         """
         sx = float(dpi_x) / 2.54
         sy = (float(dpi_y) / 2.54) if dpi_y is not None else sx

@@ -331,8 +331,8 @@ class TestScientificRemediation(unittest.TestCase):
 
     def test_from_fov_defaults_to_unverified(self):
         """
-        Mechanistic Test: PhysicalCalibration.from_fov must default to is_verified=False
-        unless is_verified=True is explicitly supplied.
+        The mechanistic justification for this step is: verify that PhysicalCalibration.from_fov
+        defaults to is_verified=False unless is_verified=True is explicitly supplied.
         """
         cal_default = PhysicalCalibration.from_fov(
             image_width_px=640,
@@ -350,6 +350,18 @@ class TestScientificRemediation(unittest.TestCase):
             is_verified=True,
         )
         self.assertTrue(cal_verified.is_verified, "from_fov must accept explicit is_verified=True")
+
+    def test_from_dpi_defaults_to_unverified(self):
+        """
+        The mechanistic justification for this step is: verify that PhysicalCalibration.from_dpi
+        defaults to is_verified=False to prevent nominal hardware scanner metadata from bypassing
+        stage-micrometer verification.
+        """
+        cal_default = PhysicalCalibration.from_dpi(300.0)
+        self.assertFalse(cal_default.is_verified, "from_dpi must default to is_verified=False")
+
+        cal_verified = PhysicalCalibration.from_dpi(300.0, is_verified=True)
+        self.assertTrue(cal_verified.is_verified, "from_dpi must accept explicit is_verified=True")
 
 
 if __name__ == "__main__":

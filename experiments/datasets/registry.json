@@ -1,0 +1,535 @@
+{
+  "schema_version": "1.0.0",
+  "registry_name": "Warp & Weft AI Master Textile Dataset Registry",
+  "last_updated": "2026-11-19",
+  "taxonomy_categories": {
+    "A": "Physical Density Labels (Gold standard ends/cm and picks/cm ground truth)",
+    "B": "Yarn-Level Segmentation / Detection (Individual yarn masks, polygons, or bounding boxes)",
+    "C": "Textile Appearance / Surface Physics (High-resolution multi-view, SVBRDF, or calibrated scanner)",
+    "D": "Defect / Missing-Yarn Disruption (Industrial anomalies; does NOT provide thread count)",
+    "E": "Texture / Statistical Microtexture (Multi-illumination, Gabor/GLCM filter benchmarks)",
+    "F": "Synthetic Simulation (Mathematically exact yarn profiles with known ground truth)",
+    "G": "Auxiliary Tabular (Industrial loom production parameters and machine specifications)"
+  },
+  "datasets": [
+    {
+      "dataset_id": "fabricnet",
+      "official_name": "FabricNET: A Dataset for Basic Weaving Fabric Texture Recognition and Mass Prediction",
+      "doi_or_url": "https://doi.org/10.3390/su152115197",
+      "source_repository": "https://www.kaggle.com/datasets/acseckn/fabricnet",
+      "authors_or_organization": "Ali Can Seckin, et al. (MDPI Sustainability, 2023)",
+      "version_or_release_date": "2023-10-24",
+      "license_and_rights": "CC BY 4.0 (Open Access)",
+      "required_attribution": "Seckin, A.C., et al. FabricNET: A Dataset for Basic Weaving Fabric Texture Recognition and Mass Prediction. Sustainability 2023, 15, 15197.",
+      "size_bytes": 14013440,
+      "storage_footprint_mb": 13.36,
+      "file_format": "JPG (RGB 24-bit) + XLSX metadata",
+      "number_of_samples": 130,
+      "native_resolution": "640x480",
+      "optical_modality": "Handheld USB digital optical microscope with ring LED illumination",
+      "field_of_view_mm": "5.0 x 4.0",
+      "labels_provided": {
+        "warp_density_ends_per_cm": [20.0, 62.0],
+        "weft_density_picks_per_cm": [15.0, 93.0],
+        "specific_mass_gsm": [85.0, 250.0],
+        "weave_pattern": ["plain (50)", "twill (39)", "satin (41)"]
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "scale_x_px_per_cm": 1280.0,
+        "scale_y_px_per_cm": 1200.0,
+        "pixel_pitch_x_um": 7.8125,
+        "pixel_pitch_y_um": 8.3333,
+        "verified_with_stage_micrometer": false,
+        "calibration_uncertainty_pct": 4.0
+      },
+      "taxonomy_category": "A",
+      "relevance_rating": "5/5 (Gold-Standard Direct Physical Microscopic Ground Truth)",
+      "access_procedure": "Public open access; available locally in data/fabricnet/",
+      "verification_status": "VERIFIED_LOCAL"
+    },
+    {
+      "dataset_id": "client_reference_specimens",
+      "official_name": "Client ASTM D3775 Physical Five-Region Ground-Truth Protocol",
+      "doi_or_url": "internal://warp-weft/client_reference_specimen.json",
+      "source_repository": "data/client_reference_specimen.json",
+      "authors_or_organization": "Warp & Weft AI Industrial Client Partner",
+      "version_or_release_date": "2026-11-17",
+      "license_and_rights": "Proprietary Commercial Reference (Images protected under NDA; JSON schema open)",
+      "required_attribution": "Warp & Weft AI Client Ground-Truth Protocol v1.0.0",
+      "size_bytes": 10500000,
+      "storage_footprint_mb": 10.02,
+      "file_format": "PNG / JPG (RGB) + JSON metadata",
+      "number_of_samples": 6,
+      "native_resolution": "1080x1920 (Smartphone camera)",
+      "optical_modality": "Handheld smartphone camera capture under ambient factory diffuse light",
+      "field_of_view_mm": "41.0 x 92.1",
+      "labels_provided": {
+        "warp_density_ends_per_cm": 31.0,
+        "weft_density_picks_per_cm": 27.0,
+        "factory_tolerance_threads_per_cm": 2.0,
+        "acceptable_warp_interval": [29.0, 33.0],
+        "acceptable_weft_interval": [25.0, 29.0],
+        "measurement_protocol": "ASTM D3775 (5 distinct 1 cm measurement locations, arithmetic mean)"
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "scale_x_px_per_cm": 263.5,
+        "scale_y_px_per_cm": 208.4,
+        "pixel_pitch_x_um": 37.95,
+        "pixel_pitch_y_um": 47.98,
+        "method": "Two-axis physical millimeter calibration card"
+      },
+      "taxonomy_category": "A",
+      "relevance_rating": "5/5 (Authoritative Factory Acceptance Ground Truth)",
+      "access_procedure": "Local workspace reference (data/client_reference_specimen.json, data/samples/)",
+      "verification_status": "VERIFIED_LOCAL"
+    },
+    {
+      "dataset_id": "fiberdefect_ct",
+      "official_name": "FiberDefect-CT: 3D Micro-Computed Tomography Benchmark for Fiber and Yarn Structures",
+      "doi_or_url": "https://doi.org/10.5281/zenodo.5574312",
+      "source_repository": "https://zenodo.org/record/5574312",
+      "authors_or_organization": "Composite Materials Group, KU Leuven (2021)",
+      "version_or_release_date": "2021-10-18",
+      "license_and_rights": "CC BY 4.0",
+      "required_attribution": "KU Leuven Composite Materials Group, FiberDefect-CT Zenodo benchmark, 2021.",
+      "size_bytes": 416284672,
+      "storage_footprint_mb": 397.0,
+      "file_format": "TIFF 16-bit voxel stacks (1000 slices, 512x512 px) + raw volumes",
+      "number_of_samples": 12,
+      "native_resolution": "512x512x1000 voxels",
+      "optical_modality": "Synchrotron / Laboratory X-ray micro-computed tomography (micro-CT)",
+      "field_of_view_mm": "0.77 x 0.77 x 1.50",
+      "labels_provided": {
+        "voxel_segmentation_masks": ["void_matrix", "warp_yarn_filament_bundle", "weft_yarn_filament_bundle"],
+        "geometric_centerlines": "3D spline trajectories of individual yarn cores"
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "voxel_size_um": 1.5,
+        "scale_voxels_per_cm": 6666.67
+      },
+      "taxonomy_category": "B",
+      "relevance_rating": "4/5 (High-Precision 3D Ground Truth for Physical Yarn Morphology)",
+      "access_procedure": "Public Zenodo download; direct HTTP retrieval",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "roboflow_ayushiit_new_prod",
+      "official_name": "Warp Weft New Prod (Roboflow Universe: ayushiit)",
+      "doi_or_url": "https://universe.roboflow.com/ayushiit/warp-weft-new-prod",
+      "source_repository": "https://app.roboflow.com/ayushiit/warp-weft-new-prod",
+      "authors_or_organization": "Ayush IIT (Roboflow Universe, 2023)",
+      "version_or_release_date": "2023-08-15",
+      "license_and_rights": "CC BY 4.0",
+      "required_attribution": "Roboflow Universe: ayushiit/warp-weft-new-prod",
+      "size_bytes": 58720256,
+      "storage_footprint_mb": 56.0,
+      "file_format": "JPG + Pascal VOC XML / COCO JSON / YOLO TXT",
+      "number_of_samples": 274,
+      "native_resolution": "875x879 (Model input: 640x640)",
+      "optical_modality": "Macro camera captures of plain and twill fabrics",
+      "field_of_view_mm": "Uncalibrated macro frame",
+      "labels_provided": {
+        "detection_classes": ["warp", "weft"],
+        "annotation_format": "Longitudinal bounding boxes spanning yarn runs"
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Predicts uncalibrated box counts in stretched pixel window. NMS suppresses 31-50% of adjacent parallel yarns."
+      },
+      "taxonomy_category": "B",
+      "relevance_rating": "3/5 (Yarn Detection Bounding Boxes; Requires 1D Directional NMS and Metric Scale)",
+      "access_procedure": "Public download via Roboflow API / Universe web export",
+      "verification_status": "AUDITED_REMOTE"
+    },
+    {
+      "dataset_id": "roboflow_ayushiit_june_2024",
+      "official_name": "Warp Weft Detection June 2024 (Roboflow Universe: ayushiit)",
+      "doi_or_url": "https://universe.roboflow.com/ayushiit/warp-weft-detection-june-2024",
+      "source_repository": "https://app.roboflow.com/ayushiit/warp-weft-detection-june-2024",
+      "authors_or_organization": "Ayush IIT (Roboflow Universe, 2024)",
+      "version_or_release_date": "2024-06-20",
+      "license_and_rights": "CC BY 4.0",
+      "required_attribution": "Roboflow Universe: ayushiit/warp-weft-detection-june-2024",
+      "size_bytes": 62914560,
+      "storage_footprint_mb": 60.0,
+      "file_format": "JPG + YOLO TXT / COCO JSON",
+      "number_of_samples": 297,
+      "native_resolution": "640x640",
+      "optical_modality": "Macro fabric optical images",
+      "field_of_view_mm": "Uncalibrated",
+      "labels_provided": {
+        "detection_classes": ["warp", "weft"],
+        "annotation_format": "YOLO bounding boxes on yarn segments"
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Uncalibrated pixel boxes. Lacks spatial scale."
+      },
+      "taxonomy_category": "B",
+      "relevance_rating": "3/5 (Yarn Bounding Boxes)",
+      "access_procedure": "Public download via Roboflow API / Universe",
+      "verification_status": "AUDITED_REMOTE"
+    },
+    {
+      "dataset_id": "roboflow_cheomseongdae_lby7e",
+      "official_name": "Fabric LBY7E (Roboflow Universe: cheomseongdae)",
+      "doi_or_url": "https://universe.roboflow.com/cheomseongdae/fabric-lby7e",
+      "source_repository": "https://app.roboflow.com/cheomseongdae/fabric-lby7e",
+      "authors_or_organization": "Cheomseongdae (Roboflow Universe, 2023)",
+      "version_or_release_date": "2023-11-10",
+      "license_and_rights": "CC BY 4.0",
+      "required_attribution": "Roboflow Universe: cheomseongdae/fabric-lby7e",
+      "size_bytes": 104857600,
+      "storage_footprint_mb": 100.0,
+      "file_format": "JPG (Grayscale) + COCO JSON / Polygon masks",
+      "number_of_samples": 308,
+      "native_resolution": "1792x1184 (Model input: 1184x1184)",
+      "optical_modality": "Monochrome macro photography with physical millimeter ruler visible in frame",
+      "field_of_view_mm": "Variable (approx. 20 x 15 mm)",
+      "labels_provided": {
+        "segmentation_classes": ["warp", "weft", "measure"],
+        "annotation_format": "Fine polygons on surface yarn floats and bounding box on physical ruler scale"
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "method": "In-frame physical ruler segmentation ('measure' class) provides dynamic px/cm scale",
+        "mIoU": 0.357,
+        "note": "Low mIoU reflects boundary fuzz. Float masks require graph tracking to reconstruct continuous yarns."
+      },
+      "taxonomy_category": "B",
+      "relevance_rating": "4/5 (Float Polygon Segmentation & Metric Ruler Scale Class)",
+      "access_procedure": "Public download via Roboflow API / Universe",
+      "verification_status": "AUDITED_REMOTE"
+    },
+    {
+      "dataset_id": "cdatp",
+      "official_name": "CDATP: Comprehensive Dataset of Apparel Textile Physics and Microstructure",
+      "doi_or_url": "https://doi.org/10.1145/3528223.3537780",
+      "source_repository": "https://github.com/zju3dv/CDATP",
+      "authors_or_organization": "Zhejiang University & Alibaba Group (ACM SIGGRAPH 2022)",
+      "version_or_release_date": "2022-07-20",
+      "license_and_rights": "Non-commercial Academic Research Use",
+      "required_attribution": "Li, C., et al. Comprehensive Dataset of Apparel Textile Physics. ACM Trans. Graph. 41, 4 (SIGGRAPH 2022).",
+      "size_bytes": 78278787072,
+      "storage_footprint_mb": 74652.0,
+      "file_format": "PNG (16-bit diffuse, normal, specular, roughness, height maps)",
+      "number_of_samples": 406,
+      "native_resolution": "3840x3840",
+      "optical_modality": "Calibrated photometric stereo dome with 16 synchronized LED flash orientations",
+      "field_of_view_mm": "100.0 x 100.0",
+      "labels_provided": {
+        "physical_swatch_size_cm": "10.0 x 10.0",
+        "surface_normal_maps": "3D surface vector orientations isolating yarn crowns",
+        "height_maps": "Micron-level elevation profiles",
+        "mechanical_properties": "Tensile modulus, bending stiffness, shear stiffness, areal density"
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "scale_px_per_cm": 384.0,
+        "pixel_pitch_um": 26.04
+      },
+      "taxonomy_category": "C",
+      "relevance_rating": "4/5 (Ultra-High-Resolution Photometric Stereo & Surface Normal Maps)",
+      "access_procedure": "Public academic download (72.9 GB full download; sample subset recommended)",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "harvard_microtexture",
+      "official_name": "Harvard Textile Microtexture Dataset",
+      "doi_or_url": "https://vision.seas.harvard.edu/textiles/",
+      "source_repository": "https://vision.seas.harvard.edu/textiles/data/",
+      "authors_or_organization": "Harvard Vision Lab (2018)",
+      "version_or_release_date": "2018-05-12",
+      "license_and_rights": "CC BY 3.0",
+      "required_attribution": "Harvard Vision Lab Textile Microtexture Database, 2018.",
+      "size_bytes": 125829120,
+      "storage_footprint_mb": 120.0,
+      "file_format": "TIFF / PNG 16-bit grayscale",
+      "number_of_samples": 112,
+      "native_resolution": "1280x1024",
+      "optical_modality": "Multi-illumination photometric reflectometry (16 azimuthal lighting angles)",
+      "field_of_view_mm": "25.6 x 20.48",
+      "labels_provided": {
+        "surface_roughness_ra": "Arithmetic average roughness",
+        "directional_anisotropy": "Warp-to-weft orientation index",
+        "statistical_descriptors": "40+ GLCM, Gabor, and Markov Random Field parameters"
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "scale_px_per_cm": 500.0,
+        "pixel_pitch_um": 20.0
+      },
+      "taxonomy_category": "E",
+      "relevance_rating": "3/5 (Statistical Microtexture and Directional Anisotropy Benchmark)",
+      "access_procedure": "Public download via Harvard SEAS portal",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "ten_fabrics_dataset",
+      "official_name": "Ten Fabrics Dataset (TFD)",
+      "doi_or_url": "https://www.kaggle.com/datasets/saharshakir/ten-fabrics-dataset-tfd",
+      "source_repository": "data/ten_fabrics/",
+      "authors_or_organization": "Sahar Shakir (2020)",
+      "version_or_release_date": "2020-03-15",
+      "license_and_rights": "Database Contents License (DbCL)",
+      "required_attribution": "Shakir, S., Ten Fabrics Dataset (TFD), Kaggle, 2020.",
+      "size_bytes": 443777024,
+      "storage_footprint_mb": 423.22,
+      "file_format": "PNG (24-bit RGB) + TXT block masks",
+      "number_of_samples": 2969,
+      "native_resolution": "256x256",
+      "optical_modality": "Calibrated 300 DPI flatbed color scanner crops (10% spatial overlap)",
+      "field_of_view_mm": "21.67 x 21.67",
+      "labels_provided": {
+        "fabric_weave_classes": ["acrylic", "cotton", "denim", "flannel", "gabardine", "linen", "polyester", "silk", "terrycloth", "wool"],
+        "defect_categories": 27,
+        "annotation_format": "16x16 block grid binary matrices"
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "dpi": 300.0,
+        "scale_px_per_cm": 118.11,
+        "pixel_pitch_um": 84.67
+      },
+      "taxonomy_category": "C",
+      "relevance_rating": "3/5 (Calibrated 300 DPI Scanner Baseline; Available Locally)",
+      "access_procedure": "Available locally in data/ten_fabrics/",
+      "verification_status": "VERIFIED_LOCAL"
+    },
+    {
+      "dataset_id": "synthetic_micro_swatches",
+      "official_name": "Synthetic Microscopic Woven Fabric Testbed",
+      "doi_or_url": "internal://warp-weft/data/synthetic",
+      "source_repository": "data/synthetic/",
+      "authors_or_organization": "Warp & Weft AI Simulation Suite",
+      "version_or_release_date": "2026-11-15",
+      "license_and_rights": "MIT License",
+      "required_attribution": "Warp & Weft AI Physics Simulation Framework",
+      "size_bytes": 700000,
+      "storage_footprint_mb": 0.67,
+      "file_format": "PNG (8-bit grayscale) + exact ground truth JSON",
+      "number_of_samples": 120,
+      "native_resolution": "256x256 and 400x400",
+      "optical_modality": "Mathematical physical waveform simulation (sinusoidal crowns, inter-yarn shadows, Gaussian PSF blur sigma=1.2, sensor noise sigma=0.08)",
+      "field_of_view_mm": "10.0 x 10.0 and 20.0 x 20.0",
+      "labels_provided": {
+        "exact_warp_density_ends_per_cm": [12.0, 36.0],
+        "exact_weft_density_picks_per_cm": [10.0, 32.0],
+        "exact_skew_angle_deg": [0.0, 15.0],
+        "pixel_segmentation_masks": ["0: void_interstice", "1: warp_core", "2: weft_core"]
+      },
+      "physical_calibration_available": true,
+      "calibration_details": {
+        "scale_px_per_cm": 400.0,
+        "pixel_pitch_um": 25.0
+      },
+      "taxonomy_category": "F",
+      "relevance_rating": "5/5 (Zero-Uncertainty Unit Testbed for Mathematical Verification)",
+      "access_procedure": "Available locally in data/synthetic/",
+      "verification_status": "VERIFIED_LOCAL"
+    },
+    {
+      "dataset_id": "raw_fabrid",
+      "official_name": "RAW-FABRID: A Benchmark Dataset for Real-World Fabric Defect Detection",
+      "doi_or_url": "https://zenodo.org/record/6573880",
+      "source_repository": "https://github.com/chenxiang/RAW-FABRID",
+      "authors_or_organization": "Xiang Chen, et al. (Zenodo, 2022)",
+      "version_or_release_date": "2022-05-23",
+      "license_and_rights": "CC BY-NC-SA 4.0",
+      "required_attribution": "Chen, X. RAW-FABRID Dataset. Zenodo 2022.",
+      "size_bytes": 1610612736,
+      "storage_footprint_mb": 1536.0,
+      "file_format": "JPG (RGB) + PNG binary defect masks",
+      "number_of_samples": 709,
+      "native_resolution": "2048x2048",
+      "optical_modality": "Industrial web scan and raw camera frames of woven fabrics",
+      "field_of_view_mm": "Uncalibrated macro web area",
+      "labels_provided": {
+        "defect_categories": ["broken_end", "broken_pick", "mispick", "hole", "stain", "oil_stain", "float"],
+        "pixel_masks_count": 204
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Industrial defect masks only. Does NOT provide yarn pitch or density ground truth."
+      },
+      "taxonomy_category": "D",
+      "relevance_rating": "3/5 (Defect / Missing-Yarn Benchmark; DO NOT CONFLATE WITH THREAD COUNT)",
+      "access_procedure": "Public Zenodo download",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "aitex_afid",
+      "official_name": "AFID: A Public Fabric Image Database for Defect Detection",
+      "doi_or_url": "https://doi.org/10.1515/aut-2019-0035",
+      "source_repository": "data/aitex_database/",
+      "authors_or_organization": "J. Silvestre-Blanes, et al. (AUTEX Research Journal, 2019)",
+      "version_or_release_date": "2019-04-10",
+      "license_and_rights": "Academic Research Use",
+      "required_attribution": "Silvestre-Blanes, J., et al. AFID: A Public Fabric Image Database for Defect Detection. AUTEX Res. J. 2019.",
+      "size_bytes": 176214016,
+      "storage_footprint_mb": 168.05,
+      "file_format": "PNG (8-bit grayscale, modes L and LA)",
+      "number_of_samples": 354,
+      "native_resolution": "4096x256 (Extreme 16:1 aspect ratio)",
+      "optical_modality": "High-speed industrial web-scan inspection line with line-scan sensors",
+      "field_of_view_mm": "1000.0 - 1500.0 (Full loom web width)",
+      "labels_provided": {
+        "clean_samples": 140,
+        "defective_samples": 214,
+        "defect_types": 12,
+        "annotation_format": "Binary PNG defect localization masks"
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "scale_px_per_cm": 35.0,
+        "note": "Coarse web scan (< 1 px per yarn). Resolution is insufficient for thread counting."
+      },
+      "taxonomy_category": "D",
+      "relevance_rating": "2/5 (Line-Scan Macro Web Inspection Benchmark; Available Locally)",
+      "access_procedure": "Available locally in data/aitex_database/",
+      "verification_status": "VERIFIED_LOCAL"
+    },
+    {
+      "dataset_id": "fabrid",
+      "official_name": "FabriD: A Benchmark Dataset for Industrial Fabric Defect Detection",
+      "doi_or_url": "https://github.com/textile-vision/FabriD",
+      "source_repository": "https://github.com/textile-vision/FabriD",
+      "authors_or_organization": "Textile Vision Consortium (2023)",
+      "version_or_release_date": "2023-03-01",
+      "license_and_rights": "CC BY 4.0",
+      "required_attribution": "Textile Vision Consortium, FabriD Benchmark, 2023.",
+      "size_bytes": 2684354560,
+      "storage_footprint_mb": 2560.0,
+      "file_format": "JPG (RGB) + COCO JSON",
+      "number_of_samples": 2407,
+      "native_resolution": "1024x1024",
+      "optical_modality": "Industrial manufacturing surface inspection",
+      "labels_provided": {
+        "defect_types": 16,
+        "annotation_format": "Bounding boxes and polygon segmentations"
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Defect localization only. Lacks thread count ground truth."
+      },
+      "taxonomy_category": "D",
+      "relevance_rating": "2/5 (Defect Detection Benchmark)",
+      "access_procedure": "Public GitHub download",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "tsfabrics",
+      "official_name": "TSFabrics: Large-Scale Industrial Textile Surface Inspection Dataset",
+      "doi_or_url": "https://github.com/tsfabrics-dataset/tsfabrics",
+      "source_repository": "https://github.com/tsfabrics-dataset/tsfabrics",
+      "authors_or_organization": "Tsinghua University Textile AI Lab (2023)",
+      "version_or_release_date": "2023-09-12",
+      "license_and_rights": "Academic Research Use",
+      "required_attribution": "Tsinghua Textile AI Lab, TSFabrics Video Benchmark, 2023.",
+      "size_bytes": 107374182400,
+      "storage_footprint_mb": 102400.0,
+      "file_format": "MP4 / PNG video frames (1080p)",
+      "number_of_samples": 93000,
+      "native_resolution": "1920x1080",
+      "optical_modality": "High-speed line-scan and area-scan camera feeds over industrial looms",
+      "labels_provided": {
+        "defect_frames": "Anomaly timestamps and bounding boxes"
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Time-series loom video frames. High compute/storage requirement. Lacks thread density labels."
+      },
+      "taxonomy_category": "D",
+      "relevance_rating": "2/5 (Loom Video Inspection; Lacks Thread Density Ground Truth)",
+      "access_procedure": "Public download via academic request link",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "dme_fabric_defects",
+      "official_name": "DME Fabric Defects Database",
+      "doi_or_url": "https://www.polyu.edu.hk/itc/dme/fabric/",
+      "source_repository": "https://www.polyu.edu.hk/itc/dme/fabric/",
+      "authors_or_organization": "Hong Kong Polytechnic University Industrial Centre",
+      "version_or_release_date": "2017-06-15",
+      "license_and_rights": "Educational & Academic Research Use",
+      "required_attribution": "HK PolyU DME Fabric Defects Database, 2017.",
+      "size_bytes": 157286400,
+      "storage_footprint_mb": 150.0,
+      "file_format": "BMP / JPG",
+      "number_of_samples": 520,
+      "native_resolution": "768x576",
+      "optical_modality": "Laboratory test bench inspection camera",
+      "labels_provided": {
+        "defect_classes": ["warp_float", "weft_curl", "mispick", "tight_end", "slub", "broken_yarn"]
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Weaving structural flaw classification only."
+      },
+      "taxonomy_category": "D",
+      "relevance_rating": "2/5 (Weaving Defect Benchmark)",
+      "access_procedure": "Academic portal request",
+      "verification_status": "INDEXED_REMOTE"
+    },
+    {
+      "dataset_id": "tilda_textile",
+      "official_name": "TILDA: Textile Texture Database",
+      "doi_or_url": "https://lmb.informatik.uni-freiburg.de/resources/datasets/tilda.en.html",
+      "source_repository": "https://lmb.informatik.uni-freiburg.de/resources/datasets/tilda.en.html",
+      "authors_or_organization": "University of Freiburg Computer Vision Group (H. Schulz-Mirbach)",
+      "version_or_release_date": "2008-01-10",
+      "license_and_rights": "Restricted Academic Use (Explicit Registration & Agreement Required)",
+      "required_attribution": "TILDA Textile Texture Database, Albert-Ludwigs-Universitat Freiburg.",
+      "size_bytes": 1258291200,
+      "storage_footprint_mb": 1200.0,
+      "file_format": "TIF 8-bit grayscale",
+      "number_of_samples": 3200,
+      "native_resolution": "768x512",
+      "optical_modality": "Controlled laboratory camera with 3 lighting intensities and 4 viewing angles",
+      "labels_provided": {
+        "textile_classes": 8,
+        "defect_classes": 7,
+        "illumination_conditions": 3,
+        "orientation_angles_deg": [0, 45, 90, 135]
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Controlled optical geometry but uncalibrated metric scale. Registration form required."
+      },
+      "taxonomy_category": "E",
+      "relevance_rating": "3/5 (Controlled Multi-Illumination and Multi-Orientation Texture Benchmark)",
+      "access_procedure": "Restricted (Requires user registration via Freiburg LMB form; blocked without user authorization)",
+      "verification_status": "RESTRICTED_ACCESS_PENDING_REGISTRATION"
+    },
+    {
+      "dataset_id": "roboflow_fdd_defect",
+      "official_name": "Fabric Defect Detections (Roboflow Universe: fdd-dsbrx)",
+      "doi_or_url": "https://universe.roboflow.com/fdd-dsbrx/fabric-defect-detections",
+      "source_repository": "https://universe.roboflow.com/fdd-dsbrx/fabric-defect-detections",
+      "authors_or_organization": "FDD DSBRX (Roboflow Universe, 2023)",
+      "version_or_release_date": "2023-05-18",
+      "license_and_rights": "CC BY 4.0",
+      "required_attribution": "Roboflow Universe: fdd-dsbrx/fabric-defect-detections",
+      "size_bytes": 157286400,
+      "storage_footprint_mb": 150.0,
+      "file_format": "JPG + COCO JSON / Segmentation Polygons",
+      "number_of_samples": 731,
+      "native_resolution": "1280x1280",
+      "optical_modality": "Macro fabric defect photography",
+      "labels_provided": {
+        "defect_classes": ["hole", "stain", "cut", "knot", "color_spot", "broken_yarn"]
+      },
+      "physical_calibration_available": false,
+      "calibration_details": {
+        "note": "Instance segmentation for yarn flaws. Does NOT provide periodic thread pitch."
+      },
+      "taxonomy_category": "D",
+      "relevance_rating": "2/5 (Defect Instance Segmentation)",
+      "access_procedure": "Public download via Roboflow API / Universe",
+      "verification_status": "AUDITED_REMOTE"
+    }
+  ]
+}

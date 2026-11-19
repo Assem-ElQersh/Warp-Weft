@@ -52,7 +52,7 @@
       "test_pixel_accuracy": 0.9782,
       "test_miou": 0.9181,
       "direct_density_prediction": false,
-      "integration_recommendation": "Recommended for Mode 3 (Hybrid Analysis): use model output for topological skeletonization followed by calibrated spatial pitch measurement."
+      "integration_recommendation": "Preserved strictly as reference checkpoint for synthetic-domain validation. Production flag disabled (available: false) due to fiber fuzz bridging on real-world smartphone imagery."
     }
   ]
 }

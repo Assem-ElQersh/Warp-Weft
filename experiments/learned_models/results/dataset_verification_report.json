@@ -1,0 +1,67 @@
+{
+  "verification_timestamp": "2026-11-19",
+  "datasets": [
+    {
+      "dataset_id": "fabricnet",
+      "status": "PASS",
+      "total_images": 130,
+      "valid_images": 130,
+      "corrupt_files": [],
+      "dimensions_found": [
+        [
+          640,
+          480
+        ]
+      ],
+      "metadata_file_present": true,
+      "expected_count": 130
+    },
+    {
+      "dataset_id": "client_reference_specimens",
+      "status": "PASS",
+      "region_count": 5,
+      "fabric_id": "client_specimen_002",
+      "schema_version": "1.0.0",
+      "warp_mean_target": 31.0,
+      "weft_mean_target": 26.6
+    },
+    {
+      "dataset_id": "synthetic_micro_swatches",
+      "status": "PASS",
+      "total_images": 3,
+      "valid_images": 3,
+      "corrupt_files": [],
+      "dimensions_found": [
+        [
+          400,
+          400
+        ],
+        [
+          800,
+          800
+        ]
+      ]
+    },
+    {
+      "dataset_id": "ten_fabrics_dataset",
+      "status": "PASS",
+      "total_images": 2969,
+      "total_masks": 2970,
+      "sample_verified": 100,
+      "sample_valid": 100
+    },
+    {
+      "dataset_id": "aitex_afid",
+      "status": "PASS",
+      "total_images": 354,
+      "sample_verified": 50,
+      "sample_valid": 50,
+      "sample_dimensions": [
+        [
+          4096,
+          256
+        ]
+      ]
+    }
+  ]
+}

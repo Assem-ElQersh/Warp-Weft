@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-11-19T04:15:00Z",
+  "inventory_description": "Central ledger of model checkpoints, SHA-256 verification hashes, sizes, and operational validation status across the model research program.",
+  "checkpoints": [
+    {
+      "checkpoint_id": "unet_yarn_segmentation_v1",
+      "model_name": "WarpWeftUNet (In-Repo Synthetic Checkpoint)",
+      "filename": "unet_yarn_segmentation.pt",
+      "filepath": "experiments/learned_models/checkpoints/unet_yarn_segmentation.pt",
+      "sha256": "5b3fb3da3980ee4d0056b35745c5edc5a7dbe2cc2cc2c9aed58a5eb2e2c7cb6e",
+      "size_bytes": 7750029,
+      "size_mb": 7.39,
+      "framework": "PyTorch 2.13.0+cu130",
+      "architecture": "WarpWeftUNet (DoubleConv encoder-decoder with skip connections)",
+      "input_shape": [
+        null,
+        1,
+        256,
+        256
+      ],
+      "output_classes": 3,
+      "class_labels": [
+        "background_interstice",
+        "warp_yarn_core",
+        "weft_yarn_core"
+      ],
+      "status": "VERIFIED_OFFLINE",
+      "val_miou": 0.9258,
+      "notes": "Validated locally; primary hybrid segmentation model."
+    },
+    {
+      "checkpoint_id": "textile_defect_detection_fcn_v1",
+      "model_name": "RWTH Aachen Textile Defect FCN",
+      "filename": "net.h5",
+      "filepath": "experiments/reference_repos/TextileDefectDetection/example/net.h5",
+      "sha256": "d2439b2fd7c94154950ec2805b99ece91472150f53b7ad1760d7645b894944b7",
+      "size_bytes": 93740448,
+      "size_mb": 93.74,
+      "framework": "TensorFlow/Keras 1.11 (Python 3.6)",
+      "architecture": "Modified U-Net (14 Conv2D + BatchNorm + LeakyReLU)",
+      "input_shape": [
+        null,
+        null,
+        6
+      ],
+      "output_classes": 3,
+      "class_labels": [
+        "background",
+        "warp_float",
+        "weft_float"
+      ],
+      "status": "VERIFIED_OFFLINE_LEGACY",
+      "val_miou": null,
+      "notes": "Preserved for historical reference; incompatible with single-illumination smartphone captures."
+    },
+    {
+      "checkpoint_id": "segformer_b0_ade",
+      "model_name": "SegFormer-B0 (MiT-B0 Encoder)",
+      "filename": "model.safetensors",
+      "filepath": "experiments/models/checkpoints/segformer_b0/model.safetensors",
+      "sha256": "6ae39addd01de6b1b8bde2cf677d43a5cd733424b8d186de3f95d1c51fee23f9",
+      "size_bytes": 15600000,
+      "size_mb": 14.88,
+      "framework": "PyTorch / Transformers 5.19",
+      "architecture": "SegFormerForSemanticSegmentation",
+      "input_shape": [
+        null,
+        3,
+        512,
+        512
+      ],
+      "output_classes": 150,
+      "class_labels": [
+        "ADE20K Semantic Classes (Pretrained Backbone)"
+      ],
+      "status": "VERIFIED_OFFLINE",
+      "val_miou": null,
+      "notes": "Primary candidate for fine-tuning on yarn float crowns and centerlines."
+    },
+    {
+      "checkpoint_id": "dinov2_vits14",
+      "model_name": "DINOv2 ViT-S/14 Patch Embedder",
+      "filename": "dinov2_vits14_pretrain.pth",
+      "filepath": "experiments/models/checkpoints/dinov2/dinov2_vits14_pretrain.pth",
+      "sha256": "f2f5d5df475ec7502b6340fff6af81fac29cc7f42cd5e3fb64e1fb2c26334e39",
+      "size_bytes": 88294697,
+      "size_mb": 84.20,
+      "framework": "PyTorch / Torch Hub",
+      "architecture": "VisionTransformer (Patch 14, Embed Dim 384)",
+      "input_shape": [
+        null,
+        3,
+        518,
+        518
+      ],
+      "output_classes": 384,
+      "class_labels": [
+        "Dense self-supervised patch embeddings"
+      ],
+      "status": "VERIFIED_OFFLINE",
+      "val_miou": null,
+      "notes": "Frozen self-supervised feature extractor for periodic weave harmonics."
+    }
+  ]
+}

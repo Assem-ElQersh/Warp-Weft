@@ -96,8 +96,12 @@ reports/*.html
 *.bin
 *.weights
 *.h5
+*.safetensors
 !experiments/learned_models/checkpoints/*.pt
 experiments/reference_repos/
+docs/Papers/
+docs/Papers/*.pdf
+
 
 # Large Archives & Package Installers
 *.zip

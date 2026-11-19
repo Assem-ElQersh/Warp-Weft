@@ -1,0 +1,85 @@
+{
+  "system_hardware_audit": {
+    "audit_timestamp": "2026-11-19T03:55:00Z",
+    "gpu_model": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+    "vram_total_gb": 3.684,
+    "vram_allocated_gb": 0.0,
+    "cpu_cores": 8,
+    "system_ram_total_gb": 15.41,
+    "system_ram_available_gb": 7.81,
+    "disk_free_gb": 23.20,
+    "filesystem_mount": "/home"
+  },
+  "storage_budget_allocation": {
+    "total_acquisition_cap_gb": 8.00,
+    "extraction_and_cache_gb": 4.00,
+    "model_checkpoints_cache_gb": 2.50,
+    "training_artifacts_and_logs_gb": 1.50,
+    "minimum_disk_reserve_gb": 7.20,
+    "policy": "Strict storage ceiling. If available disk drops below 7.0 GB, all new downloads are halted immediately."
+  },
+  "dataset_acquisition_targets": [
+    {
+      "dataset_id": "harvard_dataverse_microtexture",
+      "expected_download_mb": 21.72,
+      "extracted_size_mb": 45.0,
+      "license": "CC0 1.0 Universal",
+      "priority": "HIGH",
+      "justification": "100+ microscopic fabric captures at 100x optical magnification with explicit Haralick and LBP features."
+    },
+    {
+      "dataset_id": "zenodo_cdatp_curated_subset",
+      "expected_download_mb": 850.0,
+      "extracted_size_mb": 1200.0,
+      "license": "CC BY-SA 4.0",
+      "priority": "MEDIUM",
+      "justification": "Exact physical calibration of 605 DPI (238.19 px/cm) on Vizoo xTex system across woven structures."
+    },
+    {
+      "dataset_id": "mendeley_raw_fabrid_sample",
+      "expected_download_mb": 450.0,
+      "extracted_size_mb": 600.0,
+      "license": "CC BY 4.0",
+      "priority": "MEDIUM",
+      "justification": "High-resolution 1792x1024 industrial line-scan texture representations."
+    },
+    {
+      "dataset_id": "mendeley_fabrid_sample",
+      "expected_download_mb": 350.0,
+      "extracted_size_mb": 500.0,
+      "license": "CC BY 4.0",
+      "priority": "LOW",
+      "justification": "Real-world smartphone and camera apparel captures for missing yarn recognition."
+    }
+  ],
+  "model_checkpoint_targets": [
+    {
+      "model_id": "segformer_b0_ade",
+      "expected_size_mb": 14.9,
+      "framework": "PyTorch / Transformers",
+      "vram_footprint_mb": 650,
+      "justification": "Ultra-lightweight hierarchical vision transformer backbone (3.7M params) capable of 512x512 segmentation on 3.68 GB VRAM."
+    },
+    {
+      "model_id": "dinov2_vits14",
+      "expected_size_mb": 88.0,
+      "framework": "PyTorch / Torch Hub",
+      "vram_footprint_mb": 1200,
+      "justification": "Self-supervised visual representations capturing periodic weave harmonics without label supervision."
+    },
+    {
+      "model_id": "mobile_sam",
+      "expected_size_mb": 39.0,
+      "framework": "PyTorch",
+      "vram_footprint_mb": 1400,
+      "justification": "Lightweight promptable segmentation foundation model optimized for mobile and edge compute."
+    },
+    {
+      "model_id": "warpweft_unet_synthetic",
+      "expected_size_mb": 7.39,
+      "framework": "PyTorch",
+      "vram_footprint_mb": 450,
+      "justification": "Existing specialized 4-stage dual-channel yarn segmentation network trained in-repo."
+    }
+  ]
+}

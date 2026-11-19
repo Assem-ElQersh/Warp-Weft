@@ -39,7 +39,7 @@ find_prominent_peaks = find_prominent_peaks_adaptive
 
 def run_complete_fabric_analysis(
     img_pil: Image.Image,
-    pixels_per_cm: float = 400.0,
+    pixels_per_cm: Optional[float] = None,
     pixels_per_cm_y: Optional[float] = None,
     auto_skew: bool = True,
     prominence: float = 0.012,
@@ -50,9 +50,9 @@ def run_complete_fabric_analysis(
     """
     The mechanistic justification for this step is: execute the authoritative
     fabric analysis pipeline via src.fabric_analysis, supporting both isotropic
-    and anisotropic calibration parameters.
+    and anisotropic calibration parameters, and preserving uncalibrated state when omitted.
     """
-    if calibration is None:
+    if calibration is None and pixels_per_cm is not None:
         sx = float(pixels_per_cm)
         sy = float(pixels_per_cm_y) if pixels_per_cm_y is not None else sx
         calibration = PhysicalCalibration.from_scales(sx=sx, sy=sy, source="web_app_request")
@@ -60,6 +60,8 @@ def run_complete_fabric_analysis(
     return analyze_fabric(
         img_pil=img_pil,
         calibration=calibration,
+        pixels_per_cm=pixels_per_cm,
+        pixels_per_cm_y=pixels_per_cm_y,
         auto_skew=auto_skew,
         prominence=prominence,
         weave_hint=weave_hint,

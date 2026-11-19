@@ -155,10 +155,23 @@ def analyze_fabric(
     t_start = time.perf_counter()
 
     # 1. Resolve Calibration
+    # The mechanistic justification for this step is: distinguish authenticated physical calibration
+    # from uncalibrated raw images, preventing silent assignment of 400 px/cm as valid physical scale.
+    is_uncalibrated = False
     if calibration is None:
-        sx = float(pixels_per_cm) if pixels_per_cm is not None else 400.0
-        sy = float(pixels_per_cm_y) if pixels_per_cm_y is not None else sx
-        calibration = PhysicalCalibration.from_scales(sx=sx, sy=sy, source="api_default")
+        if pixels_per_cm is not None:
+            sx = float(pixels_per_cm)
+            sy = float(pixels_per_cm_y) if pixels_per_cm_y is not None else sx
+            calibration = PhysicalCalibration.from_scales(sx=sx, sy=sy, source="api_parameter")
+        else:
+            is_uncalibrated = True
+            calibration = PhysicalCalibration.from_scales(
+                sx=400.0,
+                sy=400.0,
+                source="uncalibrated",
+                is_verified=False,
+                uncertainty_pct=50.0
+            )
 
     # 2. Metric ROI Localization
     roi_pil, roi_meta = extract_metric_roi(
@@ -225,6 +238,27 @@ def analyze_fabric(
         crop_h_cm=crop_h_cm
     )
 
+    # The mechanistic justification for this step is: if the input image is uncalibrated,
+    # physical spatial densities (ends/cm, picks/cm) cannot be physically known and must be
+    # suppressed to prevent false metrological assertions.
+    if is_uncalibrated:
+        fusion_res["accepted_warp_density_ends_per_cm"] = None
+        fusion_res["accepted_weft_density_picks_per_cm"] = None
+        fusion_res["warp_density_ends_per_cm"] = None
+        fusion_res["weft_density_picks_per_cm"] = None
+        fusion_res["warp_density_continuous"] = None
+        fusion_res["weft_density_continuous"] = None
+        fusion_res["linear_density_sum_per_cm"] = None
+        fusion_res["areal_intersection_density_per_cm2"] = None
+        fusion_res["pitch_warp_um"] = None
+        fusion_res["pitch_weft_um"] = None
+        fusion_res["is_validated"] = False
+        fusion_res["decision_status"] = "UNCALIBRATED"
+        fusion_res["decision_rationale"] = (
+            "Image is uncalibrated; physical density requires known pixel scale (pixels/cm)."
+        )
+        fusion_res["candidate_measurements"] = {}
+
     latency_ms = (time.perf_counter() - t_start) * 1000.0
 
     # 7. Render Visual Diagnostics
@@ -277,10 +311,10 @@ def analyze_fabric(
                 "warp_ends_per_cm": calibration.density_interval(fusion_res["accepted_warp_density_ends_per_cm"]),
                 "weft_picks_per_cm": calibration.density_interval(fusion_res["accepted_weft_density_picks_per_cm"]),
                 "candidate_measurements": {
-                    "warp_fft": calibration.density_interval(warp_fft),
-                    "warp_projection": calibration.density_interval(warp_proj),
-                    "weft_fft": calibration.density_interval(weft_fft),
-                    "weft_projection": calibration.density_interval(weft_proj),
+                    "warp_fft": None if is_uncalibrated else calibration.density_interval(warp_fft),
+                    "warp_projection": None if is_uncalibrated else calibration.density_interval(warp_proj),
+                    "weft_fft": None if is_uncalibrated else calibration.density_interval(weft_fft),
+                    "weft_projection": None if is_uncalibrated else calibration.density_interval(weft_proj),
                 },
             }
         },

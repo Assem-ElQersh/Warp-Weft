@@ -168,5 +168,17 @@ class TestWebServerIntegration(unittest.TestCase):
         self.assertIn("weft_mean_picks_per_cm", spec)
 
 
+    def test_specimen_analysis_endpoint_rejects_missing_calibration(self):
+        # The mechanistic justification for this step is: verify that /api/analyze/specimen
+        # explicitly rejects requests lacking calibration profile or scales with HTTP 400.
+        status, result, _ = self.request("POST", "/api/analyze/specimen", {
+            "fabric_id": "uncalibrated_specimen",
+            "preset_id": "synthetic_skewed_12",
+        })
+        self.assertEqual(status, 400)
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["code"], "missing_calibration")
+
+
 if __name__ == "__main__":
     unittest.main()

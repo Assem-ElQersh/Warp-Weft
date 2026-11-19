@@ -852,10 +852,10 @@
                     </div>
                     <div class="help-box" id="help-weave"></div>
                     <select class="form-control" id="select-weave-hint">
-                        <option value="auto" selected>Auto-Detect / Balanced</option>
-                        <option value="plain">Plain Weave (Consensus Dominant)</option>
-                        <option value="twill">Twill Weave (2D FFT Dominant)</option>
-                        <option value="satin">Satin Weave (2D FFT Dominant)</option>
+                        <option value="auto" selected>Auto-Detect / Balanced (Metadata)</option>
+                        <option value="plain">Plain Weave (Metadata hint)</option>
+                        <option value="twill">Twill Weave (Metadata hint)</option>
+                        <option value="satin">Satin Weave (Metadata hint)</option>
                     </select>
                 </div>
 
@@ -982,7 +982,7 @@
                     <button class="tab-btn" onclick="switchTab('tab-proj', this)" id="tab-btn-proj">1D Projection Profiles</button>
                     <button class="tab-btn" onclick="switchTab('tab-fft', this)" id="tab-btn-fft">2D FFT Spectrum</button>
                     <button class="tab-btn" onclick="switchTab('tab-audit', this)" id="tab-btn-audit">Mathematical Audit</button>
-                    <button class="tab-btn" onclick="switchTab('tab-specimen', this)" id="tab-btn-specimen">5-Region Factory Protocol</button>
+                    <button class="tab-btn" onclick="switchTab('tab-specimen', this)" id="tab-btn-specimen">5-Region Spatial Uniformity</button>
                 </div>
 
                 <!-- Tab 1: Overview & ROI -->
@@ -1084,8 +1084,8 @@
                     <div style="padding: 16px; background: #ffffff; border-radius: 8px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
                             <div>
-                                <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f2b48;" id="title-specimen-protocol">Client 5-Region Specimen Protocol (ASTM D3775)</h4>
-                                <p style="font-size: 0.82rem; color: var(--text-muted);" id="desc-specimen-protocol">Evaluates 5 independent spatial regions across the fabric specimen against factory tolerance bounds (&plusmn;2 threads/cm).</p>
+                                <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f2b48;" id="title-specimen-protocol">5-Region Spatial Uniformity Protocol</h4>
+                                <p style="font-size: 0.82rem; color: var(--text-muted);" id="desc-specimen-protocol">Evaluates 5 spatial regions (quadrants & center) across the fabric specimen against factory tolerance bounds (&plusmn;2 threads/cm). Note: ASTM D3775-17(2023) standard roll certification requires 5 physically distinct swatches distributed across full roll width/length; digital crops evaluate single-specimen spatial uniformity.</p>
                             </div>
                             <button type="button" class="btn-analyze" id="btn-run-specimen" onclick="executeSpecimenEvaluation()" style="width: auto; padding: 8px 18px; margin-top: 0;">
                                 <span id="btn-specimen-text">Run 5-Region Evaluation</span>
@@ -1273,8 +1273,8 @@
                 lblRulerUnit: "Distance Unit",
                 lblRulerAxis: "Orientation / Axis",
                 btnTwoPointTool: "Ruler Tool",
-                titleSpecimenProtocol: "Client 5-Region Specimen Protocol (ASTM D3775)",
-                descSpecimenProtocol: "Evaluates 5 independent spatial regions across the fabric specimen against factory tolerance bounds (±2 threads/cm).",
+                titleSpecimenProtocol: "5-Region Spatial Uniformity Protocol",
+                descSpecimenProtocol: "Evaluates 5 spatial regions across the specimen against factory tolerance bounds (±2 threads/cm). Note: ASTM D3775 roll certification requires swatches across the full roll; single-image crops test local spatial uniformity.",
                 lblSpecimenId: "Specimen ID",
                 lblTargetWarp: "Target Warp (ends/cm)",
                 lblTargetWeft: "Target Weft (picks/cm)",
@@ -1345,8 +1345,8 @@
                 lblRulerUnit: "وحدة القياس",
                 lblRulerAxis: "المحور / الاتجاه",
                 btnTwoPointTool: "أداة المسطرة",
-                titleSpecimenProtocol: "بروتوكول العينة المعتمد بـ 5 مناطق (ASTM D3775)",
-                descSpecimenProtocol: "يقيس 5 مناطق جغرافية مستقلة عبر عينة النسيج للتحقق من حدود التفاوت المسموح بها للمصنع (±2 خيط/سم).",
+                titleSpecimenProtocol: "بروتوكول التجانس المكاني بـ 5 مناطق",
+                descSpecimenProtocol: "يقيس 5 مناطق مكانية عبر العينة للتحقق من حدود التفاوت المسموح بها للمصنع (±2 خيط/سم). تنبيه: فحص اللفافة حسب ASTM D3775 يتطلب عينات موزعة عبر كامل اللفافة؛ بينما قياس الصور يقيّم التجانس المكاني للعينة الواحدة.",
                 lblSpecimenId: "معرف العينة",
                 lblTargetWarp: "السداء المستهدف (خيط/سم)",
                 lblTargetWeft: "اللحمة المستهدفة (خيط/سم)",

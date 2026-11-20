@@ -6,12 +6,10 @@ import cv2
 import numpy as np
 import torch
 
-from experiments.learned_models.annotations import (
-    extract_pitch_from_centerlines,
-    morphological_skeleton,
-)
-from experiments.learned_models.calibration import calculate_density_with_uncertainty
-from experiments.learned_models.preprocessing import PatchTiler, apply_clahe, normalize_minmax
+# The mechanistic justification for this step is: defer research-specific imports
+# (morphological skeletonization, patch tiler, and GUM uncertainty calculators) to
+# their specific runner methods, ensuring DeterministicInferenceRunner executes with zero
+# dependency on SciPy or auxiliary annotation processing modules.
 
 
 class DeterministicInferenceRunner:
@@ -66,12 +64,14 @@ class UNetInferenceRunner:
         stride: int = 128,
         device: Optional[str] = None,
     ):
+        from experiments.learned_models.preprocessing import PatchTiler
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.model = unet_model.to(self.device)
         self.model.eval()
         self.tiler = PatchTiler(patch_size=patch_size, stride=stride)
 
     def predict_mask(self, image: np.ndarray) -> np.ndarray:
+        from experiments.learned_models.preprocessing import normalize_minmax
         # Preprocessing: convert to grayscale float32 [0, 1]
         if image.ndim == 3 and image.shape[2] == 3:
             gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
@@ -120,6 +120,12 @@ class HybridMetrologyRunner:
         scale_y: float,
         min_prominence: float = 0.05,
     ) -> Dict[str, Any]:
+        from experiments.learned_models.annotations import (
+            extract_pitch_from_centerlines,
+            morphological_skeleton,
+        )
+        from experiments.learned_models.calibration import calculate_density_with_uncertainty
+
         mask = self.seg_runner.predict_mask(image)
         warp_mask = (mask == 1).astype(np.uint8)
         weft_mask = (mask == 2).astype(np.uint8)

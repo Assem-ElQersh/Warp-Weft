@@ -2,11 +2,12 @@
 # Warp & Weft AI — Test and Research Dependencies
 # ==============================================================================
 # The mechanistic justification for this file is: declare testing and research
-# dependencies (headless OpenCV for morphology/features, bounded PyTorch for
-# deep learning model registry validation, and pytest) while inheriting the core
-# production runtime requirements.
+# dependencies (headless OpenCV for morphology/features, SciPy for spatial
+# filters and peak detection, bounded PyTorch for deep learning model registry
+# validation, and pytest) while inheriting the core production runtime requirements.
 
 -r requirements.txt
 opencv-python-headless>=4.8.0,<5.0.0
+scipy>=1.10.0,<2.0.0
 torch>=2.0.0,<2.7.0
 pytest>=8.0.0

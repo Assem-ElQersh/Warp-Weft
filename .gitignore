@@ -35,6 +35,10 @@ wheels/
 .env.*
 *.env
 secrets/
+*telegram*
+scripts/*telegram*
+telegram_auth.json
+*.token
 
 # Model Context Protocol (MCP) & Local IDE Agent Configurations
 .mcp.json
